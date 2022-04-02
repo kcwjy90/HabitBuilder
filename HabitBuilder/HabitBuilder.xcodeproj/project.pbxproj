@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48B22CEA27F6706A00967056 /* HabitBuilderDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* HabitBuilderDB.swift */; };
+		48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CEC27F7153B00967056 /* MainVCnotusing.swift */; };
 		C01CC1FE27A3C96A00698E03 /* AddHabitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FD27A3C96A00698E03 /* AddHabitVC.swift */; };
 		C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */; };
 		C0B2E8C027A119D900BC03EB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B2E8BF27A119D900BC03EB /* AppDelegate.swift */; };
@@ -22,6 +24,8 @@
 
 /* Begin PBXFileReference section */
 		389F6030B377C8AD6055D89E /* Pods_HabitBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HabitBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		48B22CE927F6706A00967056 /* HabitBuilderDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitBuilderDB.swift; sourceTree = "<group>"; };
+		48B22CEC27F7153B00967056 /* MainVCnotusing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCnotusing.swift; sourceTree = "<group>"; };
 		4D74EE2AC5A365C3D37B7746 /* Pods-HabitBuilder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.release.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.release.xcconfig"; sourceTree = "<group>"; };
 		680D9F63CFD8EBC82EE79390 /* Pods-HabitBuilder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.debug.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.debug.xcconfig"; sourceTree = "<group>"; };
 		C01CC1FD27A3C96A00698E03 /* AddHabitVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHabitVC.swift; sourceTree = "<group>"; };
@@ -50,6 +54,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		48B22CEB27F7151C00967056 /* 안쓰는Main */ = {
+			isa = PBXGroup;
+			children = (
+				48B22CEC27F7153B00967056 /* MainVCnotusing.swift */,
+			);
+			name = "안쓰는Main";
+			path = "안쓰는Main";
+			sourceTree = "<group>";
+		};
 		82C23625D13EA4BCC056A5B6 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -111,7 +124,9 @@
 		C0B2E8D527A11B4B00BC03EB /* VCs */ = {
 			isa = PBXGroup;
 			children = (
+				48B22CEB27F7151C00967056 /* 안쓰는Main */,
 				C0B2E8D827A11BF600BC03EB /* Main */,
+				48B22CE927F6706A00967056 /* HabitBuilderDB.swift */,
 			);
 			path = VCs;
 			sourceTree = "<group>";
@@ -265,6 +280,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */,
 				C0B2E8DE27A11C8200BC03EB /* DBManager.swift in Sources */,
 				C0B2E8E627A11DC500BC03EB /* MainVC.swift in Sources */,
 				C0B2E8E227A11D1C00BC03EB /* ServiceKey.swift in Sources */,
@@ -272,6 +288,7 @@
 				C0B2E8E027A11C9A00BC03EB /* PrefsManager.swift in Sources */,
 				C01CC1FE27A3C96A00698E03 /* AddHabitVC.swift in Sources */,
 				C0B2E8E427A11DA600BC03EB /* ColorExtension.swift in Sources */,
+				48B22CEA27F6706A00967056 /* HabitBuilderDB.swift in Sources */,
 				C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

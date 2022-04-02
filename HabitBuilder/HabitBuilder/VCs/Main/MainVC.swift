@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
 class MainVC: UIViewController { 
     
@@ -51,6 +52,7 @@ class MainVC: UIViewController {
     
     override func loadView() {
         super.loadView()
+                
         navigationController?.navigationBar.prefersLargeTitles = true
         
         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
@@ -108,7 +110,25 @@ class MainVC: UIViewController {
 extension MainVC: addHabitVCDelegate {
     func addedGoal (title: String, detail: String) {
         print("HabitVC - title : \(title), detail: \(detail)")
-        myArray.append(["title":title, "detail": detail])
+        
+        
+        // Open the local-only default realm
+        let localRealm = try! Realm()
+
+        // Add some tasks
+        let task = HabitBuilderDB()
+        task.title = title
+        task.desc = detail
+
+        try! localRealm.write {
+            localRealm.add(task)
+        }
+
+        // Get all tasks in the realm
+        let tasks = localRealm.objects(HabitBuilderDB.self)
+
+        print(tasks)
+        
         goalTableView.reloadData()
     }
     
@@ -138,13 +158,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 return UITableViewCell()
         }
         
-        let d = myArray[indexPath.row]
-        let title = d["title"] ?? ""
-        let detail = d["detail"] ?? ""
+        let localRealm = try! Realm()
+        
+        
+        let tasks = localRealm.objects(HabitBuilderDB.self)
+                
+        print(tasks)
+        let d = tasks[indexPath.row]
+        print("-------")
+        print(d)
+        let title = tasks[16].title
+        let detail = d.desc
         
         cell.newTitle.text = title + " - "
         cell.newDetail.text = detail
-        
+
         return cell
     }
     
@@ -155,3 +183,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 //Q. 형이 만드 색깔 가지고 오는거
 //Q. line 104 v.delegate = self가 하는 일을 다시 한번만 설명을...
 //Q. TabBar를 AppDelegate에 넣는거는 끝끝내 못했는디..다 가르쳐 주지 마시고, 조금만 힌트를..
+
+//3/30
+//1. 근데 realm db를 extension에 생성 하는게 맞는가? scope문제로 인해서 일단 여기다 생성하기는 했는데..
+//2.indexpath를 바꿔야 하는건가?? 근데 그러려면 어떻게 바꿔야 하는거지? indexpath 는 tablecell이랑 연관이 있고,
