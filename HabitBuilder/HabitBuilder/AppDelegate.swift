@@ -19,20 +19,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          self.window = UIWindow(frame: UIScreen.main.bounds)
 
          // Declaring TabBar
-         let tabBar = UITabBarController()
+         let tabBarController = UITabBarController()
         
+         tabBarController.tabBar.isTranslucent = false // both lines needed
+         tabBarController.tabBar.backgroundColor = .white // to change tabbar color
     
+         UITabBar.appearance().tintColor = .red
+         
          let mainVC = MainVC()
          let defaultNavi = UINavigationController(rootViewController: mainVC)
-         defaultNavi.title = "HB"
+         mainVC.title = "Habits"
+         mainVC.tabBarItem.image = UIImage(named: "goals")
          
-         // TabBar를 눌렀을때 가게되는 2번째 VC. 임시
-         let secondvc = secondV()
-         secondvc.title = "second"
          
-         self.window!.rootViewController = tabBar
+         let settingVC = SettingsVC()
+         let settingNavi = UINavigationController(rootViewController: settingVC)
+         settingVC.title = "Setting"
+         settingVC.tabBarItem.image = UIImage(named: "settings")
          
-         tabBar.setViewControllers([defaultNavi, secondvc], animated: false)
+//         settingVC.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 0)
+                
+         self.window!.rootViewController = tabBarController
+         
+         tabBarController.setViewControllers([defaultNavi, settingNavi], animated: false)
                   
          self.window!.makeKeyAndVisible()
          return true
@@ -42,12 +51,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
 
 }
 
-// Declaring 2번째 viewcontroller. 임시
-class secondV: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .green
-    }
-}
-
-//일단 tabbar가 들어가기는 했는데..뭔가..색이 왜이렇지? 뭔가가 잘못 적용되어있어

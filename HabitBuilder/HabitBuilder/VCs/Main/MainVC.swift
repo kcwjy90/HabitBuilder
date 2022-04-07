@@ -19,6 +19,7 @@ class MainVC: UIViewController {
         return v
     }()
     
+
     // 음...Habit Builder라는곳 색은 흰색으로 놔두고 날짜 있는 부분은 색을 바꾸기  위해. 근데 다른 방법이 있지 않을까?
     lazy var secondBackView: UIView = {
         let v = UIView()
@@ -36,28 +37,21 @@ class MainVC: UIViewController {
         return v
     }()
     
-    // 날짜 Label 생성
+    // Date Label 생성
     lazy var date: UILabel = {
         let v = UILabel()
         v.text = "1/21/2022"
         v.font = UIFont.systemFont(ofSize: 20.0)
         return v
     }()
-    
-    
-    public var myArray: [[String:String]] =
-        [
-            ["title": "Habit Builder", "detail": "숙제 정해진거 끝내기"]
-    ]
-    
+
+    // Open the local-only default realm 멤버변수로
+    let localRealm = try! Realm()
+
     override func loadView() {
         super.loadView()
-                
-        navigationController?.navigationBar.prefersLargeTitles = true
-        
-        // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
-        title = "Habit Builder"
-        navBar()
+                        
+        setNaviBar()
         
         view.addSubview(backView)
         view.addSubview(secondBackView)
@@ -89,17 +83,19 @@ class MainVC: UIViewController {
     }
     
     //Nav Bar 만드는 func. loadview() 밖에!
-    func navBar() {
-        
+    func setNaviBar() {
+        title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
+        navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Add",
             style: .done,
             target: self,
-            action: #selector(addItem))
+            action: #selector(addItem)
+        )
     }
     
     @objc func addItem(){
-        let v = AddHabitVC()
+        let v = NewHabitVC()
         v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
         v.modalPresentationStyle = .fullScreen
         present(v, animated:true)   // modal view 가능케 하는 코드
@@ -107,14 +103,10 @@ class MainVC: UIViewController {
 }
 
 // extension 은 class 밖에
-extension MainVC: addHabitVCDelegate {
-    func addedGoal (title: String, detail: String) {
+extension MainVC: NewHabitVCDelegate {
+    func newGoal (title: String, detail: String) {
         print("HabitVC - title : \(title), detail: \(detail)")
         
-        
-        // Open the local-only default realm
-        let localRealm = try! Realm()
-
         // Add some tasks
         let task = HabitBuilderDB()
         task.title = title
@@ -140,11 +132,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row: \(indexPath.row)")
-        print("Value: \(myArray[indexPath.row])")
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return myArray.count
+        let tasks = localRealm.objects(HabitBuilderDB.self)
+        return tasks.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -158,20 +150,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 return UITableViewCell()
         }
         
-        let localRealm = try! Realm()
-        
-        
         let tasks = localRealm.objects(HabitBuilderDB.self)
-                
-        print(tasks)
-        let d = tasks[indexPath.row]
-        print("-------")
-        print(d)
-        let title = tasks[16].title
-        let detail = d.desc
+        let habit = tasks[indexPath.row]
+        let title = habit.title
+        let desc = habit.desc
         
         cell.newTitle.text = title + " - "
-        cell.newDetail.text = detail
+        cell.newDetail.text = desc
 
         return cell
     }

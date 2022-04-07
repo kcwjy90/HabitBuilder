@@ -29,7 +29,6 @@ class HabitTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier )
         
-        
         //아 이것들이 왜 필요한가 했는데, 얘네들이 없으면 tableview에서 안보이는구나..
         addSubview(backView)
         backView.snp.makeConstraints{ (make) in
