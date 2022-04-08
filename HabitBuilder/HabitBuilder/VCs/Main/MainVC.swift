@@ -19,7 +19,7 @@ class MainVC: UIViewController {
         return v
     }()
     
-
+    
     // 음...Habit Builder라는곳 색은 흰색으로 놔두고 날짜 있는 부분은 색을 바꾸기  위해. 근데 다른 방법이 있지 않을까?
     lazy var secondBackView: UIView = {
         let v = UIView()
@@ -44,13 +44,15 @@ class MainVC: UIViewController {
         v.font = UIFont.systemFont(ofSize: 20.0)
         return v
     }()
-
-    // Open the local-only default realm 멤버변수로
-    let localRealm = try! Realm()
-
+    
+    
     override func loadView() {
         super.loadView()
-                        
+        
+        // migration
+        let configuration = Realm.Configuration(schemaVersion:3)
+        let localRealm = try! Realm(configuration: configuration)
+        
         setNaviBar()
         
         view.addSubview(backView)
@@ -100,6 +102,7 @@ class MainVC: UIViewController {
         v.modalPresentationStyle = .fullScreen
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
+    
 }
 
 // extension 은 class 밖에
@@ -108,17 +111,20 @@ extension MainVC: NewHabitVCDelegate {
         print("HabitVC - title : \(title), detail: \(detail)")
         
         // Add some tasks
-        let task = HabitBuilderDB()
+        let task = RMO_HB()
         task.title = title
         task.desc = detail
-
+        
+        let configuration = Realm.Configuration(schemaVersion:3)
+        let localRealm = try! Realm(configuration: configuration)
+        
         try! localRealm.write {
             localRealm.add(task)
         }
-
+        
         // Get all tasks in the realm
-        let tasks = localRealm.objects(HabitBuilderDB.self)
-
+        let tasks = localRealm.objects(RMO_HB.self)
+        
         print(tasks)
         
         goalTableView.reloadData()
@@ -126,8 +132,8 @@ extension MainVC: NewHabitVCDelegate {
     
 }
 
-//Adding tableview and content
 
+//Adding tableview and content
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -135,7 +141,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let tasks = localRealm.objects(HabitBuilderDB.self)
+        let configuration = Realm.Configuration(schemaVersion:3)
+        let localRealm = try! Realm(configuration: configuration)
+        
+        let tasks = localRealm.objects(RMO_HB.self)
         return tasks.count
     }
     
@@ -146,18 +155,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
-            else {
-                return UITableViewCell()
+        else {
+            return UITableViewCell()
         }
         
-        let tasks = localRealm.objects(HabitBuilderDB.self)
+        let configuration = Realm.Configuration(schemaVersion:3)
+        let localRealm = try! Realm(configuration: configuration)
+        
+        let tasks = localRealm.objects(RMO_HB.self)
         let habit = tasks[indexPath.row]
         let title = habit.title
         let desc = habit.desc
         
         cell.newTitle.text = title + " - "
         cell.newDetail.text = desc
-
+        
         return cell
     }
     
