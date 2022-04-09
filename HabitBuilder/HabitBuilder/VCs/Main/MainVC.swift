@@ -39,8 +39,12 @@ class MainVC: UIViewController {
     
     // Date Label 생성
     lazy var date: UILabel = {
+        let autoDate = Date() //
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy" //왜 DD 로 하면 09 대신에 99가 찍히며 mm 하면 04 대신에 15가 찍히는가?
+        let currentDate = dateFormatter.string(from: autoDate)
         let v = UILabel()
-        v.text = "1/21/2022"
+        v.text = currentDate
         v.font = UIFont.systemFont(ofSize: 20.0)
         return v
     }()
@@ -102,7 +106,6 @@ class MainVC: UIViewController {
         v.modalPresentationStyle = .fullScreen
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
-    
 }
 
 // extension 은 class 밖에
@@ -132,8 +135,8 @@ extension MainVC: NewHabitVCDelegate {
     
 }
 
-
 //Adding tableview and content
+
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
