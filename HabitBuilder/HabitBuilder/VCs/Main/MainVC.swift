@@ -54,7 +54,7 @@ class MainVC: UIViewController {
         super.loadView()
         
         // migration
-        let configuration = Realm.Configuration(schemaVersion:3)
+        let configuration = Realm.Configuration(schemaVersion:4)
         let localRealm = try! Realm(configuration: configuration)
         
         setNaviBar()
@@ -118,7 +118,7 @@ extension MainVC: NewHabitVCDelegate {
         task.title = title
         task.desc = detail
         
-        let configuration = Realm.Configuration(schemaVersion:3)
+        let configuration = Realm.Configuration(schemaVersion:4)
         let localRealm = try! Realm(configuration: configuration)
         
         try! localRealm.write {
@@ -144,7 +144,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let configuration = Realm.Configuration(schemaVersion:3)
+        let configuration = Realm.Configuration(schemaVersion:4)
         let localRealm = try! Realm(configuration: configuration)
         
         let tasks = localRealm.objects(RMO_HB.self)
@@ -162,7 +162,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let configuration = Realm.Configuration(schemaVersion:3)
+        let configuration = Realm.Configuration(schemaVersion:4)
         let localRealm = try! Realm(configuration: configuration)
         
         let tasks = localRealm.objects(RMO_HB.self)

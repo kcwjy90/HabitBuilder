@@ -14,7 +14,6 @@ import RealmSwift
 class RMO_HB: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
-    @Persisted var id: String?
 
     convenience init(title: String) {
         self.init()
