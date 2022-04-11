@@ -14,6 +14,7 @@ import RealmSwift
 class RMO_Habit: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
+    
 
     convenience init(title: String) {
         self.init()

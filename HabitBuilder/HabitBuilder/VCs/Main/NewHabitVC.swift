@@ -10,7 +10,7 @@ import UIKit
 
 // 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
 protocol NewHabitVCDelegate: class {
-    func newGoal(title: String, detail: String)
+    func newHabit(title: String, desc: String)
 }
 
 
@@ -25,8 +25,8 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
-    // Add title TextField
-    lazy var newGoalTitle: UITextField = {
+    // newHabitTitle TextField 생성
+    lazy var newHabitTitle: UITextField = {
         let v = UITextField()
         v.backgroundColor = .white
         v.placeholder = " Title of your Goal"
@@ -35,8 +35,8 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
-    // Add Detail TextField
-    lazy var newGoalDetail: UITextField = {
+    //  newHabitDesc TextField 생성
+    lazy var newHabitDesc: UITextField = {
         let v = UITextField()
         v.backgroundColor = .white
         v.placeholder = " Description of your Goal"
@@ -45,7 +45,7 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
-    // Add button 생성
+    // addButton 생성
     lazy var addButton: UIButton = {
         let v = UIButton()
         v.backgroundColor = .blue
@@ -59,26 +59,26 @@ class NewHabitVC: UIViewController {
         super.loadView()
         
         view.addSubview(backView)
-        view.addSubview(newGoalTitle)
-        view.addSubview(newGoalDetail)
+        view.addSubview(newHabitTitle)
+        view.addSubview(newHabitDesc)
         view.addSubview(addButton)
         
-        // backview grid
+        // backView grid
         backView.snp.makeConstraints { (make) in
             make.top.left.right.bottom.equalTo(view)
         }
         
-        // newGoalTitle TextField size grid
-        newGoalTitle.snp.makeConstraints { (make) in
+        // newHabitTitle TextField size grid
+        newHabitTitle.snp.makeConstraints { (make) in
             make.top.equalTo(backView).offset(150)
             make.left.equalTo(backView).offset(30)
             make.right.equalTo(backView).offset(-30)
             make.height.equalTo(50)
         }
         
-        // newGoalDetail TextField size grid
-        newGoalDetail.snp.makeConstraints { (make) in
-            make.top.equalTo(newGoalTitle).offset(60)
+        // newHabitDesc TextField size grid
+        newHabitDesc.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitTitle).offset(60)
             make.left.equalTo(backView).offset(30)
             make.right.equalTo(backView).offset(-30)
             make.height.equalTo(50)
@@ -98,7 +98,7 @@ class NewHabitVC: UIViewController {
     
     @objc func addDirectory(sender: UIButton) {
         
-        delegate?.newGoal(title: newGoalTitle.text!, detail: newGoalDetail.text!)
+        delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!)
         dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     
     }

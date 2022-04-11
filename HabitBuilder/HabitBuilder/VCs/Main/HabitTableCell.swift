@@ -15,12 +15,12 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
-    lazy var newTitle: UILabel = {
+    lazy var newHabitTitle: UILabel = {
         let v = UILabel()
         return v
     }()
     
-    lazy var newDetail: UILabel = {
+    lazy var newHabitDesc: UILabel = {
         let v = UILabel()
         return v
     }()
@@ -35,16 +35,16 @@ class HabitTableCell: UITableViewCell {
             make.edges.equalTo(self)
         }
         
-        backView.addSubview(newTitle)
-        newTitle.snp.makeConstraints{ (make) in
+        backView.addSubview(newHabitTitle)
+        newHabitTitle.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.left.equalTo(backView).offset(10)
         }
         
-        backView.addSubview(newDetail)
-        newDetail.snp.makeConstraints{ (make) in
-            make.top.equalTo(newTitle)
-            make.left.equalTo(newTitle.snp.right)
+        backView.addSubview(newHabitDesc)
+        newHabitDesc.snp.makeConstraints{ (make) in
+            make.top.equalTo(newHabitTitle)
+            make.left.equalTo(newHabitTitle.snp.right)
         }
     }
     
