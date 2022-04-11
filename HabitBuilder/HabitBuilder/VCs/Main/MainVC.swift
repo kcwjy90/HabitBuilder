@@ -19,14 +19,6 @@ class MainVC: UIViewController {
         return v
     }()
     
-    
-    // 음...Habit Builder라는곳 색은 흰색으로 놔두고 날짜 있는 부분은 색을 바꾸기  위해. 근데 다른 방법이 있지 않을까?
-    lazy var secondBackView: UIView = {
-        let v = UIView()
-        v.backgroundColor = .exoticLiras
-        return v
-    }()
-    
     // TablewView 생성
     lazy var goalTableView: UITableView = {
         let v = UITableView()
@@ -37,15 +29,23 @@ class MainVC: UIViewController {
         return v
     }()
     
+    // dateLabel backView
+    lazy var dateLabelBackView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .exoticLiras
+        return v
+    }()
+    
     // Date Label 생성
-    lazy var date: UILabel = {
+    lazy var dateLabel: UILabel = {
         let autoDate = Date() //
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy" //왜 DD 로 하면 09 대신에 99가 찍히며 mm 하면 04 대신에 15가 찍히는가?
         let currentDate = dateFormatter.string(from: autoDate)
         let v = UILabel()
         v.text = currentDate
-        v.font = UIFont.systemFont(ofSize: 20.0)
+        v.font = UIFont.systemFont(ofSize: 18.0)
+        v.backgroundColor = .blue
         return v
     }()
     
@@ -54,36 +54,37 @@ class MainVC: UIViewController {
         super.loadView()
         
         // migration
-        let configuration = Realm.Configuration(schemaVersion:4)
+        let configuration = Realm.Configuration(schemaVersion:5)
         let localRealm = try! Realm(configuration: configuration)
         
         setNaviBar()
         
         view.addSubview(backView)
-        view.addSubview(secondBackView)
-        view.addSubview(date)
-        view.addSubview(goalTableView)
+        backView.addSubview(dateLabelBackView)
+        dateLabelBackView.addSubview(dateLabel)
+        backView.addSubview(goalTableView)
         
         // backview grid
         backView.snp.makeConstraints { (make) in
-            make.top.left.right.bottom.equalTo(view)
+            make.top.equalTo(view).offset(64)
+            make.left.right.bottom.equalTo(view)
         }
         
         // second backveiw grid
-        secondBackView.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(150)
-            make.left.right.bottom.equalTo(backView)
+        dateLabelBackView.snp.makeConstraints{ (make) in
+            make.top.left.right.equalTo(backView)
+            make.height.equalTo(52)
         }
         
         // NAVIGATION BAR 밑에 바로 넣을라면 어떡해야 하나....
-        date.snp.makeConstraints{ (make) in
-            make.top.equalTo(secondBackView).offset(20)
-            make.right.equalTo(secondBackView).offset(-10)
+        dateLabel.snp.makeConstraints{ (make) in
+            make.centerY.equalTo(dateLabelBackView)
+            make.right.equalTo(dateLabelBackView).offset(-10)
         }
         
         // goal tableview size grid
         goalTableView.snp.makeConstraints { (make) in
-            make.top.equalTo(date.snp.bottom).offset(20)
+            make.top.equalTo(dateLabelBackView.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
     }
@@ -91,7 +92,8 @@ class MainVC: UIViewController {
     //Nav Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
-        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.navigationBar.backgroundColor = .green
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Add",
             style: .done,
@@ -114,11 +116,11 @@ extension MainVC: NewHabitVCDelegate {
         print("HabitVC - title : \(title), detail: \(detail)")
         
         // Add some tasks
-        let task = RMO_HB()
+        let task = RMO_Habit()
         task.title = title
         task.desc = detail
         
-        let configuration = Realm.Configuration(schemaVersion:4)
+        let configuration = Realm.Configuration(schemaVersion:5)
         let localRealm = try! Realm(configuration: configuration)
         
         try! localRealm.write {
@@ -126,7 +128,7 @@ extension MainVC: NewHabitVCDelegate {
         }
         
         // Get all tasks in the realm
-        let tasks = localRealm.objects(RMO_HB.self)
+        let tasks = localRealm.objects(RMO_Habit.self)
         
         print(tasks)
         
@@ -144,10 +146,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let configuration = Realm.Configuration(schemaVersion:4)
+        let configuration = Realm.Configuration(schemaVersion:5)
         let localRealm = try! Realm(configuration: configuration)
         
-        let tasks = localRealm.objects(RMO_HB.self)
+        let tasks = localRealm.objects(RMO_Habit.self)
         return tasks.count
     }
     
@@ -162,10 +164,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let configuration = Realm.Configuration(schemaVersion:4)
+        let configuration = Realm.Configuration(schemaVersion:5)
         let localRealm = try! Realm(configuration: configuration)
         
-        let tasks = localRealm.objects(RMO_HB.self)
+        let tasks = localRealm.objects(RMO_Habit.self)
         let habit = tasks[indexPath.row]
         let title = habit.title
         let desc = habit.desc

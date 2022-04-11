@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		480567F927FBD7E50066FF9A /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567F827FBD7E50066FF9A /* SettingsVC.swift */; };
-		48B22CEA27F6706A00967056 /* RMO_HB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_HB.swift */; };
+		48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_Habit.swift */; };
 		48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CEC27F7153B00967056 /* MainVCnotusing.swift */; };
 		C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */; };
 		C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */; };
@@ -26,7 +26,7 @@
 /* Begin PBXFileReference section */
 		389F6030B377C8AD6055D89E /* Pods_HabitBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HabitBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		480567F827FBD7E50066FF9A /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
-		48B22CE927F6706A00967056 /* RMO_HB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_HB.swift; sourceTree = "<group>"; };
+		48B22CE927F6706A00967056 /* RMO_Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Habit.swift; sourceTree = "<group>"; };
 		48B22CEC27F7153B00967056 /* MainVCnotusing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCnotusing.swift; sourceTree = "<group>"; };
 		4D74EE2AC5A365C3D37B7746 /* Pods-HabitBuilder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.release.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.release.xcconfig"; sourceTree = "<group>"; };
 		680D9F63CFD8EBC82EE79390 /* Pods-HabitBuilder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.debug.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.debug.xcconfig"; sourceTree = "<group>"; };
@@ -59,7 +59,7 @@
 		480567F527FBD4390066FF9A /* Database Model */ = {
 			isa = PBXGroup;
 			children = (
-				48B22CE927F6706A00967056 /* RMO_HB.swift */,
+				48B22CE927F6706A00967056 /* RMO_Habit.swift */,
 			);
 			path = "Database Model";
 			sourceTree = "<group>";
@@ -300,7 +300,7 @@
 				C0B2E8E027A11C9A00BC03EB /* PrefsManager.swift in Sources */,
 				C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */,
 				C0B2E8E427A11DA600BC03EB /* ColorExtension.swift in Sources */,
-				48B22CEA27F6706A00967056 /* RMO_HB.swift in Sources */,
+				48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */,
 				C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

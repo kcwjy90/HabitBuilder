@@ -11,7 +11,7 @@ import RealmSwift
 
 //Temporary Local Database created
 
-class RMO_HB: Object {
+class RMO_Habit: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
 
