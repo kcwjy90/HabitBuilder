@@ -53,7 +53,7 @@ class MainVC: UIViewController {
         super.loadView()
         
         // migration
-        let configuration = Realm.Configuration(schemaVersion:5)
+        let configuration = Realm.Configuration(schemaVersion:6)
         let localRealm = try! Realm(configuration: configuration)
         
         setNaviBar()
@@ -111,15 +111,17 @@ class MainVC: UIViewController {
 
 // extension 은 class 밖에
 extension MainVC: NewHabitVCDelegate {
-    func newHabit (title: String, desc: String) {
+    func newHabit (title: String, desc: String, date: String, time: String) {
         print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
         let fromRMO_Habit = RMO_Habit()
         fromRMO_Habit.title = title
         fromRMO_Habit.desc = desc
+        fromRMO_Habit.date = date
+        fromRMO_Habit.time = time
         
-        let configuration = Realm.Configuration(schemaVersion:5)
+        let configuration = Realm.Configuration(schemaVersion:6)
         let localRealm = try! Realm(configuration: configuration)
         
         try! localRealm.write {
@@ -145,11 +147,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let configuration = Realm.Configuration(schemaVersion:5)
+        let configuration = Realm.Configuration(schemaVersion:6)
         let localRealm = try! Realm(configuration: configuration)
         
-        let tasks = localRealm.objects(RMO_Habit.self)
-        return tasks.count
+        let habits = localRealm.objects(RMO_Habit.self)
+        return habits.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -163,13 +165,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let configuration = Realm.Configuration(schemaVersion:5)
+        let configuration = Realm.Configuration(schemaVersion:6)
         let localRealm = try! Realm(configuration: configuration)
         
         let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
+        let date = newHabit.date
+        let time = newHabit.time
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
