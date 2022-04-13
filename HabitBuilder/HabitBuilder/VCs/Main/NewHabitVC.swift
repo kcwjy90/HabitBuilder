@@ -25,6 +25,26 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
+    // backToMainButton 생성
+    lazy var backToMainButton: UIButton = {
+        let v = UIButton()
+        v.backgroundColor = .purple
+        v.setTitle("Back", for: .normal)
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
+    
+    // addHabitButton 생성
+    lazy var addHabitButton: UIButton = {
+        let v = UIButton()
+        v.backgroundColor = .blue
+        v.setTitle("Add", for: .normal)
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
+    
     // newHabitTitle TextField 생성
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
@@ -63,77 +83,83 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
-    // addButton 생성
-    lazy var addButton: UIButton = {
-        let v = UIButton()
-        v.backgroundColor = .blue
-        v.setTitle("Add", for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 25
-        return v
-    }()
-    
     override func loadView() {
         super.loadView()
         
+        // tapGasture - Dismisses Keyboard
+        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(UITapGesture)
+        
         view.addSubview(backView)
+        backView.addSubview(backToMainButton)
+        backView.addSubview(addHabitButton)
         backView.addSubview(newHabitTitle)
         backView.addSubview(newHabitDesc)
         backView.addSubview(newHabitDate)
         backView.addSubview(newHabitTime)
-        backView.addSubview(addButton)
-   
         
         // backView grid
         backView.snp.makeConstraints { (make) in
-            make.top.left.right.bottom.equalTo(view)
+            make.edges.equalTo(view)
+        }
+        
+        // backToMainButton size grid
+        backToMainButton.snp.makeConstraints{ (make) in
+            make.top.equalTo(backView).offset(5)
+            make.left.equalTo(backView).offset(5)
+            make.width.equalTo(80)
+            make.height.equalTo(40)
+        }
+        
+        // addHabitButton size grid
+        addHabitButton.snp.makeConstraints{ (make) in
+            make.top.equalTo(backView).offset(5)
+            make.right.equalTo(backView).offset(-5)
+            make.width.equalTo(80)
+            make.height.equalTo(40)
         }
         
         // newHabitTitle TextField size grid
         newHabitTitle.snp.makeConstraints { (make) in
-            make.top.equalTo(backView).offset(150)
-            make.left.equalTo(backView).offset(30)
-            make.right.equalTo(backView).offset(-30)
+            make.top.equalTo(backView).offset(74)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
         
         // newHabitDesc TextField size grid
         newHabitDesc.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitTitle.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(30)
-            make.right.equalTo(backView).offset(-30)
-            make.height.equalTo(50)
+            make.top.equalTo(newHabitTitle.snp.bottom).offset(5)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(160)
         }
         
         // newHabitDate size grid
         newHabitDate.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(30)
-            make.right.equalTo(backView).offset(-30)
-            make.height.equalTo(50)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(60)
         }
 
         // newHabitTime size grid
         newHabitTime.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDate.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(30)
-            make.right.equalTo(backView).offset(-30)
-            make.height.equalTo(50)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(60)
         }
 //        newHabitTime.timeZone = TimeZone.init(identifier: "UTC") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
-        // addButton size grid
-        addButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView.snp.bottom).offset(-100)
-            make.centerX.equalTo(backView)
-            make.width.equalTo(100)
-            make.height.equalTo(50)
-        }
+   
         
-        // addButton Action
-        addButton.addTarget(self, action: #selector(addNewHabit), for: .touchUpInside)
+        // Button Actions - AddHabitButton & backToMainButton
+        addHabitButton.addTarget(self, action: #selector(addNewHabit), for: .touchUpInside)
   
+        backToMainButton.addTarget(self, action: #selector(goBackToMain), for: .touchUpInside)
     }
+    
     
     @objc func addNewHabit(sender: UIButton) {
         
@@ -151,6 +177,10 @@ class NewHabitVC: UIViewController {
         delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString)
         dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     
+    }
+    
+    @objc func goBackToMain(sender: UIButton){
+        self.dismiss(animated: true, completion: nil)
     }
     
 }

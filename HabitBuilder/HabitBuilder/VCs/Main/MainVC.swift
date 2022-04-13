@@ -58,7 +58,9 @@ class MainVC: UIViewController {
         
         setNaviBar()
         
+        
         view.addSubview(backView)
+        view.backgroundColor = .yellow
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -104,7 +106,7 @@ class MainVC: UIViewController {
     @objc func addItem(){
         let v = NewHabitVC()
         v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
-        v.modalPresentationStyle = .fullScreen
+        v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
 }
