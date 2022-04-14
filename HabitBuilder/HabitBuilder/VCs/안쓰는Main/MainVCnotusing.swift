@@ -153,3 +153,8 @@
 //
 //
 //}
+
+
+//        Old SchemaVersion controller
+//        let configuration = Realm.Configuration(schemaVersion:6)
+//        let localRealm = try! Realm(configuration: configuration)

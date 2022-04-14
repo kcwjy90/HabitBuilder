@@ -16,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
      func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
          // Override point for customization after application launch.
          
+         DBManager.SI.initialize()
+         
          self.window = UIWindow(frame: UIScreen.main.bounds)
 
          // Declaring TabBar

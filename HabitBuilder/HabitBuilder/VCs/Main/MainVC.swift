@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-class MainVC: UIViewController { 
+class MainVC: UIViewController {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -18,17 +18,7 @@ class MainVC: UIViewController {
         v.backgroundColor = .white
         return v
     }()
-    
-    // todaysHabitTablewView 생성
-    lazy var todaysHabitTableView: UITableView = {
-        let v = UITableView()
-        v.register(HabitTableCell.self,
-                   forCellReuseIdentifier:"MyCell")
-        v.delegate = self
-        v.dataSource = self
-        return v
-    }()
-    
+        
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
@@ -49,16 +39,23 @@ class MainVC: UIViewController {
         return v
     }()
     
+    // todaysHabitTablewView 생성
+    lazy var todaysHabitTableView: UITableView = {
+        let v = UITableView()
+        v.register(HabitTableCell.self,
+                   forCellReuseIdentifier:"MyCell")
+        v.delegate = self
+        v.dataSource = self
+        return v
+    }()
+    
+    let localRealm = DBManager.SI.realm!
+
     override func loadView() {
         super.loadView()
         
-        // migration
-        let configuration = Realm.Configuration(schemaVersion:6)
-        let localRealm = try! Realm(configuration: configuration)
-        
         setNaviBar()
-        
-        
+            
         view.addSubview(backView)
         view.backgroundColor = .yellow
         backView.addSubview(dateLabelBackView)
@@ -101,7 +98,12 @@ class MainVC: UIViewController {
             target: self,
             action: #selector(addItem)
         )
+        
+        let searchController = UISearchController(searchResultsController: MainVC())
+        navigationItem.searchController = searchController
+        
     }
+
     
     @objc func addItem(){
         let v = NewHabitVC()
@@ -122,9 +124,6 @@ extension MainVC: NewHabitVCDelegate {
         fromRMO_Habit.desc = desc
         fromRMO_Habit.date = date
         fromRMO_Habit.time = time
-        
-        let configuration = Realm.Configuration(schemaVersion:6)
-        let localRealm = try! Realm(configuration: configuration)
         
         try! localRealm.write {
             localRealm.add(fromRMO_Habit)
@@ -167,9 +166,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let configuration = Realm.Configuration(schemaVersion:6)
-        let localRealm = try! Realm(configuration: configuration)
-        
         let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
         let title = newHabit.title
@@ -186,9 +182,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-//Q. Backview를 2개 만드는거 말고, Habit Builder Nav Bar는 하얗게, 날짜는 색깔입히는거
-//Q. 형이 만드 색깔 가지고 오는거
+//Q. UISearchController가 날짜를 가리는데..이것을 어찌 해야하나...게다가 search를 누르면 다른애들을 몽땅 같이 끌어 올리는거는 안돼는가 ㅜㅜㅜㅜ
 //Q. line 104 v.delegate = self가 하는 일을 다시 한번만 설명을...
 
-//3/30
-//1. 근데 realm db를 extension에 생성 하는게 맞는가? scope문제로 인해서 일단 여기다 생성하기는 했는데..
+//아직 해야 하는거
+//2. delegate 다시 연습
+//3. 오늘 날짜에 맞는게 표시되도록 적용
+//4. color 맞추기
