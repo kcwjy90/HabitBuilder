@@ -10,7 +10,7 @@ import UIKit
 
 // 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
 protocol NewHabitVCDelegate: class {
-    func newHabit(title: String, desc: String, date: String, time: String)
+    func newHabit(title: String, desc: String, date: String, time: String, dateTime: Date)
 }
 
 
@@ -83,6 +83,13 @@ class NewHabitVC: UIViewController {
         return v
     }()
     
+    lazy var newHabitDateTime: UIDatePicker = {
+        let v = UIDatePicker()
+        v.layer.cornerRadius = 15
+        v.backgroundColor = .orange
+        return v
+    }()
+    
     override func loadView() {
         super.loadView()
         
@@ -97,6 +104,8 @@ class NewHabitVC: UIViewController {
         backView.addSubview(newHabitDesc)
         backView.addSubview(newHabitDate)
         backView.addSubview(newHabitTime)
+        backView.addSubview(newHabitDateTime)
+
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -150,7 +159,14 @@ class NewHabitVC: UIViewController {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(60)
         }
-//        newHabitTime.timeZone = TimeZone.init(identifier: "UTC") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
+        
+        newHabitDateTime.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitTime.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(60)
+        }
+        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
    
         
@@ -165,7 +181,7 @@ class NewHabitVC: UIViewController {
         
         // 지정한 date과 time의 format을 string으로 바꿔준다.
         let dateFormatterDate = DateFormatter()
-        dateFormatterDate.dateStyle = .short
+        dateFormatterDate.dateFormat = "MM/dd/yyyy"
         let newHabitDateString = dateFormatterDate.string(from: newHabitDate.date)
         print(newHabitDateString)
         
@@ -174,7 +190,7 @@ class NewHabitVC: UIViewController {
         let newHabitTimeString = dateFormatterTime.string(from: newHabitTime.date)
         print(newHabitTimeString)
 
-        delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString)
+        delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString, dateTime: newHabitDateTime.date)
         dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     
     }
@@ -191,3 +207,6 @@ class NewHabitVC: UIViewController {
 //        newHabitDate.timeZone = TimeZone.init(identifier: "UTC")
 //   근데 dateFormatter.dateStyler = .short를 적용하고, dateformatter가 적용된 날짜가 담긴 variable을 print 하니 다시 하루 전 날짜가 찍힘.
 //.   예) 4/29를 찍으면 4/30 이 떠서 timezone 을 새로 set up 하니 4/29가 찍힘. 근데 이 date에 dateformatter을 적용하니 이제는 4/28 이 찍힘..
+
+// Q. 4/14/22 newHabitDateTime 이라는 date() type을 새로 만들었는데....date이랑 시간이 맞게 찍히지가 않아요. 오늘은 4/14/22 저녁 10시 인데 po 해서 찍히는건 자꾸 4/15/22 시간도 새벽 왜그러지요? 그래서 일단 string으로 되어있는 newhabitdate 이랑 newhabittime 으로 진행을 해보겠음.
+

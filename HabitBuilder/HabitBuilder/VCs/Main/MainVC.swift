@@ -10,8 +10,10 @@ import UIKit
 import SnapKit
 import RealmSwift
 
+        
+
 class MainVC: UIViewController {
-    
+        
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -99,11 +101,11 @@ class MainVC: UIViewController {
             action: #selector(addItem)
         )
         
+    //SearchController 더하는 코드
         let searchController = UISearchController(searchResultsController: MainVC())
         navigationItem.searchController = searchController
         
     }
-
     
     @objc func addItem(){
         let v = NewHabitVC()
@@ -115,7 +117,7 @@ class MainVC: UIViewController {
 
 // extension 은 class 밖에
 extension MainVC: NewHabitVCDelegate {
-    func newHabit (title: String, desc: String, date: String, time: String) {
+    func newHabit (title: String, desc: String, date: String, time: String, dateTime: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
@@ -124,6 +126,7 @@ extension MainVC: NewHabitVCDelegate {
         fromRMO_Habit.desc = desc
         fromRMO_Habit.date = date
         fromRMO_Habit.time = time
+        fromRMO_Habit.dateTime = dateTime
         
         try! localRealm.write {
             localRealm.add(fromRMO_Habit)
@@ -148,9 +151,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let configuration = Realm.Configuration(schemaVersion:6)
-        let localRealm = try! Realm(configuration: configuration)
-        
+
         let habits = localRealm.objects(RMO_Habit.self)
         return habits.count
     }
@@ -166,15 +167,24 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
+//        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
+        
+        let todaysDate = dateLabel.text
+        
         let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
+        
+        if todaysDate == newHabit.date {
+            
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
         let time = newHabit.time
+        let dateTime = newHabit.dateTime
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
+        }
         
         return cell
     }
@@ -187,5 +197,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 //아직 해야 하는거
 //2. delegate 다시 연습
-//3. 오늘 날짜에 맞는게 표시되도록 적용
+//3. 오늘 날짜에 맞는게 표시되도록 적용 .....흠....이대로 하면은 오늘에 해당하는 것만 보이기는 하는데 중간에 cell들은 비어있단 말이지. 이것은 왜냐, count가 RMO_Habit obj에서 오기 때문인데..그럼 count의 number를 바꿔야 하는데 어찌하지?
 //4. color 맞추기
+//5. 나머지
