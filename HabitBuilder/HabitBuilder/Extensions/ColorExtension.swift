@@ -9,7 +9,8 @@ import UIKit
 
 extension UIColor {
     @nonobjc class var exoticLiras: UIColor { return UIColor(red:0.87, green:0.16, blue: 0.16, alpha: 1.00) }
+    @nonobjc class var starWhite: UIColor { return UIColor(red:0.94, green:0.94, blue: 0.96, alpha: 1.00) }
 }
-    
 
-//  형 컬러 뽑아내는 기술..을 전수 받아야 하는디..
+
+// Spuit 설치

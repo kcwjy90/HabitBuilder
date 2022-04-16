@@ -10,21 +10,21 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-        
+
 
 class MainVC: UIViewController {
-        
+    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
         return v
     }()
-        
+    
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
-        v.backgroundColor = .exoticLiras
+        v.backgroundColor = .starWhite
         return v
     }()
     
@@ -36,8 +36,8 @@ class MainVC: UIViewController {
         let currentDate = dateFormatter.string(from: autoDate)
         let v = UILabel()
         v.text = currentDate
-        v.font = UIFont.systemFont(ofSize: 18.0)
-        v.backgroundColor = .blue
+        v.font = UIFont.boldSystemFont(ofSize: 18.0)
+        //        v.backgroundColor = .blue
         return v
     }()
     
@@ -52,14 +52,14 @@ class MainVC: UIViewController {
     }()
     
     let localRealm = DBManager.SI.realm!
-
+    
     override func loadView() {
         super.loadView()
         
         setNaviBar()
-            
+        
         view.addSubview(backView)
-        view.backgroundColor = .yellow
+        view.backgroundColor = .white
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -93,7 +93,7 @@ class MainVC: UIViewController {
     func setNaviBar() {
         title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .green
+        navigationController?.navigationBar.backgroundColor = .white
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Add",
             style: .done,
@@ -101,7 +101,7 @@ class MainVC: UIViewController {
             action: #selector(addItem)
         )
         
-    //SearchController 더하는 코드
+        //SearchController 더하는 코드
         let searchController = UISearchController(searchResultsController: MainVC())
         navigationItem.searchController = searchController
         
@@ -151,7 +151,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
+        
         let habits = localRealm.objects(RMO_Habit.self)
         return habits.count
     }
@@ -167,7 +167,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-//        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
+        //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
         
         let todaysDate = dateLabel.text
         
@@ -176,14 +176,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         if todaysDate == newHabit.date {
             
-        let title = newHabit.title
-        let desc = newHabit.desc
-        let date = newHabit.date
-        let time = newHabit.time
-        let dateTime = newHabit.dateTime
-        
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
+            let title = newHabit.title
+            let desc = newHabit.desc
+            let date = newHabit.date
+            let time = newHabit.time
+            let dateTime = newHabit.dateTime
+            
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
         }
         
         return cell
@@ -197,6 +197,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 //아직 해야 하는거
 //2. delegate 다시 연습
-//3. 오늘 날짜에 맞는게 표시되도록 적용 .....흠....이대로 하면은 오늘에 해당하는 것만 보이기는 하는데 중간에 cell들은 비어있단 말이지. 이것은 왜냐, count가 RMO_Habit obj에서 오기 때문인데..그럼 count의 number를 바꿔야 하는데 어찌하지?
-//4. color 맞추기
+//3. 오늘 날짜에 맞는게 표시되도록 적용 .....흠....이대로 하면은 오늘에 해당하는 것만 보이기는 하는데 중간에 cell들은 비어있단 말이지. 해당 안되는 row 는 건너뛰고 비어있는 다음cell 에 해당 되는 row 를 어찌 찍어야 하는고...
 //5. 나머지
+

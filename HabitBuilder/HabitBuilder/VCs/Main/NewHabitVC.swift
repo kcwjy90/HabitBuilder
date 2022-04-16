@@ -21,25 +21,36 @@ class NewHabitVC: UIViewController {
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .exoticLiras
+        v.backgroundColor = .white
         return v
     }()
     
     // backToMainButton 생성
     lazy var backToMainButton: UIButton = {
         let v = UIButton()
-        v.backgroundColor = .purple
+        //        v.backgroundColor = .purple
         v.setTitle("Back", for: .normal)
+        v.setTitleColor(.red, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
+        return v
+    }()
+    
+    // pageLabel 생성
+    lazy var pageLabel: UILabel = {
+        let v = UILabel()
+        v.text = "New Habit"
+        v.textColor = .black
+        v.font = UIFont.boldSystemFont(ofSize: 16.0)
         return v
     }()
     
     // addHabitButton 생성
     lazy var addHabitButton: UIButton = {
         let v = UIButton()
-        v.backgroundColor = .blue
+        //        v.backgroundColor = .blue
         v.setTitle("Add", for: .normal)
+        v.setTitleColor(.blue, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
@@ -48,7 +59,7 @@ class NewHabitVC: UIViewController {
     // newHabitTitle TextField 생성
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .white
+        v.backgroundColor = .systemGray5
         v.placeholder = " Title of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -58,10 +69,26 @@ class NewHabitVC: UIViewController {
     //  newHabitDesc TextField 생성
     lazy var newHabitDesc: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .white
+        v.backgroundColor = .systemGray5
         v.placeholder = " Description of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
+        return v
+    }()
+    
+    // newHabitDateBackview 생성
+    lazy var newHabitDateBackview: UIView = {
+        let v = UIView()
+        v.layer.cornerRadius = 15
+        v.backgroundColor = .systemGray5
+        return v
+    }()
+    
+    // newHabitDateLabel 생성
+    lazy var newHabitDateLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Date"
+        v.textColor = .systemGray
         return v
     }()
     
@@ -70,7 +97,7 @@ class NewHabitVC: UIViewController {
         let v = UIDatePicker()
         v.datePickerMode = .date
         v.layer.cornerRadius = 15
-        v.backgroundColor = .green
+        //        v.backgroundColor = .systemGray5
         return v
     }()
     
@@ -79,14 +106,14 @@ class NewHabitVC: UIViewController {
         let v = UIDatePicker()
         v.datePickerMode = .time
         v.layer.cornerRadius = 15
-        v.backgroundColor = .blue
+        v.backgroundColor = .systemGray5
         return v
     }()
     
     lazy var newHabitDateTime: UIDatePicker = {
         let v = UIDatePicker()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .orange
+        v.backgroundColor = .systemGray5
         return v
     }()
     
@@ -99,13 +126,16 @@ class NewHabitVC: UIViewController {
         
         view.addSubview(backView)
         backView.addSubview(backToMainButton)
+        backView.addSubview(pageLabel)
         backView.addSubview(addHabitButton)
         backView.addSubview(newHabitTitle)
         backView.addSubview(newHabitDesc)
+        backView.addSubview(newHabitDateBackview)
+        backView.addSubview(newHabitDateLabel)
         backView.addSubview(newHabitDate)
         backView.addSubview(newHabitTime)
         backView.addSubview(newHabitDateTime)
-
+        
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -114,23 +144,31 @@ class NewHabitVC: UIViewController {
         
         // backToMainButton size grid
         backToMainButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(5)
-            make.left.equalTo(backView).offset(5)
+            make.top.equalTo(backView).offset(10)
+            make.left.equalTo(backView)
+            make.width.equalTo(60)
+            make.height.equalTo(40)
+        }
+        
+        // pageLabel size grid
+        pageLabel.snp.makeConstraints{ (make) in
+            make.top.equalTo(backView).offset(10)
+            make.centerX.equalTo(backView)
             make.width.equalTo(80)
             make.height.equalTo(40)
         }
         
         // addHabitButton size grid
         addHabitButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(5)
-            make.right.equalTo(backView).offset(-5)
-            make.width.equalTo(80)
+            make.top.equalTo(backView).offset(10)
+            make.right.equalTo(backView)
+            make.width.equalTo(60)
             make.height.equalTo(40)
         }
         
         // newHabitTitle TextField size grid
         newHabitTitle.snp.makeConstraints { (make) in
-            make.top.equalTo(backView).offset(74)
+            make.top.equalTo(pageLabel.snp.bottom).offset(20)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
@@ -144,14 +182,28 @@ class NewHabitVC: UIViewController {
             make.height.equalTo(160)
         }
         
-        // newHabitDate size grid
-        newHabitDate.snp.makeConstraints { (make) in
+        // newHabitDateBackview size grid
+        newHabitDateBackview.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(60)
         }
-
+        
+        // newHabitDateLabel size grid
+        newHabitDateLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(39)
+            make.height.equalTo(60)
+        }
+        
+        // newHabitDate size grid
+        newHabitDate.snp.makeConstraints { (make) in
+            make.centerY.equalTo(newHabitDateBackview)
+            make.right.equalTo(backView).offset(-28)
+            make.height.equalTo(60)
+        }
+        
         // newHabitTime size grid
         newHabitTime.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDate.snp.bottom).offset(10)
@@ -168,11 +220,11 @@ class NewHabitVC: UIViewController {
         }
         newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
-   
+        
         
         // Button Actions - AddHabitButton & backToMainButton
         addHabitButton.addTarget(self, action: #selector(addNewHabit), for: .touchUpInside)
-  
+        
         backToMainButton.addTarget(self, action: #selector(goBackToMain), for: .touchUpInside)
     }
     
@@ -189,10 +241,10 @@ class NewHabitVC: UIViewController {
         dateFormatterTime.timeStyle = .short
         let newHabitTimeString = dateFormatterTime.string(from: newHabitTime.date)
         print(newHabitTimeString)
-
+        
         delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString, dateTime: newHabitDateTime.date)
         dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
-    
+        
     }
     
     @objc func goBackToMain(sender: UIButton){
@@ -210,3 +262,5 @@ class NewHabitVC: UIViewController {
 
 // Q. 4/14/22 newHabitDateTime 이라는 date() type을 새로 만들었는데....date이랑 시간이 맞게 찍히지가 않아요. 오늘은 4/14/22 저녁 10시 인데 po 해서 찍히는건 자꾸 4/15/22 시간도 새벽 왜그러지요? 그래서 일단 string으로 되어있는 newhabitdate 이랑 newhabittime 으로 진행을 해보겠음.
 
+// Q. Title 하고 description하고 figma에서는 합쳐져 있는데 이를 어찌할까요? 그리고 해야할것 - description padding 아직 못했고, 그 text 시작을 textfield 상단에서 부터 할수 있게
+// Q. newHabitDateLabel하고 newHabitDateBackView, newHabitDate 합칠수 있나요?
