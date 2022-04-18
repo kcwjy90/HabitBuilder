@@ -14,9 +14,8 @@ import RealmSwift
 class RMO_Habit: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
-    @Persisted var date: String = ""
-    @Persisted var time: String = ""
-    @Persisted var dateTime = Date()
+    @Persisted var date: Date = Date()
+    @Persisted var time: Date = Date()
     
     convenience init(title: String) {
         self.init()

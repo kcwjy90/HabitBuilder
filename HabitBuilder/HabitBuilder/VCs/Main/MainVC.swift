@@ -21,6 +21,13 @@ class MainVC: UIViewController {
         return v
     }()
     
+    // searchBar 생성
+    lazy var searchBar : UISearchBar = {
+        let v = UISearchBar()
+        v.searchBarStyle = .minimal
+        return v
+    }()
+    
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
@@ -60,6 +67,7 @@ class MainVC: UIViewController {
         
         view.addSubview(backView)
         view.backgroundColor = .white
+        backView.addSubview(searchBar)
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -70,9 +78,16 @@ class MainVC: UIViewController {
             make.left.right.bottom.equalTo(view)
         }
         
+        // searchBar grid
+        searchBar.snp.makeConstraints { (make) in
+            make.top.left.right.equalTo(backView)
+            make.height.equalTo(44)
+        }
+        
         // dateLabelBackView backveiw grid
         dateLabelBackView.snp.makeConstraints{ (make) in
-            make.top.left.right.equalTo(backView)
+            make.top.equalTo(searchBar.snp.bottom)
+            make.left.right.equalTo(backView)
             make.height.equalTo(52)
         }
         
@@ -102,8 +117,8 @@ class MainVC: UIViewController {
         )
         
         //SearchController 더하는 코드
-        let searchController = UISearchController(searchResultsController: MainVC())
-        navigationItem.searchController = searchController
+//        let searchController = UISearchController(searchResultsController: MainVC())
+//        navigationItem.searchController = searchController
         
     }
     
@@ -117,7 +132,7 @@ class MainVC: UIViewController {
 
 // extension 은 class 밖에
 extension MainVC: NewHabitVCDelegate {
-    func newHabit (title: String, desc: String, date: String, time: String, dateTime: Date) {
+    func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
@@ -126,7 +141,6 @@ extension MainVC: NewHabitVCDelegate {
         fromRMO_Habit.desc = desc
         fromRMO_Habit.date = date
         fromRMO_Habit.time = time
-        fromRMO_Habit.dateTime = dateTime
         
         try! localRealm.write {
             localRealm.add(fromRMO_Habit)
@@ -168,23 +182,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
-        
-        let todaysDate = dateLabel.text
-        
+                
         let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
+        let title = newHabit.title
+        let desc = newHabit.desc
+        let date = newHabit.date
+        let time = newHabit.time
         
-        if todaysDate == newHabit.date {
-            
-            let title = newHabit.title
-            let desc = newHabit.desc
-            let date = newHabit.date
-            let time = newHabit.time
-            let dateTime = newHabit.dateTime
-            
-            cell.newHabitTitle.text = title + " - "
-            cell.newHabitDesc.text = desc
-        }
+        cell.newHabitTitle.text = title + " - "
+        cell.newHabitDesc.text = desc
+        
         
         return cell
     }
@@ -193,10 +201,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 //Q. UISearchController가 날짜를 가리는데..이것을 어찌 해야하나...게다가 search를 누르면 다른애들을 몽땅 같이 끌어 올리는거는 안돼는가 ㅜㅜㅜㅜ
-//Q. line 104 v.delegate = self가 하는 일을 다시 한번만 설명을...
 
 //아직 해야 하는거
-//2. delegate 다시 연습
 //3. 오늘 날짜에 맞는게 표시되도록 적용 .....흠....이대로 하면은 오늘에 해당하는 것만 보이기는 하는데 중간에 cell들은 비어있단 말이지. 해당 안되는 row 는 건너뛰고 비어있는 다음cell 에 해당 되는 row 를 어찌 찍어야 하는고...
 //5. 나머지
 

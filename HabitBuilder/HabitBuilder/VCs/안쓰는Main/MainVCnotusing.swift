@@ -158,3 +158,23 @@
 //        Old SchemaVersion controller
 //        let configuration = Realm.Configuration(schemaVersion:6)
 //        let localRealm = try! Realm(configuration: configuration)
+
+
+//N NewHabitVC - How to change format from date to string EXAMPLE
+//@objc func addButtonPressed(sender: UIButton) {
+//
+//    // 지정한 date과 time의 format을 string으로 바꿔준다.
+//    let dateFormatterDate = DateFormatter()
+//    dateFormatterDate.dateFormat = "MM/dd/yyyy"
+//    let newHabitDateString = dateFormatterDate.string(from: newHabitDate.date)
+//    print(newHabitDateString)
+//
+//    let dateFormatterTime = DateFormatter()
+//    dateFormatterTime.timeStyle = .short
+//    let newHabitTimeString = dateFormatterTime.string(from: newHabitTime.date)
+//    print(newHabitTimeString)
+//
+//    delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString)
+//    dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
+//
+//}

@@ -54,4 +54,3 @@ class HabitTableCell: UITableViewCell {
     
 }
 
-//Q. Cell 이 받아서 tablewview 얹어지는 거던가? 그 프로세스를 다시 한번만 설명을..
