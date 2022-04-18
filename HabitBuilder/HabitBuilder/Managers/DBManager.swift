@@ -18,7 +18,7 @@ class DBManager: NSObject {
     }
     
     func initialize() {
-        let realmConfig = Realm.Configuration(schemaVersion: 17,
+        let realmConfig = Realm.Configuration(schemaVersion: 18,
             migrationBlock: { (migration, oldSchemaVersion) in
                 switch oldSchemaVersion {
                 case 0 :
@@ -45,3 +45,8 @@ class DBManager: NSObject {
 //The root class of most Objective-C class hierarchies, from which subclasses inherit a basic interface to the runtime system and the ability to behave as Objective-C objects
 
 
+extension Results {
+    func toArray<T>(type: T.Type) -> [T] {
+        return compactMap { $0 as? T }
+    }
+}

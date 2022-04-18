@@ -10,8 +10,6 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-
-
 class MainVC: UIViewController {
     
     // backView 생성
@@ -53,6 +51,8 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
+    var habits: [RMO_Habit] = []
+    
     override func loadView() {
         super.loadView()
         
@@ -87,7 +87,16 @@ class MainVC: UIViewController {
             make.top.equalTo(dateLabelBackView.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
+        
+        reloadHabits()
     }
+    
+    func removeTimeFrom(date: Date) -> Date {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        let date = Calendar.current.date(from: components)
+        return date!
+    }
+
     
     //Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
@@ -113,31 +122,36 @@ class MainVC: UIViewController {
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
+    
+    func reloadHabits() {
+        let today = removeTimeFrom(date: Date())
+        let predicate = NSPredicate(format: "date >= %@", today as NSDate)
+        habits = localRealm.objects(RMO_Habit.self).filter(predicate).toArray(type: RMO_Habit.self)
+        todaysHabitTableView.reloadData()
+    }
 }
 
 // extension 은 class 밖에
 extension MainVC: NewHabitVCDelegate {
-    func newHabit (title: String, desc: String, date: String, time: String, dateTime: Date) {
+    func newHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
-        let fromRMO_Habit = RMO_Habit()
-        fromRMO_Habit.title = title
-        fromRMO_Habit.desc = desc
-        fromRMO_Habit.date = date
-        fromRMO_Habit.time = time
-        fromRMO_Habit.dateTime = dateTime
+        let habit = RMO_Habit()
+        habit.title = title
+        habit.desc = desc
+        habit.date = date
+        habit.time = time
         
         try! localRealm.write {
-            localRealm.add(fromRMO_Habit)
+            localRealm.add(habit)
         }
         
         // Get all habits in the realm
         let habits = localRealm.objects(RMO_Habit.self)
-        
         print(habits)
         
-        todaysHabitTableView.reloadData()
+        reloadHabits()
     }
     
 }
@@ -152,7 +166,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        let habits = localRealm.objects(RMO_Habit.self)
         return habits.count
     }
     
@@ -167,24 +180,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
+        let habit = habits[indexPath.row]
+        cell.newHabitTitle.text = habit.title
+        cell.newHabitDesc.text = habit.desc
         
-        let todaysDate = dateLabel.text
-        
-        let habits = localRealm.objects(RMO_Habit.self)
-        let newHabit = habits[indexPath.row]
-        
-        if todaysDate == newHabit.date {
-            
-            let title = newHabit.title
-            let desc = newHabit.desc
-            let date = newHabit.date
-            let time = newHabit.time
-            let dateTime = newHabit.dateTime
-            
-            cell.newHabitTitle.text = title + " - "
-            cell.newHabitDesc.text = desc
-        }
         
         return cell
     }

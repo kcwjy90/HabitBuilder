@@ -9,8 +9,8 @@
 import UIKit
 
 // 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
-protocol NewHabitVCDelegate: class {
-    func newHabit(title: String, desc: String, date: String, time: String, dateTime: Date)
+protocol NewHabitVCDelegate: AnyObject {
+    func newHabit(title: String, desc: String, date: Date, time: Date)
 }
 
 
@@ -218,9 +218,6 @@ class NewHabitVC: UIViewController {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(60)
         }
-        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
-        
-        
         
         // Button Actions - AddHabitButton & backToMainButton
         addHabitButton.addTarget(self, action: #selector(addNewHabit), for: .touchUpInside)
@@ -230,19 +227,7 @@ class NewHabitVC: UIViewController {
     
     
     @objc func addNewHabit(sender: UIButton) {
-        
-        // 지정한 date과 time의 format을 string으로 바꿔준다.
-        let dateFormatterDate = DateFormatter()
-        dateFormatterDate.dateFormat = "MM/dd/yyyy"
-        let newHabitDateString = dateFormatterDate.string(from: newHabitDate.date)
-        print(newHabitDateString)
-        
-        let dateFormatterTime = DateFormatter()
-        dateFormatterTime.timeStyle = .short
-        let newHabitTimeString = dateFormatterTime.string(from: newHabitTime.date)
-        print(newHabitTimeString)
-        
-        delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDateString, time: newHabitTimeString, dateTime: newHabitDateTime.date)
+        delegate?.newHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
         dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
         
     }
