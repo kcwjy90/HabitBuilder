@@ -35,4 +35,11 @@ class DBManager: NSObject {
 //NSObject
 //The root class of most Objective-C class hierarchies, from which subclasses inherit a basic interface to the runtime system and the ability to behave as Objective-C objects
 
-
+// DB model 안에 있는것들을 array안으로 넣어주기 위해
+extension Results {
+    func toArray() -> [Element] {
+        return compactMap {
+            $0
+        }
+    }
+}

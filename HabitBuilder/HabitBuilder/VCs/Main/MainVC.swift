@@ -60,6 +60,10 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
+    // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
+    var habits: [RMO_Habit] = []
+    
+    
     override func loadView() {
         super.loadView()
         
@@ -102,6 +106,19 @@ class MainVC: UIViewController {
             make.top.equalTo(dateLabelBackView.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
+        
+//       filter하는거
+        habits = localRealm.objects(RMO_Habit.self).filter {
+            habit in
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let habitDate = dateFormatter.string(from: habit.date)
+            let today = Date()
+            let todaysDate = dateFormatter.string(from: today)
+            return habitDate == todaysDate
+        }
+
+        
     }
     
     //Navi Bar 만드는 func. loadview() 밖에!
@@ -115,10 +132,6 @@ class MainVC: UIViewController {
             target: self,
             action: #selector(addItem)
         )
-        
-        //SearchController 더하는 코드
-//        let searchController = UISearchController(searchResultsController: MainVC())
-//        navigationItem.searchController = searchController
         
     }
     
@@ -162,11 +175,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row: \(indexPath.row)")
+        print(habits[indexPath.row].date)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        let habits = localRealm.objects(RMO_Habit.self)
         return habits.count
     }
     
@@ -183,7 +196,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
                 
-        let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
@@ -200,9 +212,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-//Q. UISearchController가 날짜를 가리는데..이것을 어찌 해야하나...게다가 search를 누르면 다른애들을 몽땅 같이 끌어 올리는거는 안돼는가 ㅜㅜㅜㅜ
-
-//아직 해야 하는거
-//3. 오늘 날짜에 맞는게 표시되도록 적용 .....흠....이대로 하면은 오늘에 해당하는 것만 보이기는 하는데 중간에 cell들은 비어있단 말이지. 해당 안되는 row 는 건너뛰고 비어있는 다음cell 에 해당 되는 row 를 어찌 찍어야 하는고...
-//5. 나머지
+// 일단 filter 해서 보여지는 틀은 잡았음. 일단은 시험삼아 string으로 바꾸는것 까지는 됐으니 logic은 되는거 같고
+// 해야 할것 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거 3) reload가 필요함. 지금 현재는 내가 직접 다시 앱을 실행해야지만 새로운 habit이 뜸. 4) toArray()를 쓰지 않아도 되는건가? 그냥 .filter만 썼는데..
 

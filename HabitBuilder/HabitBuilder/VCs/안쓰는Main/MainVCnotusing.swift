@@ -97,6 +97,10 @@
 //            action: #selector(addItem))
 //    }
 //
+//   SearchController 더하는 코드
+//        let searchController = UISearchController(searchResultsController: MainVC())
+//        navigationItem.searchController = searchController
+
 //    @objc func addItem(){
 //        let v = AddHabitVC()
 //        v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
