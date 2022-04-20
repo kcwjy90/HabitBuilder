@@ -34,16 +34,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          mainVC.tabBarItem.image = UIImage(named: "goals")
          
          
-         let settingVC = SettingsVC()
-         let settingNavi = UINavigationController(rootViewController: settingVC)
-         settingVC.title = "Setting"
-         settingVC.tabBarItem.image = UIImage(named: "settings")
+         let allHabitsVC = AllHabitsVC()
+         let allHabitsNavi = UINavigationController(rootViewController: allHabitsVC)
+         allHabitsVC.title = "All Habits"
+         allHabitsVC.tabBarItem.image = UIImage(named: "all")
          
 //         settingVC.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 0)
                 
          self.window!.rootViewController = tabBarController
          
-         tabBarController.setViewControllers([defaultNavi, settingNavi], animated: false)
+         tabBarController.setViewControllers([defaultNavi, allHabitsNavi], animated: false)
                   
          self.window!.makeKeyAndVisible()
          return true

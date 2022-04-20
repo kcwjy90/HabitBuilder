@@ -11,6 +11,7 @@ import UIKit
 // 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
 protocol NewHabitVCDelegate: class {
     func didCreateNewHabit(title: String, desc: String, date: Date, time: Date)
+    
 }
 
 
@@ -248,7 +249,9 @@ class NewHabitVC: UIViewController {
     @objc func addButtonPressed(sender: UIButton) {
         
         delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
-        dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
+        dismiss(animated: true, completion: nil)
+      
+//와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     }
     
     @objc func backButtonPressed(sender: UIButton){

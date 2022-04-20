@@ -10,9 +10,7 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-
-
-class MainVC: UIViewController {
+class AllHabitsVC: UIViewController {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -28,28 +26,8 @@ class MainVC: UIViewController {
         return v
     }()
     
-    // dateLabelBackView 생성
-    lazy var dateLabelBackView: UIView = {
-        let v = UIView()
-        v.backgroundColor = .starWhite
-        return v
-    }()
-    
-    // dateLabel 생성
-    lazy var dateLabel: UILabel = {
-        let autoDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let currentDate = dateFormatter.string(from: autoDate)
-        let v = UILabel()
-        v.text = currentDate
-        v.font = UIFont.boldSystemFont(ofSize: 18.0)
-        //        v.backgroundColor = .blue
-        return v
-    }()
-    
     // todaysHabitTablewView 생성
-    lazy var todaysHabitTableView: UITableView = {
+    lazy var allHabitsTableView: UITableView = {
         let v = UITableView()
         v.register(HabitTableCell.self,
                    forCellReuseIdentifier:"MyCell")
@@ -60,21 +38,15 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
-    // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
-    var habits: [RMO_Habit] = []
-    
-    
     override func loadView() {
         super.loadView()
         
         setNaviBar()
-        
+        view.backgroundColor = .red
         view.addSubview(backView)
         view.backgroundColor = .white
         backView.addSubview(searchBar)
-        backView.addSubview(dateLabelBackView)
-        dateLabelBackView.addSubview(dateLabel)
-        backView.addSubview(todaysHabitTableView)
+        backView.addSubview(allHabitsTableView)
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
@@ -88,35 +60,18 @@ class MainVC: UIViewController {
             make.height.equalTo(44)
         }
         
-        // dateLabelBackView backveiw grid
-        dateLabelBackView.snp.makeConstraints{ (make) in
-            make.top.equalTo(searchBar.snp.bottom)
-            make.left.right.equalTo(backView)
-            make.height.equalTo(52)
-        }
-        
-        // dateLabel grid
-        dateLabel.snp.makeConstraints{ (make) in
-            make.centerY.equalTo(dateLabelBackView)
-            make.right.equalTo(dateLabelBackView).offset(-10)
-        }
         
         // todaysHabitTableView grid
-        todaysHabitTableView.snp.makeConstraints { (make) in
-            make.top.equalTo(dateLabelBackView.snp.bottom)
+        allHabitsTableView.snp.makeConstraints { (make) in
+            make.top.equalTo(searchBar.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
-        
-        filterTodaysHabit()
-        todaysHabitTableView.reloadData()
-        print("loaded")
-        
         
     }
     
     //Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
-        title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
+        title = "All Habits"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
@@ -125,19 +80,6 @@ class MainVC: UIViewController {
             target: self,
             action: #selector(addItem)
         )
-    }
-    
-    //filter to display Today's Habit
-    func filterTodaysHabit() {
-        habits = localRealm.objects(RMO_Habit.self).filter {
-            habit in
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
-            let habitDate = dateFormatter.string(from: habit.date)
-            let today = Date()
-            let todaysDate = dateFormatter.string(from: today)
-            return habitDate == todaysDate
-        }
     }
     
     @objc func addItem(){
@@ -149,9 +91,10 @@ class MainVC: UIViewController {
 }
 
 // extension 은 class 밖에
-extension MainVC: NewHabitVCDelegate {
+extension AllHabitsVC: NewHabitVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
+        
         // Get new habit from RMO_Habit
         let fromRMO_Habit = RMO_Habit()
         fromRMO_Habit.title = title
@@ -165,26 +108,29 @@ extension MainVC: NewHabitVCDelegate {
         
         // Get all habits in the realm
         let habits = localRealm.objects(RMO_Habit.self)
+        let mainVC = MainVC()
+        mainVC.loadView()
+        
         //        print(habits)
         
-        filterTodaysHabit()
-        todaysHabitTableView.reloadData()
+        allHabitsTableView.reloadData()
         
     }
     
 }
 
+
 //Adding tableview and content
 
-extension MainVC: UITableViewDelegate, UITableViewDataSource {
+extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row: \(indexPath.row)")
-        print(habits[indexPath.row].date)
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        let habits = localRealm.objects(RMO_Habit.self)
         return habits.count
     }
     
@@ -199,8 +145,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
-        
+        let habits = localRealm.objects(RMO_Habit.self)
         let newHabit = habits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
@@ -210,13 +155,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
         
-        
         return cell
     }
     
     
 }
-
-// 일단 filter 해서 보여지는 틀은 잡았음. 일단은 시험삼아 string으로 바꾸는것 까지는 됐으니 logic은 되는거 같고
-// 해야 할것 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거 3) reload가 필요함. 지금 현재는 내가 직접 다시 앱을 실행해야지만 새로운 habit이 뜸. 4) toArray()를 쓰지 않아도 되는건가? 그냥 .filter만 썼는데..
-
