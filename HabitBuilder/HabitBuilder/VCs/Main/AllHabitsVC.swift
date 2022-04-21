@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-class AllHabitsVC: UIViewController {
+class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -26,7 +26,7 @@ class AllHabitsVC: UIViewController {
         return v
     }()
     
-    // todaysHabitTablewView 생성
+    // allHabitTablewView 생성
     lazy var allHabitsTableView: UITableView = {
         let v = UITableView()
         v.register(HabitTableCell.self,
@@ -37,11 +37,16 @@ class AllHabitsVC: UIViewController {
     }()
     
     let localRealm = DBManager.SI.realm!
+    var habits: [RMO_Habit] = []
+    var searchedHabits: [RMO_Habit]! //일단은 empty []로.
     
     override func loadView() {
         super.loadView()
         
         setNaviBar()
+        
+        searchBar.delegate = self
+        
         view.backgroundColor = .red
         view.addSubview(backView)
         view.backgroundColor = .white
@@ -60,12 +65,15 @@ class AllHabitsVC: UIViewController {
             make.height.equalTo(44)
         }
         
-        
         // todaysHabitTableView grid
         allHabitsTableView.snp.makeConstraints { (make) in
             make.top.equalTo(searchBar.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
+        
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+        searchedHabits = habits //  이 3줄을 여기 적는 이유는 MainVC와는 다르게 today()로 filter하는게 없기 때문에 tableView 에서 NumbofRow를 지정하고 value를 가져오려면 searchedHabits[] 일단 data가 들어가야 해서 이다. 이전에는 바로 RMO_Habits에서 data를 가져왔기 때문에 상관없었다.
+        allHabitsTableView.reloadData()
         
     }
     
@@ -107,13 +115,11 @@ extension AllHabitsVC: NewHabitVCDelegate {
         }
         
         // Get all habits in the realm
-        let habits = localRealm.objects(RMO_Habit.self)
-        let mainVC = MainVC()
-        mainVC.loadView()
-        
-        //        print(habits)
-        
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+        searchedHabits = habits
         allHabitsTableView.reloadData()
+        
+        print(habits)
         
     }
     
@@ -131,7 +137,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         let habits = localRealm.objects(RMO_Habit.self)
-        return habits.count
+        return searchedHabits.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -145,8 +151,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let habits = localRealm.objects(RMO_Habit.self)
-        let newHabit = habits[indexPath.row]
+        let newHabit = searchedHabits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
@@ -158,5 +163,20 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        searchedHabits = []
+        
+        if searchText == "" { //만약 searchText가 비었으면 habits전체를 나타냄.
+            searchedHabits = habits
+        }
+        
+        for habit in habits { //만약 habits 안에 있는 habit.title이 검색된 것에 해당하면 그것을 searchedHabits[] 안으로
+            if habit.title.lowercased().contains(searchText.lowercased()) {
+                searchedHabits.append(habit)
+            }
+        }
+        self.allHabitsTableView.reloadData() //tableView를 reload
+    }
     
 }

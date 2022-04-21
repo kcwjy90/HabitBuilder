@@ -12,7 +12,7 @@ import RealmSwift
 
 
 
-class MainVC: UIViewController {
+class MainVC: UIViewController, UISearchBarDelegate {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -62,12 +62,14 @@ class MainVC: UIViewController {
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
     var habits: [RMO_Habit] = []
-    
+    var searchedHabits: [RMO_Habit]! //일단은 empty []로.
     
     override func loadView() {
         super.loadView()
         
         setNaviBar()
+        
+        searchBar.delegate = self
         
         view.addSubview(backView)
         view.backgroundColor = .white
@@ -108,9 +110,8 @@ class MainVC: UIViewController {
         }
         
         filterTodaysHabit()
-        todaysHabitTableView.reloadData()
-        print("loaded")
         
+        todaysHabitTableView.reloadData()
         
     }
     
@@ -138,11 +139,13 @@ class MainVC: UIViewController {
             let todaysDate = dateFormatter.string(from: today)
             return habitDate == todaysDate
         }
+        
+        searchedHabits = habits //search 된 habit을 다시 habits[] 안으로
     }
     
     @objc func addItem(){
         let v = NewHabitVC()
-        v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
+        v.delegate = self
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
@@ -162,20 +165,16 @@ extension MainVC: NewHabitVCDelegate {
         try! localRealm.write {
             localRealm.add(fromRMO_Habit)
         }
+        // let habits = localRealm.objects(RMO_Habit.self)
         
-        // Get all habits in the realm
-        let habits = localRealm.objects(RMO_Habit.self)
-        //        print(habits)
-        
-        filterTodaysHabit()
-        todaysHabitTableView.reloadData()
+        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
+        todaysHabitTableView.reloadData() //reload
         
     }
     
 }
 
 //Adding tableview and content
-
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -185,7 +184,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return habits.count
+        return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -201,7 +200,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
         
-        let newHabit = habits[indexPath.row]
+        let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
@@ -210,13 +209,27 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
         
-        
         return cell
     }
     
+    // SearchBar.
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchedHabits = []
+        
+        if searchText == "" { //만약 searchText가 비었으면 habits전체를 나타냄.
+            searchedHabits = habits
+        }
+        
+        for habit in habits { //만약 habits 안에 있는 habit.title이 검색된 것에 해당하면 그것을 searchedHabits[] 안으로
+            if habit.title.lowercased().contains(searchText.lowercased()) {
+                searchedHabits.append(habit)
+            }
+        }
+        self.todaysHabitTableView.reloadData() //tableView를 reload
+    }
     
 }
 
-// 일단 filter 해서 보여지는 틀은 잡았음. 일단은 시험삼아 string으로 바꾸는것 까지는 됐으니 logic은 되는거 같고
-// 해야 할것 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거 3) reload가 필요함. 지금 현재는 내가 직접 다시 앱을 실행해야지만 새로운 habit이 뜸. 4) toArray()를 쓰지 않아도 되는건가? 그냥 .filter만 썼는데..
+// 해야 할것 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 
