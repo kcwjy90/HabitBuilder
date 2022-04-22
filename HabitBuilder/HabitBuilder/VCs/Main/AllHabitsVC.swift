@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import RealmSwift
+import SwiftUI
 
 class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
@@ -138,20 +139,33 @@ extension AllHabitsVC: NewHabitVCDelegate {
 
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
+//    func numberOfSections(in tableView: UITableView) -> Int {
+//        return self.searchedHabits.count
+//    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row: \(indexPath.row)")
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        let habits = localRealm.objects(RMO_Habit.self)
-        return searchedHabits.count
+        return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+//        return searchedHabits[section].desc.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
         return 44.0 //Choose your custom row
     }
+    
+//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        if let date = searchedHabits.first {
+//            let dateFormatter = DateFormatter()
+//            dateFormatter.dateFormat = "MM/dd/yyyy"
+//            let header = dateFormatter.string(from: date.date)
+//            return header
+//        }
+//        return "section: \(Date())"
+//    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
@@ -178,6 +192,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
 //            cell.newHabitTitle.textColor = UIColor.black
 //        }
 //        =======
+        
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
