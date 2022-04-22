@@ -169,7 +169,7 @@ extension MainVC: NewHabitVCDelegate {
         
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
-        
+    
     }
     
 }

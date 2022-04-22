@@ -40,8 +40,11 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit]! //일단은 empty []로.
     
+    
     override func loadView() {
         super.loadView()
+        
+        print("please")
         
         setNaviBar()
         
@@ -96,6 +99,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
+
 }
 
 // extension 은 class 밖에
@@ -118,6 +122,10 @@ extension AllHabitsVC: NewHabitVCDelegate {
         habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
         searchedHabits = habits
         allHabitsTableView.reloadData()
+        
+//        let mainvc = MainVC()  // 왜 reload가 안되는거지...암만 해봐도 모르겠네
+//        mainvc.filterTodaysHabit()
+//        mainvc.todaysHabitTableView.reloadData()
         
         print(habits)
         
@@ -152,10 +160,24 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         let newHabit = searchedHabits[indexPath.row]
-        let title = newHabit.title
+        var title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
         let time = newHabit.time
+        
+//        ======== 지금 당장 필요한 기능은 아니고, 나중에 혹시 필요할지도 몰라서..
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//
+//        if dateFormatter.string(from: date) == dateFormatter.string(from: Date()) {
+//            let today = "[Today] "
+//            title = "[Today] " + title
+//            cell.newHabitTitle.textColor = UIColor.red
+//            print(date)
+//        } else {
+//            cell.newHabitTitle.textColor = UIColor.black
+//        }
+//        =======
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
@@ -180,3 +202,5 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
 }
+
+

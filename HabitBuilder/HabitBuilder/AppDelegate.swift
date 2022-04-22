@@ -44,6 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          self.window!.rootViewController = tabBarController
          
          tabBarController.setViewControllers([defaultNavi, allHabitsNavi], animated: false)
+         
                   
          self.window!.makeKeyAndVisible()
          return true
