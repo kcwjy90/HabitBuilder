@@ -125,7 +125,7 @@ class NewHabitVC: UIViewController {
         v.backgroundColor = .systemGray5
         return v
     }()
-    
+        
     override func loadView() {
         super.loadView()
         
@@ -182,6 +182,8 @@ class NewHabitVC: UIViewController {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
+        newHabitTitle.setLeftPaddingPoints(5)
+        newHabitTitle.setRightPaddingPoints(5)
         
         // newHabitDesc TextField size grid
         newHabitDesc.snp.makeConstraints { (make) in
@@ -190,6 +192,9 @@ class NewHabitVC: UIViewController {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
+        newHabitDesc.setLeftPaddingPoints(5)
+        newHabitDesc.setRightPaddingPoints(5)
+        newHabitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
         
         // newHabitDateBackview size grid
         newHabitDateBackview.snp.makeConstraints { (make) in
@@ -257,6 +262,20 @@ class NewHabitVC: UIViewController {
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
-    
 }
 
+// for UITextField Padding
+
+extension UITextField {
+    func setLeftPaddingPoints(_ amount:CGFloat){
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
+        self.leftView = paddingView
+        self.leftViewMode = .always
+    }
+    func setRightPaddingPoints(_ amount:CGFloat) {
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
+        self.rightView = paddingView
+        self.rightViewMode = .always
+    }
+  
+}
