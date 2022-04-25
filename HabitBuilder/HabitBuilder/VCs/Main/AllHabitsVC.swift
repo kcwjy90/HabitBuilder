@@ -75,9 +75,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             make.left.right.bottom.equalTo(backView)
         }
         
-        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        searchedHabits = habits //  이 3줄을 여기 적는 이유는 MainVC와는 다르게 today()로 filter하는게 없기 때문에 tableView 에서 NumbofRow를 지정하고 value를 가져오려면 searchedHabits[] 일단 data가 들어가야 해서 이다. 이전에는 바로 RMO_Habits에서 data를 가져왔기 때문에 상관없었다.
-        allHabitsTableView.reloadData()
+        reloadData()
         
     }
     
@@ -100,6 +98,19 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
+    
+    func reloadData() {
+        // Get all habits in the realm
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+        searchedHabits = habits //  이 3줄을 여기 적는 이유는 MainVC와는 다르게 today()로 filter하는게 없기 때문에 tableView 에서 NumbofRow를 지정하고 value를 가져오려면 searchedHabits[] 일단 data가 들어가야 해서 이다. 이전에는 바로 RMO_Habits에서 data를 가져왔기 때문에 상관없었다.
+        allHabitsTableView.reloadData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadData()
+    }
+    
 
 }
 
@@ -120,9 +131,7 @@ extension AllHabitsVC: NewHabitVCDelegate {
         }
         
         // Get all habits in the realm
-        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        searchedHabits = habits
-        allHabitsTableView.reloadData()
+        reloadData()
         
 //        let mainvc = MainVC()  // 왜 reload가 안되는거지...암만 해봐도 모르겠네
 //        mainvc.filterTodaysHabit()
@@ -216,6 +225,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         self.allHabitsTableView.reloadData() //tableView를 reload
     }
     
+  
 }
 
 

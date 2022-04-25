@@ -172,6 +172,15 @@ extension MainVC: NewHabitVCDelegate {
     
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        filterTodaysHabit()
+        todaysHabitTableView.reloadData()
+        
+    }
+    
+
+    
 }
 
 //Adding tableview and content
