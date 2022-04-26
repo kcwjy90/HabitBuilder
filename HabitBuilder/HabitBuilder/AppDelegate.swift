@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
     
          UITabBar.appearance().tintColor = .red
          
-         let mainVC = MainVC()
+         let mainVC = NotiTestVC()
          let defaultNavi = UINavigationController(rootViewController: mainVC)
          mainVC.title = "Habits"
          mainVC.tabBarItem.image = UIImage(named: "goals")

@@ -176,7 +176,6 @@ extension MainVC: NewHabitVCDelegate {
         super.viewWillAppear(animated)
         filterTodaysHabit()
         todaysHabitTableView.reloadData()
-        
     }
     
 
