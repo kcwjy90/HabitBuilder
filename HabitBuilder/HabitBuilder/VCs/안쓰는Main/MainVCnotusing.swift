@@ -182,3 +182,15 @@
 //    dismiss(animated: true, completion: nil)  //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
 //
 //}
+
+
+// filter 말고 if 문을 돌려서 searchText filter 했던코드
+//        if searchText != "" { //만약 searchText가 비었으면 habits전체를 나타냄.
+//            searchedHabits = habits
+//        }
+//
+//        for habit in habits { //만약 habits 안에 있는 habit.title이 검색된 것에 해당하면 그것을 searchedHabits[] 안으로
+//            if habit.title.lowercased().contains(searchText.lowercased()) {
+//                searchedHabits.append(habit)
+//            }
+//        }

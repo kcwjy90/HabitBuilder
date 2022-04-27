@@ -80,8 +80,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
-            make.top.equalTo(view).offset(64)
-            make.left.right.bottom.equalTo(view)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         // searchBar grid
@@ -223,18 +222,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     // SearchBar.
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
         searchedHabits = []
         
-        if searchText == "" { //만약 searchText가 비었으면 habits전체를 나타냄.
-            searchedHabits = habits
-        }
-        
-        for habit in habits { //만약 habits 안에 있는 habit.title이 검색된 것에 해당하면 그것을 searchedHabits[] 안으로
-            if habit.title.lowercased().contains(searchText.lowercased()) {
-                searchedHabits.append(habit)
+        if searchText != "" {
+            searchedHabits = habits.filter { habit in
+                return habit.title.lowercased().contains(searchText.lowercased())
             }
+        } else {
+            self.searchedHabits = self.habits
         }
-        self.todaysHabitTableView.reloadData() //tableView를 reload
+        self.todaysHabitTableView.reloadData()
     }
     
 }

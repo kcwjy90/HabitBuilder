@@ -59,8 +59,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
-            make.top.equalTo(view).offset(64)
-            make.left.right.bottom.equalTo(view)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         // searchBar grid
@@ -111,7 +110,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         reloadData()
     }
     
-
+    
 }
 
 // extension 은 class 밖에
@@ -133,9 +132,9 @@ extension AllHabitsVC: NewHabitVCDelegate {
         // Get all habits in the realm
         reloadData()
         
-//        let mainvc = MainVC()  // 왜 reload가 안되는거지...암만 해봐도 모르겠네
-//        mainvc.filterTodaysHabit()
-//        mainvc.todaysHabitTableView.reloadData()
+        //        let mainvc = MainVC()  // 왜 reload가 안되는거지...암만 해봐도 모르겠네
+        //        mainvc.filterTodaysHabit()
+        //        mainvc.todaysHabitTableView.reloadData()
         
         print(habits)
         
@@ -148,9 +147,9 @@ extension AllHabitsVC: NewHabitVCDelegate {
 
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return self.searchedHabits.count
-//    }
+    //    func numberOfSections(in tableView: UITableView) -> Int {
+    //        return self.searchedHabits.count
+    //    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("Row: \(indexPath.row)")
@@ -158,7 +157,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
-//        return searchedHabits[section].desc.count
+        //        return searchedHabits[section].desc.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -166,15 +165,15 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return 44.0 //Choose your custom row
     }
     
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        if let date = searchedHabits.first {
-//            let dateFormatter = DateFormatter()
-//            dateFormatter.dateFormat = "MM/dd/yyyy"
-//            let header = dateFormatter.string(from: date.date)
-//            return header
-//        }
-//        return "section: \(Date())"
-//    }
+    //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    //        if let date = searchedHabits.first {
+    //            let dateFormatter = DateFormatter()
+    //            dateFormatter.dateFormat = "MM/dd/yyyy"
+    //            let header = dateFormatter.string(from: date.date)
+    //            return header
+    //        }
+    //        return "section: \(Date())"
+    //    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
@@ -188,19 +187,19 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         let date = newHabit.date
         let time = newHabit.time
         
-//        ======== 지금 당장 필요한 기능은 아니고, 나중에 혹시 필요할지도 몰라서..
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//
-//        if dateFormatter.string(from: date) == dateFormatter.string(from: Date()) {
-//            let today = "[Today] "
-//            title = "[Today] " + title
-//            cell.newHabitTitle.textColor = UIColor.red
-//            print(date)
-//        } else {
-//            cell.newHabitTitle.textColor = UIColor.black
-//        }
-//        =======
+        //        ======== 지금 당장 필요한 기능은 아니고, 나중에 혹시 필요할지도 몰라서..
+        //        let dateFormatter = DateFormatter()
+        //        dateFormatter.dateFormat = "MM/dd/yyyy"
+        //
+        //        if dateFormatter.string(from: date) == dateFormatter.string(from: Date()) {
+        //            let today = "[Today] "
+        //            title = "[Today] " + title
+        //            cell.newHabitTitle.textColor = UIColor.red
+        //            print(date)
+        //        } else {
+        //            cell.newHabitTitle.textColor = UIColor.black
+        //        }
+        //        =======
         
         
         cell.newHabitTitle.text = title + " - "
@@ -211,21 +210,17 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        searchedHabits = []
+        searchedHabits = [] //비어있는 searchedHabits
+        let habits = localRealm.objects(RMO_Habit.self).toArray() // RMO_Habit 을 array로
         
-        if searchText == "" { //만약 searchText가 비었으면 habits전체를 나타냄.
-            searchedHabits = habits
-        }
-        
-        for habit in habits { //만약 habits 안에 있는 habit.title이 검색된 것에 해당하면 그것을 searchedHabits[] 안으로
-            if habit.title.lowercased().contains(searchText.lowercased()) {
-                searchedHabits.append(habit)
+        if searchText != "" { //만약 searchText가 비어있지 않으면
+            searchedHabits = habits.filter { habit in //searchedHabits은 Habit 을 filter한것과 =
+                return habit.title.lowercased().contains(searchText.lowercased()) //filter내용은 title = searchText
             }
+        } else {
+            self.searchedHabits = self.habits // searchText가 비어 있으면 searchedHabits = habits.
+            
         }
         self.allHabitsTableView.reloadData() //tableView를 reload
     }
-    
-  
 }
-
-
