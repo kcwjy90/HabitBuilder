@@ -74,6 +74,8 @@
 			isa = PBXGroup;
 			children = (
 				48B22CEC27F7153B00967056 /* MainVCnotusing.swift */,
+				480568022817A5DA0066FF9A /* NotiTestVC.swift */,
+				48BD66F8281A644300F239A6 /* NotiTest2VC.swift */,
 			);
 			name = NotInUseMain;
 			path = "안쓰는Main";
@@ -167,8 +169,6 @@
 		C0B2E8D827A11BF600BC03EB /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				480568022817A5DA0066FF9A /* NotiTestVC.swift */,
-				48BD66F8281A644300F239A6 /* NotiTest2VC.swift */,
 				C0B2E8E527A11DC500BC03EB /* MainVC.swift */,
 				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				480567F827FBD7E50066FF9A /* SettingsVC.swift */,

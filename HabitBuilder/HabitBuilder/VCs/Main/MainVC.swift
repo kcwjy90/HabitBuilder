@@ -58,7 +58,7 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
     }()
     
     let userNotificationCenter = UNUserNotificationCenter.current()
-
+    
     let localRealm = DBManager.SI.realm!
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
@@ -173,20 +173,13 @@ extension MainVC: NewHabitVCDelegate {
         
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
-    
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         filterTodaysHabit()
         todaysHabitTableView.reloadData()
-    }
-    
-    func formattedDate(date: Date) -> String
-    {
-        let formmater = DateFormatter()
-        formmater.dateFormat = "d MMM y HH:mm"
-        return formmater.string(from:date)
     }
     
     func requestNotificationAuthorization() { //처음에 notification 받을지 authorize 하는 것
@@ -199,30 +192,36 @@ extension MainVC: NewHabitVCDelegate {
         }
     }
     
-    func sendNotification() { //notification 보내는 content
+    func sendNotification() { //notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
         let notificationContent = UNMutableNotificationContent()
-        notificationContent.title = "Test"
-        notificationContent.body = "Test body"
-        notificationContent.badge = NSNumber(value: 2)
+        notificationContent.badge = NSNumber(value: 1)
         
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5,
-                                                        repeats: false)
-        let request = UNNotificationRequest(identifier: "testNotification",
-                                            content: notificationContent,
-                                            trigger: trigger)
-        
-        userNotificationCenter.add(request) { (error) in
-            if let error = error {
-                print("Notification Error: ", error)
+        for habit in localRealm.objects(RMO_Habit.self) {
+            
+            notificationContent.title = habit.title
+            notificationContent.body = habit.desc
+
+            let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.time)
+            
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
+            
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: notificationContent, trigger: trigger)
+            
+            self.userNotificationCenter.add(request) { (error) in
+                if (error != nil)
+                {
+                    print("Error" + error.debugDescription)
+                    return
+                }
             }
         }
     }
     
-    // 앱 안에 있을때도 noti 받을수 있게 하는 code
+    // HabitBuilder 실행 중에도 notification 받을수 있게 하는 code
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.alert, .badge, .sound])
     }
-
+    
     
 }
 
@@ -249,9 +248,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else {
             return UITableViewCell()
         }
-        
-        //        let autoDate = Date() //왜 얘는 또 4/15/22 이찍히는거야...
-        
+            
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
         let desc = newHabit.desc
@@ -282,5 +279,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-// 해야 할것 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
+//아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐.
+//저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 
