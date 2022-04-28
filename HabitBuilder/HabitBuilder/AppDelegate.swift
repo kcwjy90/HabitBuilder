@@ -49,6 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          self.window!.makeKeyAndVisible()
          return true
      }
+    
+    // Local notifications. 이 코드는 notification를 통해 app 으로 들어가면 앱 아이콘의 빨간 숫자를 지워준다.
+    func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
+        UIApplication.shared.applicationIconBadgeNumber = 0
+    }
 
 
 

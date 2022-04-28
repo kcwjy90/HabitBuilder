@@ -15,7 +15,7 @@ protocol NewHabitVCDelegate: class {
 }
 
 
-class NewHabitVC: UIViewController {
+class NewHabitVC: UIViewController, UISearchBarDelegate {
     
     weak var delegate: NewHabitVCDelegate?   // Delegate property var 생성
     
@@ -126,6 +126,7 @@ class NewHabitVC: UIViewController {
         return v
     }()
         
+
     override func loadView() {
         super.loadView()
         
@@ -249,7 +250,7 @@ class NewHabitVC: UIViewController {
         
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
     }
-    
+
     
     @objc func addButtonPressed(sender: UIButton) {
         

@@ -104,7 +104,7 @@ class NotiTestVC: UIViewController {
                 if(settings.authorizationStatus == .authorized)
                 {
                     let content = UNMutableNotificationContent()
-                    content.title = title
+                        content.title = title
                     let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
 
                     let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)

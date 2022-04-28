@@ -9,10 +9,9 @@
 import UIKit
 import SnapKit
 import RealmSwift
+import UserNotifications
 
-
-
-class MainVC: UIViewController, UISearchBarDelegate {
+class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDelegate {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -58,6 +57,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    let userNotificationCenter = UNUserNotificationCenter.current()
+
     let localRealm = DBManager.SI.realm!
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
@@ -68,6 +69,10 @@ class MainVC: UIViewController, UISearchBarDelegate {
         super.loadView()
         
         setNaviBar()
+        
+        self.userNotificationCenter.delegate = self //
+        self.requestNotificationAuthorization()
+        self.sendNotification()
         
         searchBar.delegate = self
         
@@ -177,6 +182,46 @@ extension MainVC: NewHabitVCDelegate {
         todaysHabitTableView.reloadData()
     }
     
+    func formattedDate(date: Date) -> String
+    {
+        let formmater = DateFormatter()
+        formmater.dateFormat = "d MMM y HH:mm"
+        return formmater.string(from:date)
+    }
+    
+    func requestNotificationAuthorization() { //처음에 notification 받을지 authorize 하는 것
+        let authOptions = UNAuthorizationOptions.init(arrayLiteral: .alert, .badge, .sound)
+        
+        self.userNotificationCenter.requestAuthorization(options: authOptions) { (success, error) in
+            if let error = error {
+                print("Error: ", error)
+            }
+        }
+    }
+    
+    func sendNotification() { //notification 보내는 content
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.title = "Test"
+        notificationContent.body = "Test body"
+        notificationContent.badge = NSNumber(value: 2)
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5,
+                                                        repeats: false)
+        let request = UNNotificationRequest(identifier: "testNotification",
+                                            content: notificationContent,
+                                            trigger: trigger)
+        
+        userNotificationCenter.add(request) { (error) in
+            if let error = error {
+                print("Notification Error: ", error)
+            }
+        }
+    }
+    
+    // 앱 안에 있을때도 noti 받을수 있게 하는 code
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
+    }
 
     
 }

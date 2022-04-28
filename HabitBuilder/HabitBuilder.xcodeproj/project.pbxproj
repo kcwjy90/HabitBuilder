@@ -12,6 +12,7 @@
 		480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480568022817A5DA0066FF9A /* NotiTestVC.swift */; };
 		48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_Habit.swift */; };
 		48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CEC27F7153B00967056 /* MainVCnotusing.swift */; };
+		48BD66F9281A644300F239A6 /* NotiTest2VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BD66F8281A644300F239A6 /* NotiTest2VC.swift */; };
 		C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */; };
 		C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */; };
 		C0B2E8C027A119D900BC03EB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0B2E8BF27A119D900BC03EB /* AppDelegate.swift */; };
@@ -32,6 +33,7 @@
 		480568022817A5DA0066FF9A /* NotiTestVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTestVC.swift; sourceTree = "<group>"; };
 		48B22CE927F6706A00967056 /* RMO_Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Habit.swift; sourceTree = "<group>"; };
 		48B22CEC27F7153B00967056 /* MainVCnotusing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCnotusing.swift; sourceTree = "<group>"; };
+		48BD66F8281A644300F239A6 /* NotiTest2VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTest2VC.swift; sourceTree = "<group>"; };
 		4D74EE2AC5A365C3D37B7746 /* Pods-HabitBuilder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.release.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.release.xcconfig"; sourceTree = "<group>"; };
 		680D9F63CFD8EBC82EE79390 /* Pods-HabitBuilder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.debug.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.debug.xcconfig"; sourceTree = "<group>"; };
 		C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHabitVC.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				480568022817A5DA0066FF9A /* NotiTestVC.swift */,
+				48BD66F8281A644300F239A6 /* NotiTest2VC.swift */,
 				C0B2E8E527A11DC500BC03EB /* MainVC.swift */,
 				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				480567F827FBD7E50066FF9A /* SettingsVC.swift */,
@@ -306,6 +309,7 @@
 				480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */,
 				C0B2E8E027A11C9A00BC03EB /* PrefsManager.swift in Sources */,
 				C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */,
+				48BD66F9281A644300F239A6 /* NotiTest2VC.swift in Sources */,
 				C0B2E8E427A11DA600BC03EB /* ColorExtension.swift in Sources */,
 				48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */,
 				480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */,
