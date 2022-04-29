@@ -45,10 +45,14 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     override func loadView() {
         super.loadView()
         
-        print("please")
-        
         setNaviBar()
-        
+
+        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
+
+        // tapGasture - Dismisses Keyboard
+        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(UITapGesture)
+                
         searchBar.delegate = self
         
         view.backgroundColor = .red

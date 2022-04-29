@@ -70,6 +70,13 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         
         setNaviBar()
         
+        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
+        
+        // tapGasture - Dismisses Keyboard
+        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(UITapGesture)
+        
+        
         self.userNotificationCenter.delegate = self //
         self.requestNotificationAuthorization()
         self.sendNotification()
@@ -153,6 +160,8 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
+    
+    
 }
 
 // extension 은 class 밖에

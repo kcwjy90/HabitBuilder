@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          // Override point for customization after application launch.
          
          DBManager.SI.initialize()
-         
+                  
          self.window = UIWindow(frame: UIScreen.main.bounds)
 
          // Declaring TabBar
@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
         
          tabBarController.tabBar.isTranslucent = false // both lines needed
          tabBarController.tabBar.backgroundColor = .white // to change tabbar color
-    
+             
          UITabBar.appearance().tintColor = .red
          
          let mainVC = MainVC()
@@ -48,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
                   
          self.window!.makeKeyAndVisible()
          return true
+         
      }
     
     // Local notifications. 이 코드는 notification를 통해 app 으로 들어가면 앱 아이콘의 빨간 숫자를 지워준다.
