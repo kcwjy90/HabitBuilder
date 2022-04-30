@@ -11,6 +11,7 @@
 		480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567FC280E6E050066FF9A /* AllHabitsVC.swift */; };
 		480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480568022817A5DA0066FF9A /* NotiTestVC.swift */; };
 		48990397281BBBC3009ED152 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990396281BBBC3009ED152 /* NotificationManager.swift */; };
+		48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990398281DB99E009ED152 /* HabitDetailVC.swift */; };
 		48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_Habit.swift */; };
 		48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CEC27F7153B00967056 /* MainVCnotusing.swift */; };
 		48BD66F9281A644300F239A6 /* NotiTest2VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BD66F8281A644300F239A6 /* NotiTest2VC.swift */; };
@@ -33,6 +34,7 @@
 		480567FC280E6E050066FF9A /* AllHabitsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllHabitsVC.swift; sourceTree = "<group>"; };
 		480568022817A5DA0066FF9A /* NotiTestVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTestVC.swift; sourceTree = "<group>"; };
 		48990396281BBBC3009ED152 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		48990398281DB99E009ED152 /* HabitDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitDetailVC.swift; sourceTree = "<group>"; };
 		48B22CE927F6706A00967056 /* RMO_Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Habit.swift; sourceTree = "<group>"; };
 		48B22CEC27F7153B00967056 /* MainVCnotusing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCnotusing.swift; sourceTree = "<group>"; };
 		48BD66F8281A644300F239A6 /* NotiTest2VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTest2VC.swift; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				480567F827FBD7E50066FF9A /* SettingsVC.swift */,
 				C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */,
+				48990398281DB99E009ED152 /* HabitDetailVC.swift */,
 				C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */,
 			);
 			path = Main;
@@ -305,6 +308,7 @@
 			files = (
 				480567F927FBD7E50066FF9A /* SettingsVC.swift in Sources */,
 				48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */,
+				48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */,
 				C0B2E8DE27A11C8200BC03EB /* DBManager.swift in Sources */,
 				C0B2E8E627A11DC500BC03EB /* MainVC.swift in Sources */,
 				C0B2E8E227A11D1C00BC03EB /* ServiceKey.swift in Sources */,
