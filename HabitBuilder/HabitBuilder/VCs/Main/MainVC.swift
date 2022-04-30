@@ -286,6 +286,82 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         self.todaysHabitTableView.reloadData()
     }
     
+    
+    
+    //swipe 해서 지우는 function
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                
+                let realm = localRealm.objects(RMO_Habit.self)
+                let habit = searchedHabits[indexPath.row]
+                let thisTitle = habit.title
+                let thisTime = habit.time
+                
+                try! localRealm.write {
+
+                    let deleteHabit = realm.where {
+                        $0.title == thisTitle || $0.time == thisTime
+                      }
+                    localRealm.delete(deleteHabit)
+
+                }
+                
+                //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                tableView.beginUpdates()
+                searchedHabits.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.endUpdates()
+            }
+    }
+    
+
+    
+    
+//    private func doneHabit() {
+//        print("Finished Habit")
+//    }
+//
+//    private func editHabit() {
+//        print("Edit Habit")
+//    }
+//
+//    private func deleteHabit() {
+//        print("Delete Habit")
+//    }
+//
+//    func tableView(_ tableView: UITableView,
+//                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+//
+//        let done = UIContextualAction(style: .normal,
+//                                       title: "Done") { [weak self] (action, view, completionHandler) in
+//                                        self?.doneHabit()
+//                                        completionHandler(true)
+//        }
+//        done.backgroundColor = .systemBlue
+//
+//        let edit = UIContextualAction(style: .normal,
+//                                       title: "Edit") { [weak self] (action, view, completionHandler) in
+//                                        self?.doneHabit()
+//                                        completionHandler(true)
+//        }
+//        edit.backgroundColor = .systemOrange
+//
+//        let delete = UIContextualAction(style: .destructive,
+//                                        title: "Delete") { [weak self] (action, view, completionHandler) in
+//                                            self?.deleteHabit()
+//                                            completionHandler(true)
+//        }
+//        delete.backgroundColor = .systemRed
+//
+//        return UISwipeActionsConfiguration(actions: [delete, edit, done])
+
+//    }
+
+    
 }
 
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐.
