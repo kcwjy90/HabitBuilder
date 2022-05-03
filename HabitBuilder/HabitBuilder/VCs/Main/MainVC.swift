@@ -11,6 +11,8 @@ import SnapKit
 import RealmSwift
 import UserNotifications
 
+
+
 class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDelegate {
     
     // backView 생성
@@ -73,8 +75,8 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
         // tapGasture - Dismisses Keyboard
-        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
-        view.addGestureRecognizer(UITapGesture)
+        //        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+        //        view.addGestureRecognizer(UITapGesture)
         
         
         self.userNotificationCenter.delegate = self //
@@ -191,7 +193,8 @@ extension MainVC: NewHabitVCDelegate {
         todaysHabitTableView.reloadData()
     }
     
-    func requestNotificationAuthorization() { //처음에 notification 받을지 authorize 하는 것
+    //처음에 notification 받을지 authorize 하는 것
+    func requestNotificationAuthorization() {
         let authOptions = UNAuthorizationOptions.init(arrayLiteral: .alert, .badge, .sound)
         
         self.userNotificationCenter.requestAuthorization(options: authOptions) { (success, error) in
@@ -201,7 +204,8 @@ extension MainVC: NewHabitVCDelegate {
         }
     }
     
-    func sendNotification() { //notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    // Notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    func sendNotification() {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.badge = NSNumber(value: 1)
         
@@ -209,7 +213,7 @@ extension MainVC: NewHabitVCDelegate {
             
             notificationContent.title = habit.title
             notificationContent.body = habit.desc
-
+            
             let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.time)
             
             let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
@@ -238,8 +242,24 @@ extension MainVC: NewHabitVCDelegate {
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Row: \(indexPath.row)")
-        print(habits[indexPath.row].date)
+        //        print("Row: \(indexPath.row)")
+        //        print(habits[indexPath.row].date)
+        
+        
+        let habitDetailVC = HabitDetailVC() // Your destination
+        habitDetailVC.habitTitle.text = habits[indexPath.row].title
+        habitDetailVC.habitDesc.text = habits[indexPath.row].desc
+        let dateFormatter = DateFormatter()
+        let timeFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        timeFormatter.dateFormat = "h:mm a"
+        timeFormatter.amSymbol = "AM"
+        timeFormatter.pmSymbol = "PM"
+        habitDetailVC.habitDate.text = dateFormatter.string(from: habits[indexPath.row].date)
+        habitDetailVC.habitTime.text = timeFormatter.string(from: habits[indexPath.row].date)
+        
+        navigationController?.pushViewController(habitDetailVC, animated: true)
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -257,7 +277,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else {
             return UITableViewCell()
         }
-            
+        
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
         let desc = newHabit.desc
@@ -270,8 +290,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    // SearchBar.
-    
+    // SearchBar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = []
@@ -294,77 +313,77 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-            if editingStyle == .delete {
+        if editingStyle == .delete {
+            
+            let realm = localRealm.objects(RMO_Habit.self)
+            let habit = searchedHabits[indexPath.row]
+            let thisTitle = habit.title
+            let thisTime = habit.time
+            
+            try! localRealm.write {
                 
-                let realm = localRealm.objects(RMO_Habit.self)
-                let habit = searchedHabits[indexPath.row]
-                let thisTitle = habit.title
-                let thisTime = habit.time
-                
-                try! localRealm.write {
-
-                    let deleteHabit = realm.where {
-                        $0.title == thisTitle || $0.time == thisTime
-                      }
-                    localRealm.delete(deleteHabit)
-
+                let deleteHabit = realm.where {
+                    $0.title == thisTitle || $0.time == thisTime
                 }
+                localRealm.delete(deleteHabit)
                 
-                //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-                tableView.beginUpdates()
-                searchedHabits.remove(at: indexPath.row)
-                tableView.deleteRows(at: [indexPath], with: .fade)
-                tableView.endUpdates()
             }
+            
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+            tableView.beginUpdates()
+            searchedHabits.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.endUpdates()
+        }
     }
     
     
-
     
     
-//    private func doneHabit() {
-//        print("Finished Habit")
-//    }
-//
-//    private func editHabit() {
-//        print("Edit Habit")
-//    }
-//
-//    private func deleteHabit() {
-//        print("Delete Habit")
-//    }
-//
-//    func tableView(_ tableView: UITableView,
-//                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-//
-//        let done = UIContextualAction(style: .normal,
-//                                       title: "Done") { [weak self] (action, view, completionHandler) in
-//                                        self?.doneHabit()
-//                                        completionHandler(true)
-//        }
-//        done.backgroundColor = .systemBlue
-//
-//        let edit = UIContextualAction(style: .normal,
-//                                       title: "Edit") { [weak self] (action, view, completionHandler) in
-//                                        self?.doneHabit()
-//                                        completionHandler(true)
-//        }
-//        edit.backgroundColor = .systemOrange
-//
-//        let delete = UIContextualAction(style: .destructive,
-//                                        title: "Delete") { [weak self] (action, view, completionHandler) in
-//                                            self?.deleteHabit()
-//                                            completionHandler(true)
-//        }
-//        delete.backgroundColor = .systemRed
-//
-//        return UISwipeActionsConfiguration(actions: [delete, edit, done])
-
-//    }
-
+    
+    //    private func doneHabit() {
+    //        print("Finished Habit")
+    //    }
+    //
+    //    private func editHabit() {
+    //        print("Edit Habit")
+    //    }
+    //
+    //    private func deleteHabit() {
+    //        print("Delete Habit")
+    //    }
+    //
+    //    func tableView(_ tableView: UITableView,
+    //                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    //
+    //        let done = UIContextualAction(style: .normal,
+    //                                       title: "Done") { [weak self] (action, view, completionHandler) in
+    //                                        self?.doneHabit()
+    //                                        completionHandler(true)
+    //        }
+    //        done.backgroundColor = .systemBlue
+    //
+    //        let edit = UIContextualAction(style: .normal,
+    //                                       title: "Edit") { [weak self] (action, view, completionHandler) in
+    //                                        self?.doneHabit()
+    //                                        completionHandler(true)
+    //        }
+    //        edit.backgroundColor = .systemOrange
+    //
+    //        let delete = UIContextualAction(style: .destructive,
+    //                                        title: "Delete") { [weak self] (action, view, completionHandler) in
+    //                                            self?.deleteHabit()
+    //                                            completionHandler(true)
+    //        }
+    //        delete.backgroundColor = .systemRed
+    //
+    //        return UISwipeActionsConfiguration(actions: [delete, edit, done])
+    
+    //    }
+    
     
 }
 
-//아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐.
+//아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 

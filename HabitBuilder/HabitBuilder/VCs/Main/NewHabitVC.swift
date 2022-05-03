@@ -61,9 +61,11 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
         v.backgroundColor = .systemGray5
-        v.placeholder = " Title of your Goal"
+        v.placeholder = "Title of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
+        v.setLeftPaddingPoints(10)
+        v.setRightPaddingPoints(10)
         return v
     }()
     
@@ -71,9 +73,11 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
     lazy var newHabitDesc: UITextField = {
         let v = UITextField()
         v.backgroundColor = .systemGray5
-        v.placeholder = " Description of your Goal"
+        v.placeholder = "Description of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
+        v.setLeftPaddingPoints(10)
+        v.setRightPaddingPoints(10)
         return v
     }()
     
@@ -183,8 +187,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
-        newHabitTitle.setLeftPaddingPoints(5)
-        newHabitTitle.setRightPaddingPoints(5)
         
         // newHabitDesc TextField size grid
         newHabitDesc.snp.makeConstraints { (make) in
@@ -193,8 +195,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
-        newHabitDesc.setLeftPaddingPoints(5)
-        newHabitDesc.setRightPaddingPoints(5)
         newHabitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
         
         // newHabitDateBackview size grid
