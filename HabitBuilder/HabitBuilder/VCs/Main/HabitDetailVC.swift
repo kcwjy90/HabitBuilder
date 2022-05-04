@@ -20,7 +20,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
     // backButton 생성
     lazy var backButton: UIButton = {
         let v = UIButton()
-        //        v.backgroundColor = .purple
         v.setTitle("Back", for: .normal)
         v.setTitleColor(.red, for: .normal)
         v.layer.masksToBounds = true
@@ -28,31 +27,30 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
-    // addHabitButton 생성
-//    lazy var addHabitButton: UIButton = {
-//        let v = UIButton()
-//        //        v.backgroundColor = .blue
-//        v.setTitle("Add", for: .normal)
-//        v.setTitleColor(.blue, for: .normal)
-//        v.layer.masksToBounds = true
-//        v.layer.cornerRadius = 20
-//        return v
-//    }()
-    
-    // pageLabel 생성
-    lazy var pageLabel: UILabel = {
-        let v = UILabel()
-        v.textColor = .black
-        v.text = ""
-        v.font = UIFont.boldSystemFont(ofSize: 16.0)
-        v.backgroundColor = .blue
+    // editHabitButton 생성
+    lazy var editHabitButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("Edit", for: .normal)
+        v.setTitleColor(.black, for: .normal)
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
+
+    // saveHabitButton 생성
+    lazy var saveHabitButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("Save", for: .normal)
+        v.setTitleColor(.blue, for: .normal)
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
         return v
     }()
     
     // habitTitle TextField 생성
     lazy var habitTitle: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .yellow
         v.placeholder = "No Title"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -64,7 +62,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
     //  habitDesc TextField 생성
     lazy var habitDesc: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .yellow
         v.placeholder = "No Description"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -77,7 +75,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
     lazy var habitDateBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .yellow
         return v
     }()
     
@@ -89,12 +87,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
-    //  habitDate TextField 생성
-    lazy var habitDate: UILabel = {
-        let v = UILabel()
-        v.text = ""
-        v.textColor = .black
-        v.font = UIFont.boldSystemFont(ofSize: 16.0)
+    lazy var habitDate: UIDatePicker = {
+        let v = UIDatePicker()
+        v.datePickerMode = .date
+        v.layer.cornerRadius = 15
         return v
     }()
     
@@ -102,7 +98,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
     lazy var habitTimeBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .yellow
         return v
     }()
     
@@ -114,16 +110,41 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
-    //  habitTime TextField 생성
-    lazy var habitTime: UILabel = {
-        let v = UILabel()
-        v.text = ""
-        v.textColor = .black
-        v.font = UIFont.boldSystemFont(ofSize: 16.0)
+    lazy var habitTime: UIDatePicker = {
+        let v = UIDatePicker()
+        v.datePickerMode = .time
+        v.layer.cornerRadius = 15
         return v
     }()
         
+    lazy var tempTitle: UITextField = {
+        let v = UITextField()
+        return v
+    }()
+    
+    lazy var tempDesc: UITextField = {
+        let v = UITextField()
+        return v
+    }()
+    
+    lazy var tempDate: UIDatePicker = {
+        let v = UIDatePicker()
+        v.datePickerMode = .date
+        return v
+    }()
+    
+    lazy var tempTime: UIDatePicker = {
+        let v = UIDatePicker()
+        v.datePickerMode = .time
+        return v
+    }()
+    
+    let localRealm = DBManager.SI.realm!
 
+    var habits: [RMO_Habit] = []
+
+    lazy var didPressEdit : Bool = false
+        
     override func loadView() {
         super.loadView()
         
@@ -133,7 +154,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         
         view.addSubview(backView)
         backView.addSubview(backButton)
-//        backView.addSubview(addHabitButton)
+        backView.addSubview(editHabitButton)
+        backView.addSubview(saveHabitButton)
         backView.addSubview(habitTitle)
         backView.addSubview(habitDesc)
         backView.addSubview(habitDateBackView)
@@ -142,7 +164,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         backView.addSubview(habitTimeBackView)
         backView.addSubview(habitTimeLabel)
         backView.addSubview(habitTime)
-        backView.addSubview(pageLabel)
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -157,15 +178,24 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(40)
         }
         
-        // addHabitButton size grid
-//        addHabitButton.snp.makeConstraints{ (make) in
-//            make.top.equalTo(backView).offset(10)
-//            make.right.equalTo(backView)
-//            make.width.equalTo(60)
-//            make.height.equalTo(40)
-//        }
+        // editHabitButton size grid
+        editHabitButton.snp.makeConstraints{ (make) in
+            make.top.equalTo(backView).offset(10)
+            make.centerX.equalTo(backView)
+            make.width.equalTo(60)
+            make.height.equalTo(40)
+        }
         
-        // newHabitTitle TextField size grid
+        // addHabitButton size grid
+        saveHabitButton.snp.makeConstraints{ (make) in
+            make.top.equalTo(backView).offset(10)
+            make.right.equalTo(backView)
+            make.width.equalTo(60)
+            make.height.equalTo(40)
+        }
+        
+        
+        // habitTitle TextField size grid
         habitTitle.snp.makeConstraints { (make) in
             make.top.equalTo(backButton.snp.bottom).offset(20)
             make.left.equalTo(backView).offset(16)
@@ -174,7 +204,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         }
         habitTitle.isUserInteractionEnabled = false
         
-        // newHabitDesc TextField size grid
+        // habitDesc TextField size grid
         habitDesc.snp.makeConstraints { (make) in
             make.top.equalTo(habitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
@@ -185,7 +215,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         habitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
 
         
-        // newHabitDateBackview size grid
+        // habitDateBackview size grid
         habitDateBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
@@ -193,21 +223,22 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(60)
         }
         
-        // newHabitDateLabel size grid
+        // habitDateLabel size grid
         habitDateLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
-        // newHabitDate size grid
+        // habitDate size grid
         habitDate.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateBackView)
             make.right.equalTo(backView).offset(-34)
             make.height.equalTo(60)
         }
+        habitDate.isUserInteractionEnabled = false
         
-        // newHabitTimeBackview size grid
+        // habitTimeBackview size grid
         habitTimeBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateBackView.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
@@ -215,49 +246,73 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(60)
         }
         
-        // newHabitTimeLabel size grid
+        // habitTimeLabel size grid
         habitTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateBackView.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
-        // newHabitTime size grid
+        // habitTime size grid
         habitTime.snp.makeConstraints { (make) in
             make.top.equalTo(habitDate.snp.bottom).offset(10)
             make.right.equalTo(backView).offset(-28)
             make.height.equalTo(60)
         }
+        habitTime.isUserInteractionEnabled = false
+
         
-        pageLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitTime.snp.bottom).offset(10)
-            make.right.equalTo(backView).offset(-28)
-            make.height.equalTo(60)
-        }
-        
-//        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
-        
-        
-        
-        // Button Actions - AddHabitButton & backToMainButton
-//        addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
-//
+        // Button Actions - backToMainButton & editHabitButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+        editHabitButton.addTarget(self, action: #selector(editButtonPressed), for: .touchUpInside)
+        saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
+
     }
 
-    
-//    @objc func addButtonPressed(sender: UIButton) {
-//
-//        delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
-//        dismiss(animated: true, completion: nil)
-//      //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
-//        let mainVC = MainVC()
-//        mainVC.sendNotification() //이걸 해야 sendNotification 이 방금 들어간 habit까지 check 할수 있음
-//    }
-    
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
+    
+    @objc func editButtonPressed(sender: UIButton) {
+
+        // Edit을 누를경우 다시 title, desc, date, time 을 유저가 edit 할수 있게됨
+        habitTitle.backgroundColor = .systemGray5
+        habitDesc.backgroundColor = .systemGray5
+        habitDateBackView.backgroundColor = .systemGray5
+        habitTimeBackView.backgroundColor = .systemGray5
+
+        habitTitle.isUserInteractionEnabled = true
+        habitDesc.isUserInteractionEnabled = true
+        habitDate.isUserInteractionEnabled = true
+        habitTime.isUserInteractionEnabled = true
+        
+        didPressEdit = true
+
+    }
+    
+    @objc func saveButtonPressed(sender: UIButton) {
+        
+        let realm = localRealm.objects(RMO_Habit.self)
+
+        if didPressEdit == true { //만약 editHabitButton이 press 되었으면
+            
+            let habits = localRealm.objects(RMO_Habit.self).toArray()
+            let indexNumb = habits.firstIndex(where: { $0.title == tempTitle.text! || $0.desc == tempDesc.text! || $0.date == tempDate.date || $0.time == tempTime.date })
+
+            let taskToUpdate = realm[indexNumb!]
+
+            try! self.localRealm.write {
+                taskToUpdate.title = habitTitle.text!
+                taskToUpdate.desc = habitDesc.text!
+                taskToUpdate.date = habitDate.date
+                taskToUpdate.time = habitTime.date
+            }
+
+        } else {
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
 }
 
 // for UITextField Padding

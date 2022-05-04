@@ -194,3 +194,14 @@
 //                searchedHabits.append(habit)
 //            }
 //        }
+
+
+// 시간 포멧할때 am/pm 나오게 하는법
+//        let dateFormatter = DateFormatter()
+//        let timeFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//        timeFormatter.dateFormat = "h:mm a"
+//        timeFormatter.amSymbol = "AM"
+//        timeFormatter.pmSymbol = "PM"
+//        habitDetailVC.habitDate.text = dateFormatter.string(from: habits[indexPath.row].date)
+//        habitDetailVC.habitTime.text = timeFormatter.string(from: habits[indexPath.row].date)

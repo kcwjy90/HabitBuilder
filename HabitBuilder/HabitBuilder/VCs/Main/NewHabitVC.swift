@@ -64,8 +64,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
         v.placeholder = "Title of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
-        v.setLeftPaddingPoints(10)
-        v.setRightPaddingPoints(10)
         return v
     }()
     
@@ -76,8 +74,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
         v.placeholder = "Description of your Goal"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
-        v.setLeftPaddingPoints(10)
-        v.setRightPaddingPoints(10)
         return v
     }()
     
@@ -187,6 +183,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
+        newHabitTitle.setLeftPaddingPoints(10)
+        newHabitTitle.setRightPaddingPoints(10)
         
         // newHabitDesc TextField size grid
         newHabitDesc.snp.makeConstraints { (make) in
@@ -195,6 +193,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
+        newHabitDesc.setLeftPaddingPoints(10)
+        newHabitDesc.setRightPaddingPoints(10)
         newHabitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
         
         // newHabitDateBackview size grid

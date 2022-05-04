@@ -245,21 +245,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //        print("Row: \(indexPath.row)")
         //        print(habits[indexPath.row].date)
         
-        
+        // cell을 click 하면 이 data들이 HabitDetailVC로 날라간다.
         let habitDetailVC = HabitDetailVC() // Your destination
         habitDetailVC.habitTitle.text = habits[indexPath.row].title
         habitDetailVC.habitDesc.text = habits[indexPath.row].desc
-        let dateFormatter = DateFormatter()
-        let timeFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        timeFormatter.dateFormat = "h:mm a"
-        timeFormatter.amSymbol = "AM"
-        timeFormatter.pmSymbol = "PM"
-        habitDetailVC.habitDate.text = dateFormatter.string(from: habits[indexPath.row].date)
-        habitDetailVC.habitTime.text = timeFormatter.string(from: habits[indexPath.row].date)
+        habitDetailVC.habitDate.date = habits[indexPath.row].date
+        habitDetailVC.habitTime.date = habits[indexPath.row].time
         
-        navigationController?.pushViewController(habitDetailVC, animated: true)
+        // temp 를 적는이유는 아직 변형되지 않는 기존의 data 로 filter하고 위해
+        habitDetailVC.tempTitle.text = habits[indexPath.row].title
+        habitDetailVC.tempDesc.text = habits[indexPath.row].desc
+        habitDetailVC.tempDate.date = habits[indexPath.row].date
+        habitDetailVC.tempTime.date = habits[indexPath.row].time
         
+        habitDetailVC.modalPresentationStyle = .pageSheet
+        present(habitDetailVC, animated:true)  
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
