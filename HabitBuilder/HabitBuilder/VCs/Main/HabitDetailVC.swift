@@ -8,8 +8,14 @@
 
 import UIKit
 
+protocol habitDetailVCDelegate: class {
+    func editComp(task: Int)
+    
+}
 class HabitDetailVC: UIViewController, UISearchBarDelegate {
-        
+            
+    weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
+
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -295,10 +301,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         let realm = localRealm.objects(RMO_Habit.self)
 
         if didPressEdit == true { //만약 editHabitButton이 press 되었으면
-            
             let habits = localRealm.objects(RMO_Habit.self).toArray()
             let indexNumb = habits.firstIndex(where: { $0.title == tempTitle.text! || $0.desc == tempDesc.text! || $0.date == tempDate.date || $0.time == tempTime.date })
 
+            let numb = indexNumb!
             let taskToUpdate = realm[indexNumb!]
 
             try! self.localRealm.write {
@@ -307,13 +313,33 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
                 taskToUpdate.date = habitDate.date
                 taskToUpdate.time = habitTime.date
             }
-
+            
+            delegate?.editComp(task: numb)
+            print(numb)
+            dismiss(animated: true, completion: nil)
+            print("END")
         } else {
         }
-        dismiss(animated: true, completion: nil)
+     
+        
     }
     
+//    override func viewWillDisappear(_ animated: Bool) {
+//           super.viewWillDisappear(animated)
+//
+//        if let mainVC = presentingViewController as? MainVC {
+//               DispatchQueue.main.async {
+//                   mainVC.todaysHabitTableView.reloadData()
+//                   print("COMP")
+//               }
+//           }
+//       }
+
+    
+    
 }
+
+
 
 // for UITextField Padding
 

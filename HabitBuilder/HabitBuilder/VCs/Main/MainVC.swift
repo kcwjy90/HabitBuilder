@@ -122,9 +122,7 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
             make.left.right.bottom.equalTo(backView)
         }
         
-        filterTodaysHabit()
-        
-        todaysHabitTableView.reloadData()
+        reloadData()
         
     }
     
@@ -167,7 +165,7 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
 }
 
 // extension 은 class 밖에
-extension MainVC: NewHabitVCDelegate {
+extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         // Get new habit from RMO_Habit
@@ -182,15 +180,26 @@ extension MainVC: NewHabitVCDelegate {
         }
         // let habits = localRealm.objects(RMO_Habit.self)
         
+        reloadData()
+        
+    }
+    
+    func editComp(task: Int) {
+        print("왜 여기로 안들어오지???")
+        print(task)
+        reloadData()
+    }
+        
+    func reloadData() {
+        // Get all habits in the realm
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        filterTodaysHabit()
-        todaysHabitTableView.reloadData()
+        
+        reloadData()
     }
     
     //처음에 notification 받을지 authorize 하는 것
@@ -252,7 +261,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habitDetailVC.habitDate.date = habits[indexPath.row].date
         habitDetailVC.habitTime.date = habits[indexPath.row].time
         
-        // temp 를 적는이유는 아직 변형되지 않는 기존의 data 로 filter하고 위해
+        // temp 를 적는이유는 아직 변형되지 않는 기존의 data를 filter하고 위해
         habitDetailVC.tempTitle.text = habits[indexPath.row].title
         habitDetailVC.tempDesc.text = habits[indexPath.row].desc
         habitDetailVC.tempDate.date = habits[indexPath.row].date
@@ -261,6 +270,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)  
     }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
