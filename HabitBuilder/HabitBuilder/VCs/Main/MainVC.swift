@@ -181,15 +181,12 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
         // let habits = localRealm.objects(RMO_Habit.self)
         
         reloadData()
-        
     }
     
-    func editComp(task: Int) {
-        print("왜 여기로 안들어오지???")
-        print(task)
+    func editComp() {
         reloadData()
     }
-        
+    
     func reloadData() {
         // Get all habits in the realm
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로

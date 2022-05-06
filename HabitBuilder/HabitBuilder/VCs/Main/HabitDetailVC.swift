@@ -9,13 +9,13 @@
 import UIKit
 
 protocol habitDetailVCDelegate: class {
-    func editComp(task: Int)
+    func editComp()
     
 }
-class HabitDetailVC: UIViewController, UISearchBarDelegate {
-            
+class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
+    
     weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
-
+    
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -42,7 +42,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         v.layer.cornerRadius = 20
         return v
     }()
-
+    
     // saveHabitButton 생성
     lazy var saveHabitButton: UIButton = {
         let v = UIButton()
@@ -65,15 +65,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
-    //  habitDesc TextField 생성
-    lazy var habitDesc: UITextField = {
-        let v = UITextField()
+    //  habitDesc UITextView 생성
+    lazy var habitDesc: UITextView = {
+        let v = UITextView()
+        v.backgroundColor = .systemGray5
+        //        v.placeholder = "Description of your Goal"
         v.backgroundColor = .yellow
-        v.placeholder = "No Description"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
-        v.setLeftPaddingPoints(10)
-        v.setRightPaddingPoints(10)
+        v.font = UIFont.systemFont(ofSize: 15.0)
         return v
     }()
     
@@ -122,7 +122,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
         v.layer.cornerRadius = 15
         return v
     }()
-        
+    
     lazy var tempTitle: UITextField = {
         let v = UITextField()
         return v
@@ -146,11 +146,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
     }()
     
     let localRealm = DBManager.SI.realm!
-
+    
     var habits: [RMO_Habit] = []
-
+    
     lazy var didPressEdit : Bool = false
-        
+    
     override func loadView() {
         super.loadView()
         
@@ -218,8 +218,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(160)
         }
         habitDesc.isUserInteractionEnabled = false
-        habitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
-
+        habitDesc.delegate = self
+        textViewDidBeginEditing(habitDesc)
+        textViewDidEndEditing(habitDesc)
+        habitDesc.addPadding()
+        habitDesc.addPadding()
         
         // habitDateBackview size grid
         habitDateBackView.snp.makeConstraints { (make) in
@@ -266,47 +269,47 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(60)
         }
         habitTime.isUserInteractionEnabled = false
-
+        
         
         // Button Actions - backToMainButton & editHabitButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         editHabitButton.addTarget(self, action: #selector(editButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
-
+        
     }
-
+    
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
     
     @objc func editButtonPressed(sender: UIButton) {
-
+        
         // Edit을 누를경우 다시 title, desc, date, time 을 유저가 edit 할수 있게됨
         habitTitle.backgroundColor = .systemGray5
         habitDesc.backgroundColor = .systemGray5
         habitDateBackView.backgroundColor = .systemGray5
         habitTimeBackView.backgroundColor = .systemGray5
-
+        
         habitTitle.isUserInteractionEnabled = true
         habitDesc.isUserInteractionEnabled = true
         habitDate.isUserInteractionEnabled = true
         habitTime.isUserInteractionEnabled = true
         
         didPressEdit = true
-
+        
     }
     
     @objc func saveButtonPressed(sender: UIButton) {
         
         let realm = localRealm.objects(RMO_Habit.self)
-
+        
         if didPressEdit == true { //만약 editHabitButton이 press 되었으면
             let habits = localRealm.objects(RMO_Habit.self).toArray()
             let indexNumb = habits.firstIndex(where: { $0.title == tempTitle.text! || $0.desc == tempDesc.text! || $0.date == tempDate.date || $0.time == tempTime.date })
-
-            let numb = indexNumb!
+            
+            print(indexNumb)
             let taskToUpdate = realm[indexNumb!]
-
+            
             try! self.localRealm.write {
                 taskToUpdate.title = habitTitle.text!
                 taskToUpdate.desc = habitDesc.text!
@@ -314,45 +317,38 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate {
                 taskToUpdate.time = habitTime.date
             }
             
-            delegate?.editComp(task: numb)
-            print(numb)
+            delegate?.editComp()
             dismiss(animated: true, completion: nil)
-            print("END")
+            
         } else {
         }
-     
         
     }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//           super.viewWillDisappear(animated)
-//
-//        if let mainVC = presentingViewController as? MainVC {
-//               DispatchQueue.main.async {
-//                   mainVC.todaysHabitTableView.reloadData()
-//                   print("COMP")
-//               }
-//           }
-//       }
-
+    //밑에 두 func으로 Habit Desc TextView에 placeholder 비슷한것을 넣는다.
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            textView.textColor = UIColor.black
+        }
+    }
     
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description of your New Habit"
+            textView.textColor = UIColor.lightGray
+        }
+    }
+    
+    //    override func viewWillDisappear(_ animated: Bool) {
+    //           super.viewWillDisappear(animated)
+    //
+    //        if let mainVC = presentingViewController as? MainVC {
+    //               DispatchQueue.main.async {
+    //                   mainVC.todaysHabitTableView.reloadData()
+    //                   print("COMP")
+    //               }
+    //           }
+    //       }
     
 }
-
-
-
-// for UITextField Padding
-
-//extension UITextField {
-//    func setLeftPaddingPoints(_ amount:CGFloat){
-//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
-//        self.leftView = paddingView
-//        self.leftViewMode = .always
-//    }
-//    func setRightPaddingPoints(_ amount:CGFloat) {
-//        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
-//        self.rightView = paddingView
-//        self.rightViewMode = .always
-//    }
-//
-//}

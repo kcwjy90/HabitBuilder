@@ -15,7 +15,7 @@ protocol NewHabitVCDelegate: class {
 }
 
 
-class NewHabitVC: UIViewController, UISearchBarDelegate {
+class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     weak var delegate: NewHabitVCDelegate?   // Delegate property var 생성
     
@@ -61,19 +61,22 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
         v.backgroundColor = .systemGray5
-        v.placeholder = "Title of your Goal"
+        v.placeholder = "Title of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
         return v
     }()
     
-    //  newHabitDesc TextField 생성
-    lazy var newHabitDesc: UITextField = {
-        let v = UITextField()
+    //  newHabitDesc UITextView (Multi line) 생성
+    lazy var newHabitDesc: UITextView = {
+        let v = UITextView()
         v.backgroundColor = .systemGray5
-        v.placeholder = "Description of your Goal"
+        //        v.placeholder = "Description of your Goal"
+        v.text = "Description of your New Habit"
+        v.textColor = UIColor.lightGray
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
+        v.font = UIFont.systemFont(ofSize: 15.0)
         return v
     }()
     
@@ -125,8 +128,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
         v.backgroundColor = .systemGray5
         return v
     }()
-        
-
+    
+    
     override func loadView() {
         super.loadView()
         
@@ -186,16 +189,19 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
         newHabitTitle.setLeftPaddingPoints(10)
         newHabitTitle.setRightPaddingPoints(10)
         
-        // newHabitDesc TextField size grid
+        
+        // newHabitDesc UITextVIew size grid
         newHabitDesc.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
-        newHabitDesc.setLeftPaddingPoints(10)
-        newHabitDesc.setRightPaddingPoints(10)
-        newHabitDesc.contentVerticalAlignment = UIControl.ContentVerticalAlignment.top
+        newHabitDesc.delegate = self //placer가 UITextView에는 없어서 placeholder 비슷한것을 생성하기위한 function.
+        textViewDidBeginEditing(newHabitDesc) //을 넣기 위해서 delegate을 해야함.
+        textViewDidEndEditing(newHabitDesc)
+        newHabitDesc.addPadding()
+        newHabitDesc.addPadding()
         
         // newHabitDateBackview size grid
         newHabitDateBackview.snp.makeConstraints { (make) in
@@ -241,7 +247,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(60)
         }
         
-//        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
+        //        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
         
         
@@ -250,13 +256,27 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
         
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
     }
-
+    
+    //밑에 두 func으로 Habit Desc TextView에 placeholder 비슷한것을 넣는다.
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            textView.textColor = UIColor.black
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description of your New Habit"
+            textView.textColor = UIColor.lightGray
+        }
+    }
     
     @objc func addButtonPressed(sender: UIButton) {
         
         delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
         dismiss(animated: true, completion: nil)
-      //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
+        //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
         let mainVC = MainVC()
         mainVC.sendNotification() //이걸 해야 sendNotification 이 방금 들어간 habit까지 check 할수 있음
     }
@@ -264,6 +284,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate {
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
+    
 }
 
 // for UITextField Padding
@@ -279,5 +300,11 @@ extension UITextField {
         self.rightView = paddingView
         self.rightViewMode = .always
     }
-  
+    
+}
+
+extension UITextView {
+    func addPadding() {
+        self.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
+    }
 }
