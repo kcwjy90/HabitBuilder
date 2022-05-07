@@ -257,12 +257,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habitDetailVC.habitDesc.text = habits[indexPath.row].desc
         habitDetailVC.habitDate.date = habits[indexPath.row].date
         habitDetailVC.habitTime.date = habits[indexPath.row].time
-        
-        // temp 를 적는이유는 아직 변형되지 않는 기존의 data를 filter하고 위해
-        habitDetailVC.tempTitle.text = habits[indexPath.row].title
-        habitDetailVC.tempDesc.text = habits[indexPath.row].desc
-        habitDetailVC.tempDate.date = habits[indexPath.row].date
-        habitDetailVC.tempTime.date = habits[indexPath.row].time
+        habitDetailVC.tempID = habits[indexPath.row].personID
         
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)  

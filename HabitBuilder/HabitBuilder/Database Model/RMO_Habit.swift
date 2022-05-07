@@ -12,6 +12,7 @@ import RealmSwift
 //Temporary Local Database created
 
 class RMO_Habit: Object {
+    @Persisted var personID = UUID().uuidString
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
     @Persisted var date: Date = Date()

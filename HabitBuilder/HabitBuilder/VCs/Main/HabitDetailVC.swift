@@ -123,27 +123,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    lazy var tempTitle: UITextField = {
-        let v = UITextField()
-        return v
-    }()
-    
-    lazy var tempDesc: UITextField = {
-        let v = UITextField()
-        return v
-    }()
-    
-    lazy var tempDate: UIDatePicker = {
-        let v = UIDatePicker()
-        v.datePickerMode = .date
-        return v
-    }()
-    
-    lazy var tempTime: UIDatePicker = {
-        let v = UIDatePicker()
-        v.datePickerMode = .time
-        return v
-    }()
+    lazy var tempID: String = ""
     
     let localRealm = DBManager.SI.realm!
     
@@ -297,6 +277,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         didPressEdit = true
         
+        changeTextColor(habitDesc)
+        
     }
     
     @objc func saveButtonPressed(sender: UIButton) {
@@ -305,9 +287,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         if didPressEdit == true { //만약 editHabitButton이 press 되었으면
             let habits = localRealm.objects(RMO_Habit.self).toArray()
-            let indexNumb = habits.firstIndex(where: { $0.title == tempTitle.text! || $0.desc == tempDesc.text! || $0.date == tempDate.date || $0.time == tempTime.date })
-            
-            print(indexNumb)
+            let indexNumb = habits.firstIndex(where: { $0.personID == tempID})
             let taskToUpdate = realm[indexNumb!]
             
             try! self.localRealm.write {
@@ -337,6 +317,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         if textView.text.isEmpty {
             textView.text = "Description of your New Habit"
             textView.textColor = UIColor.lightGray
+        }
+    }
+    
+    func changeTextColor(_ textView: UITextView) {
+        if textView.text == "Description of your New Habit" {
+            textView.textColor = UIColor.lightGray
+            
+            textViewDidBeginEditing(habitDesc)
+            textViewDidEndEditing(habitDesc)
         }
     }
     
