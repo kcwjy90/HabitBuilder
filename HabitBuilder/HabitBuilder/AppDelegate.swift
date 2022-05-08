@@ -28,6 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
              
          UITabBar.appearance().tintColor = .red
          
+         NotificationManger.SI.requestNotiAuth()
+         
          let mainVC = MainVC()
          let defaultNavi = UINavigationController(rootViewController: mainVC)
          mainVC.title = "Habits"

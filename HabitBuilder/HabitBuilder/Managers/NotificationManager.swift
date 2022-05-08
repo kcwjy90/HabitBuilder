@@ -9,36 +9,51 @@
 import Foundation
 import RealmSwift
 
-let localRealm = DBManager.SI.realm!
-
 class NotificationManger: NSObject {
     
     static let SI = NotificationManger()
     
-    func sendNotification() {
+    let userNotificationCenter = UNUserNotificationCenter.current()
+    
+    
+    //notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    let notificationContent = UNMutableNotificationContent()
+    
+    override init() {
+        super.init()
+        self.userNotificationCenter.delegate = self //
         
-        //notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    }
+    
+    //처음에 notification 받을지 authorize 하는 것
+    func requestNotiAuth() {
+        let authOptions = UNAuthorizationOptions.init(arrayLiteral: .alert, .badge, .sound)
+        
+        self.userNotificationCenter.requestAuthorization(options: authOptions) { (success, error) in
+            if let error = error {
+                print("Error: ", error)
+            }
+        }
+    }
+    
+    // Notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    func addScheduleNoti(habit: RMO_Habit) {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.badge = NSNumber(value: 1)
         
-        for habit in localRealm.objects(RMO_Habit.self) {
-            
-            notificationContent.title = habit.title
-            notificationContent.body = habit.desc
-
-            let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.time)
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
-            
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: notificationContent, trigger: trigger)
-            
-//            self.userNotificationCenter.add(request) { (error) in
-//                if (error != nil)
-//                {
-//                    print("Error" + error.debugDescription)
-//                    return
-//                }
-//            }
+        notificationContent.title = habit.title
+        notificationContent.body = habit.desc
+        
+        let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.time)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
+        let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
+        
+        self.userNotificationCenter.add(request) { (error) in
+            if (error != nil)
+            {
+                print("Error" + error.debugDescription)
+                return
+            }
         }
     }
     
@@ -48,4 +63,10 @@ class NotificationManger: NSObject {
     }
     
     
+}
+
+
+//Mark: UNUserNotificationCenterDelegate
+extension NotificationManger: UNUserNotificationCenterDelegate {
+    // 근데 이 안에는 아무 코드가 없어도 잘 돌아가네...뭐지? 근데 또 없으면 안돼? 왜지?
 }

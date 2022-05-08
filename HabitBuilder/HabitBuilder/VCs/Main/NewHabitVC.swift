@@ -277,8 +277,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
         dismiss(animated: true, completion: nil)
         //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
-        let mainVC = MainVC()
-        mainVC.sendNotification() //이걸 해야 sendNotification 이 방금 들어간 habit까지 check 할수 있음
     }
     
     @objc func backButtonPressed(sender: UIButton){

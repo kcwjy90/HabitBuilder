@@ -13,7 +13,7 @@ import UserNotifications
 
 
 
-class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDelegate {
+class MainVC: UIViewController, UISearchBarDelegate {
     
     // backView 생성
     lazy var backView: UIView = {
@@ -58,9 +58,7 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         v.dataSource = self
         return v
     }()
-    
-    let userNotificationCenter = UNUserNotificationCenter.current()
-    
+        
     let localRealm = DBManager.SI.realm!
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
@@ -78,10 +76,6 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         //        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         //        view.addGestureRecognizer(UITapGesture)
         
-        
-        self.userNotificationCenter.delegate = self //
-        self.requestNotificationAuthorization()
-        self.sendNotification()
         
         searchBar.delegate = self
         
@@ -154,14 +148,13 @@ class MainVC: UIViewController, UISearchBarDelegate, UNUserNotificationCenterDel
         searchedHabits = habits //search 된 habit을 다시 habits[] 안으로
     }
     
+    
     @objc func addItem(){
         let v = NewHabitVC()
         v.delegate = self
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
-    
-    
 }
 
 // extension 은 class 밖에
@@ -169,16 +162,18 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         // Get new habit from RMO_Habit
-        let fromRMO_Habit = RMO_Habit()
-        fromRMO_Habit.title = title
-        fromRMO_Habit.desc = desc
-        fromRMO_Habit.date = date
-        fromRMO_Habit.time = time
+        let newHabit = RMO_Habit()
+        newHabit.title = title
+        newHabit.desc = desc
+        newHabit.date = date
+        newHabit.time = time
         
         try! localRealm.write {
-            localRealm.add(fromRMO_Habit)
+            localRealm.add(newHabit)
         }
         // let habits = localRealm.objects(RMO_Habit.self)
+        
+        NotificationManger.SI.addScheduleNoti(habit: newHabit)
         
         reloadData()
     }
@@ -199,49 +194,6 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
         reloadData()
     }
     
-    //처음에 notification 받을지 authorize 하는 것
-    func requestNotificationAuthorization() {
-        let authOptions = UNAuthorizationOptions.init(arrayLiteral: .alert, .badge, .sound)
-        
-        self.userNotificationCenter.requestAuthorization(options: authOptions) { (success, error) in
-            if let error = error {
-                print("Error: ", error)
-            }
-        }
-    }
-    
-    // Notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
-    func sendNotification() {
-        let notificationContent = UNMutableNotificationContent()
-        notificationContent.badge = NSNumber(value: 1)
-        
-        for habit in localRealm.objects(RMO_Habit.self) {
-            
-            notificationContent.title = habit.title
-            notificationContent.body = habit.desc
-            
-            let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.time)
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
-            
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: notificationContent, trigger: trigger)
-            
-            self.userNotificationCenter.add(request) { (error) in
-                if (error != nil)
-                {
-                    print("Error" + error.debugDescription)
-                    return
-                }
-            }
-        }
-    }
-    
-    // HabitBuilder 실행 중에도 notification 받을수 있게 하는 code
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .badge, .sound])
-    }
-    
-    
 }
 
 //Adding tableview and content
@@ -257,7 +209,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habitDetailVC.habitDesc.text = habits[indexPath.row].desc
         habitDetailVC.habitDate.date = habits[indexPath.row].date
         habitDetailVC.habitTime.date = habits[indexPath.row].time
-        habitDetailVC.tempID = habits[indexPath.row].personID
+        habitDetailVC.tempID = habits[indexPath.row].id
         
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)  

@@ -287,9 +287,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         if didPressEdit == true { //만약 editHabitButton이 press 되었으면
             let habits = localRealm.objects(RMO_Habit.self).toArray()
-            let indexNumb = habits.firstIndex(where: { $0.personID == tempID})
+            let indexNumb = habits.firstIndex(where: { $0.id == tempID})
             let taskToUpdate = realm[indexNumb!]
             
+//            let habits = localRealm.objects(RMO_Habit.self).filter { habit in
+//                return habit.id == self.tempID
+//            } 32:41 
             try! self.localRealm.write {
                 taskToUpdate.title = habitTitle.text!
                 taskToUpdate.desc = habitDesc.text!
