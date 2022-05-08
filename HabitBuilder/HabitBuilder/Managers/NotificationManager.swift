@@ -15,7 +15,6 @@ class NotificationManger: NSObject {
     
     let userNotificationCenter = UNUserNotificationCenter.current()
     
-    
     //notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
     let notificationContent = UNMutableNotificationContent()
     

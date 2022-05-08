@@ -173,6 +173,7 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
         }
         // let habits = localRealm.objects(RMO_Habit.self)
         
+        // 새로운 habit을 만들때만 noti를 생성한다. 
         NotificationManger.SI.addScheduleNoti(habit: newHabit)
         
         reloadData()
@@ -205,6 +206,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         // cell을 click 하면 이 data들이 HabitDetailVC로 날라간다.
         let habitDetailVC = HabitDetailVC() // Your destination
+        habitDetailVC.delegate = self
         habitDetailVC.habitTitle.text = habits[indexPath.row].title
         habitDetailVC.habitDesc.text = habits[indexPath.row].desc
         habitDetailVC.habitDate.date = habits[indexPath.row].date
