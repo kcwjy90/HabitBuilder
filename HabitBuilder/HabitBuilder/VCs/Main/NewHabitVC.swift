@@ -9,7 +9,7 @@
 import UIKit
 
 // 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
-protocol NewHabitVCDelegate: class {
+protocol NewHabitVCDelegate: AnyObject {
     func didCreateNewHabit(title: String, desc: String, date: Date, time: Date)
     
 }

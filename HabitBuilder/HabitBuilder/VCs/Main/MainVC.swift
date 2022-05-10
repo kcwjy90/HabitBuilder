@@ -201,17 +201,12 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //        print("Row: \(indexPath.row)")
-        //        print(habits[indexPath.row].date)
+        //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
-        // cell을 click 하면 이 data들이 HabitDetailVC로 날라간다.
-        let habitDetailVC = HabitDetailVC() // Your destination
+        // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        let habit = habits[indexPath.row]
+        let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
         habitDetailVC.delegate = self
-        habitDetailVC.habitTitle.text = habits[indexPath.row].title
-        habitDetailVC.habitDesc.text = habits[indexPath.row].desc
-        habitDetailVC.habitDate.date = habits[indexPath.row].date
-        habitDetailVC.habitTime.date = habits[indexPath.row].time
-        habitDetailVC.tempID = habits[indexPath.row].id
         
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)  
@@ -219,7 +214,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
     }
     

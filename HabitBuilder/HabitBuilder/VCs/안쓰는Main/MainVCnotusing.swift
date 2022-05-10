@@ -205,3 +205,7 @@
 //        timeFormatter.pmSymbol = "PM"
 //        habitDetailVC.habitDate.text = dateFormatter.string(from: habits[indexPath.row].date)
 //        habitDetailVC.habitTime.text = timeFormatter.string(from: habits[indexPath.row].date)
+
+
+//textfield, textview, datepicker등 user가 못 만지게 하는 코드
+//habitDate.isUserInteractionEnabled = false

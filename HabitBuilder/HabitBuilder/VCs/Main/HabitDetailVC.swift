@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol habitDetailVCDelegate: class {
+protocol habitDetailVCDelegate: AnyObject {
     func editComp()
     
 }
@@ -33,16 +33,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    // editHabitButton 생성
-    lazy var editHabitButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Edit", for: .normal)
-        v.setTitleColor(.black, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
     // saveHabitButton 생성
     lazy var saveHabitButton: UIButton = {
         let v = UIButton()
@@ -56,8 +46,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // habitTitle TextField 생성
     lazy var habitTitle: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .yellow
-        v.placeholder = "No Title"
+        v.backgroundColor = .systemGray5
+        v.placeholder = "Title of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
         v.setLeftPaddingPoints(10)
@@ -69,8 +59,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var habitDesc: UITextView = {
         let v = UITextView()
         v.backgroundColor = .systemGray5
-        //        v.placeholder = "Description of your Goal"
-        v.backgroundColor = .yellow
+        v.text = "Description of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
         v.font = UIFont.systemFont(ofSize: 15.0)
@@ -81,7 +70,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var habitDateBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .yellow
+        v.backgroundColor = .systemGray5
         return v
     }()
     
@@ -104,7 +93,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var habitTimeBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .yellow
+        v.backgroundColor = .systemGray5
         return v
     }()
     
@@ -122,14 +111,24 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.layer.cornerRadius = 15
         return v
     }()
-    
-    lazy var tempID: String = ""
-    
+        
     let localRealm = DBManager.SI.realm!
     
     var habits: [RMO_Habit] = []
     
     lazy var didPressEdit : Bool = false
+    
+    
+    //CONSTRUCTOR. 이것을 MainVC에서 받지 않으면 아예 작동이 안됨.
+    var habit: RMO_Habit //RMO_Habit object를 mainVC에서 여기로
+    init (habit: RMO_Habit) {
+        self.habit = habit //initializing habit
+        super .init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) { //위의 코드랑 꼭 같이 가야함
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         super.loadView()
@@ -140,7 +139,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         view.addSubview(backView)
         backView.addSubview(backButton)
-        backView.addSubview(editHabitButton)
         backView.addSubview(saveHabitButton)
         backView.addSubview(habitTitle)
         backView.addSubview(habitDesc)
@@ -164,14 +162,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(40)
         }
         
-        // editHabitButton size grid
-        editHabitButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.centerX.equalTo(backView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
-        }
-        
         // addHabitButton size grid
         saveHabitButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
@@ -180,7 +170,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(40)
         }
         
-        
         // habitTitle TextField size grid
         habitTitle.snp.makeConstraints { (make) in
             make.top.equalTo(backButton.snp.bottom).offset(20)
@@ -188,7 +177,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
-        habitTitle.isUserInteractionEnabled = false
         
         // habitDesc TextField size grid
         habitDesc.snp.makeConstraints { (make) in
@@ -197,7 +185,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
-        habitDesc.isUserInteractionEnabled = false
         habitDesc.delegate = self
         textViewDidBeginEditing(habitDesc)
         textViewDidEndEditing(habitDesc)
@@ -225,7 +212,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-34)
             make.height.equalTo(60)
         }
-        habitDate.isUserInteractionEnabled = false
         
         // habitTimeBackview size grid
         habitTimeBackView.snp.makeConstraints { (make) in
@@ -248,12 +234,16 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-28)
             make.height.equalTo(60)
         }
-        habitTime.isUserInteractionEnabled = false
         
+        
+        habitTitle.text = habit.title
+        habitDesc.text = habit.desc
+        changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
+        habitDate.date = habit.date
+        habitTime.date = habit.time
         
         // Button Actions - backToMainButton & editHabitButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
-        editHabitButton.addTarget(self, action: #selector(editButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
         
     }
@@ -262,32 +252,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
-    @objc func editButtonPressed(sender: UIButton) {
-        
-        // Edit을 누를경우 다시 title, desc, date, time 을 유저가 edit 할수 있게됨
-        habitTitle.backgroundColor = .systemGray5
-        habitDesc.backgroundColor = .systemGray5
-        habitDateBackView.backgroundColor = .systemGray5
-        habitTimeBackView.backgroundColor = .systemGray5
-        
-        habitTitle.isUserInteractionEnabled = true
-        habitDesc.isUserInteractionEnabled = true
-        habitDate.isUserInteractionEnabled = true
-        habitTime.isUserInteractionEnabled = true
-        
-        didPressEdit = true
-        
-        changeTextColor(habitDesc)
-        
-    }
-    
     @objc func saveButtonPressed(sender: UIButton) {
         
         let realm = localRealm.objects(RMO_Habit.self)
         
-        if didPressEdit == true { //만약 editHabitButton이 press 되었으면
             let habits = localRealm.objects(RMO_Habit.self).toArray()
-            let indexNumb = habits.firstIndex(where: { $0.id == tempID})
+        let indexNumb = habits.firstIndex(where: { $0.id == habit.id})
             let taskToUpdate = realm[indexNumb!]
             
 //            let habits = localRealm.objects(RMO_Habit.self).filter { habit in
@@ -300,11 +270,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                 taskToUpdate.time = habitTime.date
             }
             
+            NotificationManger.SI.addScheduleNoti(habit: taskToUpdate) //update된걸 scheduler에. 자동적으로 이 전에 저장된건 지워지나봐. 쏘 나이스
+
             delegate?.editComp()
             dismiss(animated: true, completion: nil)
-            
-        } else {
-        }
         
     }
     
@@ -331,16 +300,5 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             textViewDidEndEditing(habitDesc)
         }
     }
-    
-    //    override func viewWillDisappear(_ animated: Bool) {
-    //           super.viewWillDisappear(animated)
-    //
-    //        if let mainVC = presentingViewController as? MainVC {
-    //               DispatchQueue.main.async {
-    //                   mainVC.todaysHabitTableView.reloadData()
-    //                   print("COMP")
-    //               }
-    //           }
-    //       }
-    
+
 }
