@@ -251,9 +251,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         
         
-        // Button Actions - AddHabitButton & backToMainButton
+        // Button Actions - AddHabitButton & backButton
         addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
-        
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
     }
     

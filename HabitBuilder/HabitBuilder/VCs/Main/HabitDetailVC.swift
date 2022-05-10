@@ -111,12 +111,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.layer.cornerRadius = 15
         return v
     }()
-        
+    
     let localRealm = DBManager.SI.realm!
-    
-    var habits: [RMO_Habit] = []
-    
-    lazy var didPressEdit : Bool = false
     
     
     //CONSTRUCTOR. 이것을 MainVC에서 받지 않으면 아예 작동이 안됨.
@@ -242,7 +238,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habitDate.date = habit.date
         habitTime.date = habit.time
         
-        // Button Actions - backToMainButton & editHabitButton & saveHabitButton
+        // Button Actions - backButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
         
@@ -255,25 +251,35 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     @objc func saveButtonPressed(sender: UIButton) {
         
         let realm = localRealm.objects(RMO_Habit.self)
+        guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+        {return} //결국 filter 를 안쓰고 where을 써버렸네..
+        let taskToUpdate = realm[indexNumb]
         
-            let habits = localRealm.objects(RMO_Habit.self).toArray()
-        let indexNumb = habits.firstIndex(where: { $0.id == habit.id})
-            let taskToUpdate = realm[indexNumb!]
-            
-//            let habits = localRealm.objects(RMO_Habit.self).filter { habit in
-//                return habit.id == self.tempID
-//            } 32:41 
-            try! self.localRealm.write {
-                taskToUpdate.title = habitTitle.text!
-                taskToUpdate.desc = habitDesc.text!
-                taskToUpdate.date = habitDate.date
-                taskToUpdate.time = habitTime.date
-            }
-            
-            NotificationManger.SI.addScheduleNoti(habit: taskToUpdate) //update된걸 scheduler에. 자동적으로 이 전에 저장된건 지워지나봐. 쏘 나이스
-
-            delegate?.editComp()
-            dismiss(animated: true, completion: nil)
+        
+        //        option 1
+        //        print를 하면 하나가 뜨는게 아니라 habit object가 다~뜸. 왜지? 그리고 여기는 guard 를 붙힐수가 없네...왜지?
+        //        let habit2 = localRealm.objects(RMO_Habit.self).filter { habit in
+        //                return habit.id == self.habit.id
+        //            }
+        //        print(habit2)
+        
+        //        option2
+        //        밑에 코드는 build는 되는데 save button을 누르면 에러가 남. 왜지?
+        //        let query = "id == \(self.habit.id)"
+        //        guard let habit = localRealm.objects(RMO_Habit.self).filter(query).first else
+        //        { return }
+        
+        try! self.localRealm.write {
+            taskToUpdate.title = habitTitle.text!
+            taskToUpdate.desc = habitDesc.text!
+            taskToUpdate.date = habitDate.date
+            taskToUpdate.time = habitTime.date
+        }
+        
+        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate) //update된걸 scheduler에. 자동적으로 이 전에 저장된건 지워지나봐. 쏘 나이스
+        
+        delegate?.editComp()
+        dismiss(animated: true, completion: nil)
         
     }
     
@@ -300,5 +306,5 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             textViewDidEndEditing(habitDesc)
         }
     }
-
+    
 }
