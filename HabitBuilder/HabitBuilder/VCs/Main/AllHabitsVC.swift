@@ -37,22 +37,63 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    var habitSearched: Bool = false
+    
     let localRealm = DBManager.SI.realm!
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit]! //일단은 empty []로.
+    
+    var sectionedHabit = [Date:Results<RMO_Habit>]() // section하기 위해서
+    var itemDates = [Date]() //이것도 section하기 위해서
     
     
     override func loadView() {
         super.loadView()
         
+        print(localRealm.objects(RMO_Habit.self))
+        
+        //Find each unique day for which an Item exists in your Realm
+        itemDates = localRealm.objects(RMO_Habit.self).reduce(into: [Date](), { results, currentItem in
+            let date = currentItem.date
+            let beginningOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
+            let endOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+            //Only add the date if it doesn't exist in the array yet
+            if !results.contains(where: { addedDate->Bool in
+                return addedDate >= beginningOfDay && addedDate <= endOfDay
+            }) {
+                results.append(beginningOfDay)
+            }
+        })
+        
+        
+        //Filter each Item in realm based on their date property and assign the results to the dictionary
+        sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
+            let beginningOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
+            let endOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+            results[beginningOfDay] = localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfDay, endOfDay)
+        })
+        
+        
         setNaviBar()
-
+        
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
-
+        
         // tapGasture - Dismisses Keyboard
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
-                
+        
         searchBar.delegate = self
         
         view.backgroundColor = .red
@@ -120,7 +161,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
 // extension 은 class 밖에
 extension AllHabitsVC: NewHabitVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
-        print("HabitVC - title : \(title), detail: \(desc)")
+        //        print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
         let fromRMO_Habit = RMO_Habit()
@@ -135,15 +176,7 @@ extension AllHabitsVC: NewHabitVCDelegate {
         
         // Get all habits in the realm
         reloadData()
-        
-        //        let mainvc = MainVC()  // 왜 reload가 안되는거지...암만 해봐도 모르겠네
-        //        mainvc.filterTodaysHabit()
-        //        mainvc.todaysHabitTableView.reloadData()
-        
-        print(habits)
-        
     }
-    
 }
 
 
@@ -151,17 +184,37 @@ extension AllHabitsVC: NewHabitVCDelegate {
 
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
-    //    func numberOfSections(in tableView: UITableView) -> Int {
-    //        return self.searchedHabits.count
-    //    }
+    func numberOfSections(in tableView: UITableView) -> Int {
+        if habitSearched == true { //search 하고 있을때는 section 이 하나로
+            return 1
+        } else {
+            return itemDates.count //search 안할때는 itemDates 수에 따라서
+        }
+    }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Row: \(indexPath.row)")
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if habitSearched == true { //search 하고 있을때는 Heading 이 Search Result로
+            return "Search Result"
+        } else {
+            if let first = sectionedHabit[itemDates[section]]!.first { // search 날짜를 heading으로
+                let dateFormmater = DateFormatter()
+                dateFormmater.dateFormat = "MM/dd/YYYY"
+                return dateFormmater.string(from: first.date)
+            }
+        }
+        return "Section" //얘는 그냥 넣어야 되더라고
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
-        //        return searchedHabits[section].desc.count
+        if habitSearched == true {
+            return searchedHabits.count //serach 를 하면 searchedHabits row number 를
+        } else {
+            return sectionedHabit[itemDates[section]]!.count // 안하면 sectionedHabit row number 를
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -169,46 +222,29 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return 44.0 //Choose your custom row
     }
     
-    //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    //        if let date = searchedHabits.first {
-    //            let dateFormatter = DateFormatter()
-    //            dateFormatter.dateFormat = "MM/dd/yyyy"
-    //            let header = dateFormatter.string(from: date.date)
-    //            return header
-    //        }
-    //        return "section: \(Date())"
-    //    }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
         else {
             return UITableViewCell()
         }
         
-        let newHabit = searchedHabits[indexPath.row]
-        var title = newHabit.title
-        let desc = newHabit.desc
-        let date = newHabit.date
-        let time = newHabit.time
-        
-        //        ======== 지금 당장 필요한 기능은 아니고, 나중에 혹시 필요할지도 몰라서..
-        //        let dateFormatter = DateFormatter()
-        //        dateFormatter.dateFormat = "MM/dd/yyyy"
-        //
-        //        if dateFormatter.string(from: date) == dateFormatter.string(from: Date()) {
-        //            let today = "[Today] "
-        //            title = "[Today] " + title
-        //            cell.newHabitTitle.textColor = UIColor.red
-        //            print(date)
-        //        } else {
-        //            cell.newHabitTitle.textColor = UIColor.black
-        //        }
-        //        =======
-        
-        
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
-        
+        if habitSearched == true { //search 가 되었을경우는 searchedHabit 에서만 object를..
+            let newHabit = searchedHabits[indexPath.row]
+            var title = newHabit.title
+            let desc = newHabit.desc
+            let date = newHabit.date
+            let time = newHabit.time
+            
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+            
+        } else { //아닌경우는 groupedHabits에서 뽑아온다
+            let itemsForDate = sectionedHabit[itemDates[indexPath.section]]!
+            var habit = itemsForDate[indexPath.row]
+            cell.newHabitTitle.text = habit.title + " - "
+            cell.newHabitDesc.text = habit.desc
+            
+        }
         return cell
     }
     
@@ -218,11 +254,13 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         let habits = localRealm.objects(RMO_Habit.self).toArray() // RMO_Habit 을 array로
         
         if searchText != "" { //만약 searchText가 비어있지 않으면
+            habitSearched = true
             searchedHabits = habits.filter { habit in //searchedHabits은 Habit 을 filter한것과 =
                 return habit.title.lowercased().contains(searchText.lowercased()) //filter내용은 title = searchText
             }
         } else {
             self.searchedHabits = self.habits // searchText가 비어 있으면 searchedHabits = habits.
+            habitSearched = false
             
         }
         self.allHabitsTableView.reloadData() //tableView를 reload
