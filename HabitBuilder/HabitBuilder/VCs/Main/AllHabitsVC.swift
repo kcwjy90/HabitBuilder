@@ -113,7 +113,8 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     func reloadData() {
         // Get all habits in the realm
         habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        searchedHabits = habits //  이 3줄을 여기 적는 이유는 MainVC와는 다르게 today()로 filter하는게 없기 때문에 tableView 에서 NumbofRow를 지정하고 value를 가져오려면 searchedHabits[] 일단 data가 들어가야 해서 이다. 이전에는 바로 RMO_Habits에서 data를 가져왔기 때문에 상관없었다.
+        searchedHabits = habits
+        createSection() // Section을 다시 reload해서 만약 날짜가 edit 되었으면 section도 update시킴
         allHabitsTableView.reloadData()
     }
     
@@ -202,7 +203,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if habitSearched == true || habits.count == 0 { //search 하고 있을때는 Heading 이 Search Result로
-            return "Search Result"
+            return ""
         } else {
             if let first = sectionedHabit[itemDates[section]]!.first { // search 날짜를 heading으로
                 let dateFormmater = DateFormatter()
@@ -210,7 +211,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 return dateFormmater.string(from: first.date)
             }
         }
-        return "Section" //얘는 그냥 넣어야 되더라고
+        return nil //얘는 그냥 넣어야 되더라고
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -339,9 +340,6 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             //                tableView.endUpdates()
             //
             //            }
-            
-                        createSection()
         }
     }
-    
 }
