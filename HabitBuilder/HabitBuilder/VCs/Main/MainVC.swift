@@ -72,7 +72,11 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
+        // Swip to dismiss tableView
+        todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
+
         // tapGasture - Dismisses Keyboard
+        
         //        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         //        view.addGestureRecognizer(UITapGesture)
         
@@ -158,7 +162,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
 }
 
 // extension 은 class 밖에
-extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
+extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         print("HabitVC - title : \(title), detail: \(desc)")
         // Get new habit from RMO_Habit
@@ -179,10 +183,6 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
         reloadData()
     }
     
-    func editComp() {
-        reloadData()
-    }
-    
     func reloadData() {
         // Get all habits in the realm
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
@@ -197,6 +197,12 @@ extension MainVC: NewHabitVCDelegate, habitDetailVCDelegate {
     
 }
 
+extension MainVC: habitDetailVCDelegate {
+    func editComp() {
+        reloadData()
+    }
+}
+
 //Adding tableview and content
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
@@ -204,7 +210,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
         // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-
         let habit = habits[indexPath.row]
         let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
         habitDetailVC.delegate = self
@@ -268,13 +273,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             let realm = localRealm.objects(RMO_Habit.self)
             let habit = searchedHabits[indexPath.row]
-            let thisTitle = habit.title
-            let thisTime = habit.time
+            let thisId = habit.id
             
             try! localRealm.write {
                 
                 let deleteHabit = realm.where {
-                    $0.title == thisTitle || $0.time == thisTime
+                    $0.id == thisId
                 }
                 localRealm.delete(deleteHabit)
                 

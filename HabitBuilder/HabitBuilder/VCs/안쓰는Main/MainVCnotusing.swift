@@ -1,3 +1,4 @@
+import SwiftUI
 ////
 ////  MainVC.swift
 ////  HabitBuilder
@@ -209,3 +210,8 @@
 
 //textfield, textview, datepicker등 user가 못 만지게 하는 코드
 //habitDate.isUserInteractionEnabled = false
+
+//// tapGasture - Dismisses Keyboard
+//let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+//view.addGestureRecognizer(UITapGesture)
+//

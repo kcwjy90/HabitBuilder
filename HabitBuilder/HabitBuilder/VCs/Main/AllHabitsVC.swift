@@ -52,47 +52,14 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
         print(localRealm.objects(RMO_Habit.self))
         
-        //Find each unique day for which an Item exists in your Realm
-        itemDates = localRealm.objects(RMO_Habit.self).reduce(into: [Date](), { results, currentItem in
-            let date = currentItem.date
-            let beginningOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
-            let endOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
-            //Only add the date if it doesn't exist in the array yet
-            if !results.contains(where: { addedDate->Bool in
-                return addedDate >= beginningOfDay && addedDate <= endOfDay
-            }) {
-                results.append(beginningOfDay)
-            }
-        })
-        
-        
-        //Filter each Item in realm based on their date property and assign the results to the dictionary
-        sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
-            let beginningOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
-            let endOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
-            results[beginningOfDay] = localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfDay, endOfDay)
-        })
-        
+        createSection() //날짜대로 section만드는 func
         
         setNaviBar()
         
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
-        // tapGasture - Dismisses Keyboard
-        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
-        view.addGestureRecognizer(UITapGesture)
+        // Swip to dismiss tableView
+        allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
         
         searchBar.delegate = self
         
@@ -150,6 +117,41 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         allHabitsTableView.reloadData()
     }
     
+    func createSection() {
+        //Find each unique day for which an Item exists in your Realm
+        itemDates = localRealm.objects(RMO_Habit.self).reduce(into: [Date](), { results, currentItem in
+            let date = currentItem.date
+            let beginningOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
+            let endOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+            //Only add the date if it doesn't exist in the array yet
+            if !results.contains(where: { addedDate->Bool in
+                return addedDate >= beginningOfDay && addedDate <= endOfDay
+            }) {
+                results.append(beginningOfDay)
+            }
+        })
+        
+        
+        //Filter each Item in realm based on their date property and assign the results to the dictionary
+        sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
+            let beginningOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
+            let endOfDay = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: date),
+                month: Calendar.current.component(.month, from: date),
+                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+            results[beginningOfDay] = localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfDay, endOfDay)
+        })
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         reloadData()
@@ -174,7 +176,13 @@ extension AllHabitsVC: NewHabitVCDelegate {
             localRealm.add(fromRMO_Habit)
         }
         
-        // Get all habits in the realm
+        createSection()
+        reloadData()
+    }
+}
+
+extension AllHabitsVC: habitDetailVCDelegate {
+    func editComp() {
         reloadData()
     }
 }
@@ -185,7 +193,7 @@ extension AllHabitsVC: NewHabitVCDelegate {
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        if habitSearched == true { //search 하고 있을때는 section 이 하나로
+        if habitSearched == true || habits.count == 0 { //search 하고 있을때는 section 이 하나로
             return 1
         } else {
             return itemDates.count //search 안할때는 itemDates 수에 따라서
@@ -193,7 +201,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if habitSearched == true { //search 하고 있을때는 Heading 이 Search Result로
+        if habitSearched == true || habits.count == 0 { //search 하고 있을때는 Heading 이 Search Result로
             return "Search Result"
         } else {
             if let first = sectionedHabit[itemDates[section]]!.first { // search 날짜를 heading으로
@@ -206,7 +214,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if habitSearched == true {
+        if habitSearched == true || habits.count == 0 {
             return searchedHabits.count //serach 를 하면 searchedHabits row number 를
         } else {
             return sectionedHabit[itemDates[section]]!.count // 안하면 sectionedHabit row number 를
@@ -215,6 +223,19 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        var habit: RMO_Habit
+        
+        if habitSearched == true || habits.count == 0 {
+            habit = habits[indexPath.row]
+        } else {
+            habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
+        }
+        
+        let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
+        habitDetailVC.delegate = self
+        habitDetailVC.modalPresentationStyle = .pageSheet
+        present(habitDetailVC, animated:true)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -228,7 +249,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        if habitSearched == true { //search 가 되었을경우는 searchedHabit 에서만 object를..
+        if habitSearched == true || habits.count == 0 { //search 가 되었을경우는 searchedHabit 에서만 object를..
             let newHabit = searchedHabits[indexPath.row]
             var title = newHabit.title
             let desc = newHabit.desc
@@ -265,4 +286,62 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         }
         self.allHabitsTableView.reloadData() //tableView를 reload
     }
+    
+    //swipe 해서 지우는 function
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            
+            //            if habitSearched == true || habits.count == 0 {
+            
+            let realm = localRealm.objects(RMO_Habit.self)
+            let habit = searchedHabits[indexPath.row]
+            let ip = indexPath.row
+            let thisId = habit.id
+            
+            try! localRealm.write {
+                
+                let deleteHabit = realm.where {
+                    $0.id == thisId
+                }
+                localRealm.delete(deleteHabit)
+                
+                //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                tableView.beginUpdates()
+                searchedHabits.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.endUpdates()
+            }
+            
+            //            }
+            //                else {
+            //
+            //                let realm = localRealm.objects(RMO_Habit.self)
+            //                let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
+            //                let inpS = indexPath.section
+            //                let inpR = indexPath.row
+            //                let thisId = habit.id
+            //
+            //                try! localRealm.write {
+            //
+            //                    let deleteHabit = realm.where {
+            //                        $0.id == thisId
+            //                    }
+            //                    localRealm.delete(deleteHabit)
+            //
+            //                }
+            //                tableView.beginUpdates()
+            //                sectionedHabit.remove(at: itemDates[indexPath.section]]![indexPath.row])
+            //                tableView.deleteRows(at: [indexPath], with: .fade)
+            //                tableView.endUpdates()
+            //
+            //            }
+            
+                        createSection()
+        }
+    }
+    
 }
