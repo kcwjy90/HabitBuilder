@@ -296,7 +296,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
-            //            if habitSearched == true || habits.count == 0 {
+                        if habitSearched == true || habits.count == 0 {
             
             let realm = localRealm.objects(RMO_Habit.self)
             let habit = searchedHabits[indexPath.row]
@@ -317,29 +317,26 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 tableView.endUpdates()
             }
             
-            //            }
-            //                else {
-            //
-            //                let realm = localRealm.objects(RMO_Habit.self)
-            //                let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
-            //                let inpS = indexPath.section
-            //                let inpR = indexPath.row
-            //                let thisId = habit.id
-            //
-            //                try! localRealm.write {
-            //
-            //                    let deleteHabit = realm.where {
-            //                        $0.id == thisId
-            //                    }
-            //                    localRealm.delete(deleteHabit)
-            //
-            //                }
-            //                tableView.beginUpdates()
-            //                sectionedHabit.remove(at: itemDates[indexPath.section]]![indexPath.row])
-            //                tableView.deleteRows(at: [indexPath], with: .fade)
-            //                tableView.endUpdates()
-            //
-            //            }
+                        } else {
+            
+                            let realm = localRealm.objects(RMO_Habit.self)
+                            let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
+                            var toArray = sectionedHabit[itemDates[indexPath.section]]!.toArray() //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
+                            let thisId = habit.id
+            
+                            try! localRealm.write {
+                                let deleteHabit = realm.where {
+                                    $0.id == thisId
+                                }
+                                localRealm.delete(deleteHabit)
+                            }
+                            
+                            tableView.beginUpdates()
+                            toArray.remove(at: indexPath.row)
+                            tableView.deleteRows(at: [indexPath], with: .fade)
+                            tableView.endUpdates()
+            
+                        }
         }
     }
 }
