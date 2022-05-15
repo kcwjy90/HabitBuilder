@@ -138,6 +138,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             }
         })
         
+        itemDates = itemDates.sorted() //sorting by Date
         
         //Filter each Item in realm based on their date property and assign the results to the dictionary
         sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
@@ -224,13 +225,15 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        // cell을 tap 하면 이 data들이 HabitDetailVC로 날라간다.
         var habit: RMO_Habit
         
         if habitSearched == true || habits.count == 0 {
-            habit = habits[indexPath.row]
+            print(indexPath.row)
+            habit = searchedHabits[indexPath.row]
         } else {
             habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
+            
         }
         
         let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
@@ -270,6 +273,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    //searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = [] //비어있는 searchedHabits
@@ -296,47 +300,46 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
-                        if habitSearched == true || habits.count == 0 {
-            
-            let realm = localRealm.objects(RMO_Habit.self)
-            let habit = searchedHabits[indexPath.row]
-            let ip = indexPath.row
-            let thisId = habit.id
-            
-            try! localRealm.write {
+            if habitSearched == true || habits.count == 0 {
                 
-                let deleteHabit = realm.where {
-                    $0.id == thisId
+                let realm = localRealm.objects(RMO_Habit.self)
+                let habit = searchedHabits[indexPath.row]
+                let thisId = habit.id
+                
+                try! localRealm.write {
+                    
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    localRealm.delete(deleteHabit)
+                    
+                    //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                    tableView.beginUpdates()
+                    searchedHabits.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    tableView.endUpdates()
                 }
-                localRealm.delete(deleteHabit)
                 
-                //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+            } else {
+                
+                let realm = localRealm.objects(RMO_Habit.self)
+                let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
+                var toArray = sectionedHabit[itemDates[indexPath.section]]!.toArray() //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
+                let thisId = habit.id
+                
+                try! localRealm.write {
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    localRealm.delete(deleteHabit)
+                }
+                
                 tableView.beginUpdates()
-                searchedHabits.remove(at: indexPath.row)
+                toArray.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.endUpdates()
+                
             }
-            
-                        } else {
-            
-                            let realm = localRealm.objects(RMO_Habit.self)
-                            let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
-                            var toArray = sectionedHabit[itemDates[indexPath.section]]!.toArray() //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
-                            let thisId = habit.id
-            
-                            try! localRealm.write {
-                                let deleteHabit = realm.where {
-                                    $0.id == thisId
-                                }
-                                localRealm.delete(deleteHabit)
-                            }
-                            
-                            tableView.beginUpdates()
-                            toArray.remove(at: indexPath.row)
-                            tableView.deleteRows(at: [indexPath], with: .fade)
-                            tableView.endUpdates()
-            
-                        }
         }
     }
 }

@@ -210,7 +210,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
         // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        let habit = habits[indexPath.row]
+        let habit = searchedHabits[indexPath.row]
         let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
         habitDetailVC.delegate = self
         
