@@ -59,6 +59,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
         return v
     }()
         
+    var habitSearched: Bool = false
+
     let localRealm = DBManager.SI.realm!
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
@@ -124,7 +126,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
     }
     
-    //Navi Bar 만드는 func. loadview() 밖에!
+    //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
@@ -137,7 +139,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         )
     }
     
-    //filter to display Today's Habit
+    //MARK: filter to display Today's Habit
     func filterTodaysHabit() {
         habits = localRealm.objects(RMO_Habit.self).filter {
             habit in
@@ -252,16 +254,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         searchedHabits = []
         
         if searchText != "" {
+            habitSearched = true
+
             searchedHabits = habits.filter { habit in
                 return habit.title.lowercased().contains(searchText.lowercased())
             }
         } else {
             self.searchedHabits = self.habits
+            habitSearched = false
         }
         self.todaysHabitTableView.reloadData()
     }
-    
-    
     
     //swipe 해서 지우는 function
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
