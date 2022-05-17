@@ -58,9 +58,9 @@ class MainVC: UIViewController, UISearchBarDelegate {
         v.dataSource = self
         return v
     }()
-        
+    
     var habitSearched: Bool = false
-
+    
     let localRealm = DBManager.SI.realm!
     
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
@@ -76,7 +76,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         // Swip to dismiss tableView
         todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
-
+        
         // tapGasture - Dismisses Keyboard
         
         //        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
@@ -179,7 +179,7 @@ extension MainVC: NewHabitVCDelegate {
         }
         // let habits = localRealm.objects(RMO_Habit.self)
         
-        // 새로운 habit을 만들때만 noti를 생성한다. 
+        // 새로운 habit을 만들때만 noti를 생성한다.
         NotificationManger.SI.addScheduleNoti(habit: newHabit)
         
         reloadData()
@@ -217,7 +217,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habitDetailVC.delegate = self
         
         habitDetailVC.modalPresentationStyle = .pageSheet
-        present(habitDetailVC, animated:true)  
+        present(habitDetailVC, animated:true)
     }
     
     
@@ -255,7 +255,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         if searchText != "" {
             habitSearched = true
-
+            
             searchedHabits = habits.filter { habit in
                 return habit.title.lowercased().contains(searchText.lowercased())
             }
@@ -266,81 +266,91 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         self.todaysHabitTableView.reloadData()
     }
     
-    //swipe 해서 지우는 function
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            
-            let realm = localRealm.objects(RMO_Habit.self)
-            let habit = searchedHabits[indexPath.row]
+  
+
+//FIXME: still need to fix app dying when habit deleted during search
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        //Complete Option
+        let complete = UIContextualAction(style: .normal, title: "Complete") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("done")
+            actionPerformed(true)
+        }
+        complete.backgroundColor = .systemBlue
+        
+        //remind option.
+        //FIXME: need modal to display time
+        let remind = UIContextualAction(style: .normal, title: "Remind") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("remind")
+            actionPerformed(true)
+        }
+        remind.backgroundColor = .systemOrange
+        
+        
+        //delete option
+        //FIXME: swipe을 해서 delete말고 꼭 눌러서 delete하게끔
+        let delete = UIContextualAction(style: .destructive, title: "Delete") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("delete")
+            let realm = self.localRealm.objects(RMO_Habit.self)
+            let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
-            
-            try! localRealm.write {
-                
+
+            try! self.localRealm.write {
+
                 let deleteHabit = realm.where {
                     $0.id == thisId
                 }
-                localRealm.delete(deleteHabit)
-                
+                self.localRealm.delete(deleteHabit)
+
             }
-            
+
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
             tableView.beginUpdates()
-            searchedHabits.remove(at: indexPath.row)
+            self.searchedHabits.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
+            actionPerformed(true)
         }
+        delete.backgroundColor = .systemRed
+        
+        return UISwipeActionsConfiguration(actions: [delete, remind, complete])
     }
-    
-    
-    
-    
-    
-    //    private func doneHabit() {
-    //        print("Finished Habit")
-    //    }
-    //
-    //    private func editHabit() {
-    //        print("Edit Habit")
-    //    }
-    //
-    //    private func deleteHabit() {
-    //        print("Delete Habit")
-    //    }
-    //
-    //    func tableView(_ tableView: UITableView,
-    //                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-    //
-    //        let done = UIContextualAction(style: .normal,
-    //                                       title: "Done") { [weak self] (action, view, completionHandler) in
-    //                                        self?.doneHabit()
-    //                                        completionHandler(true)
-    //        }
-    //        done.backgroundColor = .systemBlue
-    //
-    //        let edit = UIContextualAction(style: .normal,
-    //                                       title: "Edit") { [weak self] (action, view, completionHandler) in
-    //                                        self?.doneHabit()
-    //                                        completionHandler(true)
-    //        }
-    //        edit.backgroundColor = .systemOrange
-    //
-    //        let delete = UIContextualAction(style: .destructive,
-    //                                        title: "Delete") { [weak self] (action, view, completionHandler) in
-    //                                            self?.deleteHabit()
-    //                                            completionHandler(true)
-    //        }
-    //        delete.backgroundColor = .systemRed
-    //
-    //        return UISwipeActionsConfiguration(actions: [delete, edit, done])
-    
-    //    }
-    
-    
 }
+
+
+
+
+   //swipe 해서 지우는 function
+   //    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+   //        return .delete
+   //    }
+   
+   //    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+   //        if editingStyle == .delete {
+   //
+   //            let realm = localRealm.objects(RMO_Habit.self)
+   //            let habit = searchedHabits[indexPath.row]
+   //            let thisId = habit.id
+   //
+   //            try! localRealm.write {
+   //
+   //                let deleteHabit = realm.where {
+   //                    $0.id == thisId
+   //                }
+   //                localRealm.delete(deleteHabit)
+   //
+   //            }
+   //
+   //            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+   //            tableView.beginUpdates()
+   //            searchedHabits.remove(at: indexPath.row)
+   //            tableView.deleteRows(at: [indexPath], with: .fade)
+   //            tableView.endUpdates()
+   //        }
+   //
+   //    }
+   //
+   
 
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거

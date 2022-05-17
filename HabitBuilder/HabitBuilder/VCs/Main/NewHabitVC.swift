@@ -129,6 +129,17 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    lazy var repeatButton: UIButton = {
+        let v = UIButton()
+//        v.layer.borderWidth = 0.5
+//        v.layer.borderColor = UIColor.secondaryLabel.cgColor
+        v.layer.cornerRadius = 15
+        v.backgroundColor = .systemGray5
+        return v
+    }()
+    
+    var isChecked: Bool = false
+    
     
     override func loadView() {
         super.loadView()
@@ -149,6 +160,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(newHabitTimeBackview)
         backView.addSubview(newHabitTimeLabel)
         backView.addSubview(newHabitTime)
+        backView.addSubview(repeatButton)
+
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -247,6 +260,14 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(60)
         }
         
+        repeatButton.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
+            make.width.height.equalTo(50)
+            make.right.equalTo(backView).offset(-28)
+        }
+        
+        
+        
         //        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
         
@@ -254,6 +275,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // Button Actions - AddHabitButton & backButton
         addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+        repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
+
     }
     
     //밑에 두 func으로 Habit Desc TextView에 placeholder 비슷한것을 넣는다.
@@ -282,6 +305,10 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
+    @objc func repeatButtonPressed(sender: UIButton){
+        print("will be repeated")
+    }
+    
 }
 
 // for UITextField Padding
@@ -305,3 +332,5 @@ extension UITextView {
         self.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
     }
 }
+
+
