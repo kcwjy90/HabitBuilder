@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,6 +11,7 @@
 		480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567FC280E6E050066FF9A /* AllHabitsVC.swift */; };
 		480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480568022817A5DA0066FF9A /* NotiTestVC.swift */; };
 		485EA4C72834C99500C38387 /* progressVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EA4C62834C99400C38387 /* progressVC.swift */; };
+		488CA39F2834D653002F1E6B /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 488CA39E2834D653002F1E6B /* SwiftUICharts */; };
 		48990397281BBBC3009ED152 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990396281BBBC3009ED152 /* NotificationManager.swift */; };
 		48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990398281DB99E009ED152 /* HabitDetailVC.swift */; };
 		48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_Habit.swift */; };
@@ -62,6 +63,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8FA6DCFF6A705D9979FFDB6 /* Pods_HabitBuilder.framework in Frameworks */,
+				488CA39F2834D653002F1E6B /* SwiftUICharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +215,9 @@
 			dependencies = (
 			);
 			name = HabitBuilder;
+			packageProductDependencies = (
+				488CA39E2834D653002F1E6B /* SwiftUICharts */,
+			);
 			productName = HabitBuilder;
 			productReference = C0B2E8BC27A119D900BC03EB /* HabitBuilder.app */;
 			productType = "com.apple.product-type.application";
@@ -241,6 +246,9 @@
 				Base,
 			);
 			mainGroup = C0B2E8B327A119D900BC03EB;
+			packageReferences = (
+				488CA39D2834D653002F1E6B /* XCRemoteSwiftPackageReference "ChartView" */,
+			);
 			productRefGroup = C0B2E8BD27A119D900BC03EB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -521,6 +529,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		488CA39D2834D653002F1E6B /* XCRemoteSwiftPackageReference "ChartView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppPear/ChartView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		488CA39E2834D653002F1E6B /* SwiftUICharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 488CA39D2834D653002F1E6B /* XCRemoteSwiftPackageReference "ChartView" */;
+			productName = SwiftUICharts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C0B2E8B427A119D900BC03EB /* Project object */;
 }
