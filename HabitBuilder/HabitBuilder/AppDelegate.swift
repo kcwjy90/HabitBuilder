@@ -41,11 +41,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          allHabitsVC.title = "All Habits"
          allHabitsVC.tabBarItem.image = UIImage(named: "all")
          
+         let progressVC = progressVC()
+         let progressNavi = UINavigationController(rootViewController: progressVC)
+         progressVC.title = "Progress"
+         progressVC.tabBarItem.image = UIImage(named: "progress")
+         
 //         settingVC.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 0)
                 
          self.window!.rootViewController = tabBarController
          
-         tabBarController.setViewControllers([defaultNavi, allHabitsNavi], animated: false)
+         tabBarController.setViewControllers([defaultNavi, allHabitsNavi, progressNavi], animated: false)
          
                   
          self.window!.makeKeyAndVisible()
