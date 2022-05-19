@@ -13,7 +13,7 @@ import SwiftUI
 import Charts
 
 
-class progressVC: UIViewController, ChartViewDelegate {
+class ProgressVC: UIViewController, ChartViewDelegate {
 
     // backView 생성
     lazy var backView: UIView = {
@@ -24,32 +24,34 @@ class progressVC: UIViewController, ChartViewDelegate {
  
     let localRealm = DBManager.SI.realm!
     var todayPiChart = PieChartView()
-    var habits: [RMO_Habit] = []
 
     
     //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공. 이제 자러가장.
     let results = ["Completed", "Failed", "Pending"]
     var counts = [0,0,0]
-    var comp: Int = 0
-    var failed: Int = 0
-    var pending: Int = 0
+    var compCount: Int = 0
+
 
     override func loadView() {
         super.loadView()
+        
         todayPiChart.delegate = self
-        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        for habit in habits {
-            if (habit.title == "One") {
-            comp = comp + 1
-            } else if (habit.title == "Two") {
-                failed = failed + 1
-                }  else if (habit.title == "Four") {
-                    pending = pending + 1
-                    }
-        }
-        counts[0] = comp
-        counts[1] = failed
-        counts[2] = pending
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return} //
+        let taskToUpdate = countRealm[indexNumb]
+        counts[0] = taskToUpdate.completed
+        
+        
+        //왜 안돼는거야왜왜왜왜왜오애왜
+//        counts[0] = compCount
+        //왜 안돼는거야왜왜왜왜왜오애왜
+
 
         
         customizeChart(dataPoints: results, values: counts.map{ Double($0) })
@@ -75,15 +77,6 @@ class progressVC: UIViewController, ChartViewDelegate {
         todayPiChart.center = backView.center
         
      
-//        var entries = [ChartDataEntry]()
-//        for x in 0..<10 {
-//            entries.append(ChartDataEntry(x: Double(x), y: Double(x)))
-//        }
-        
-//        let set = PieChartDataSet(entries: entries)
-//        set.colors = ChartColorTemplates.joyful()
-//        let data = PieChartData(dataSet: set)
-//        pieChart.data = data
         
     }
     
@@ -116,6 +109,38 @@ class progressVC: UIViewController, ChartViewDelegate {
         navigationController?.navigationBar.backgroundColor = .white
     }
     
-
-
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadView() // 이게 있어야 그레프가 업데이트됨
+    }
 }
+
+//왜 안돼는거야왜왜왜왜왜오애왜
+//extension ProgressVC: MainVCDelegate {
+//    func statusChange (countFromMain: Int) {
+//        let mainVC = MainVC()
+//        mainVC.delegate = self
+//        compCount = compCount + countFromMain
+//        print("comp is")
+//        print(compCount)
+//        print("count from Main is")
+//        print(countFromMain)
+//    }
+//
+//}
+//왜 안돼는거야왜왜왜왜왜오애왜
+
+
+
+
+
+
+//        var entries = [ChartDataEntry]()
+//        for x in 0..<10 {
+//            entries.append(ChartDataEntry(x: Double(x), y: Double(x)))
+//        }
+ 
+//        let set = PieChartDataSet(entries: entries)
+//        set.colors = ChartColorTemplates.joyful()
+//        let data = PieChartData(dataSet: set)
+//        pieChart.data = data

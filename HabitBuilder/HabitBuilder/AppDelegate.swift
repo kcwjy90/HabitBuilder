@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          allHabitsVC.title = "All Habits"
          allHabitsVC.tabBarItem.image = UIImage(named: "all")
          
-         let progressVC = progressVC()
+         let progressVC = ProgressVC()
          let progressNavi = UINavigationController(rootViewController: progressVC)
          progressVC.title = "Progress"
          progressVC.tabBarItem.image = UIImage(named: "progress")

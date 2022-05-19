@@ -11,9 +11,14 @@ import SnapKit
 import RealmSwift
 import UserNotifications
 
+protocol MainVCDelegate: AnyObject {
+    func statusChange(countFromMain: Int)
+}
 
 
 class MainVC: UIViewController, UISearchBarDelegate {
+    
+    weak var delegate: MainVCDelegate?   // Delegate property var 생성
     
     // backView 생성
     lazy var backView: UIView = {
@@ -66,6 +71,11 @@ class MainVC: UIViewController, UISearchBarDelegate {
     // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit]! //일단은 empty []로.
+    
+    //왜 안돼는거야왜왜왜왜왜오애왜
+//    var compCount = 1
+    //왜 안돼는거야왜왜왜왜왜오애왜
+
     
     override func loadView() {
         super.loadView()
@@ -174,6 +184,22 @@ extension MainVC: NewHabitVCDelegate {
         newHabit.date = date
         newHabit.time = time
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let countDate = dateFormatter.string(from: date)
+        let countRealm = localRealm.objects(RMO_Count.self)
+        
+        // newHabit을 생성할때 마다 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 오직 없을 경우만 새로운 object에 날짜를 추가해서 그 object 를 RMO_Count에 추가한다.
+        if !countRealm.contains(where: { $0.date == countDate} )
+        {
+            let newCount = RMO_Count()
+            newCount.date = countDate
+            
+            try! localRealm.write {
+                localRealm.add(newCount)
+            }
+        }
+        
         try! localRealm.write {
             localRealm.add(newHabit)
         }
@@ -266,9 +292,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         self.todaysHabitTableView.reloadData()
     }
     
-  
-
-//FIXME: still need to fix app dying when habit deleted during search
+    
+    
+    //FIXME: still need to fix app dying when habit deleted during search
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         //Complete Option
@@ -286,24 +312,48 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         remind.backgroundColor = .systemOrange
         
+        //FIXME: 나중에 scope을 바꿔야지
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+
         
         //delete option
         //FIXME: swipe을 해서 delete말고 꼭 눌러서 delete하게끔
         let delete = UIContextualAction(style: .destructive, title: "Delete") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
             print("delete")
+            
+            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 completed를 +1 한다
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+            {return} //
+            let taskToUpdate = countRealm[indexNumb]
+            
+            try! self.localRealm.write {
+                taskToUpdate.completed += 1
+            }
+            print(self.localRealm.objects(RMO_Count.self))
+            
+            
+            //왜 안돼는거야왜왜왜왜왜오애왜
+//            self.compCount += 1
+//            print(self.compCount)
+            //왜 안돼는거야왜왜왜왜왜오애왜
+
             let realm = self.localRealm.objects(RMO_Habit.self)
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
-
+            
             try! self.localRealm.write {
-
+                
                 let deleteHabit = realm.where {
                     $0.id == thisId
                 }
                 self.localRealm.delete(deleteHabit)
-
+                
             }
-
+            
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
             tableView.beginUpdates()
             self.searchedHabits.remove(at: indexPath.row)
@@ -315,43 +365,55 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         return UISwipeActionsConfiguration(actions: [delete, remind, complete])
     }
+    
+    
+    //왜 안돼는거야왜왜왜왜왜오애왜
+//    override func viewWillDisappear(_ animated: Bool) {
+//        super.viewWillDisappear(animated)
+//        self.delegate?.statusChange(countFromMain: self.compCount)
+//
+//    }
+    //왜 안돼는거야왜왜왜왜왜오애왜
+
 }
 
 
 
 
-   //swipe 해서 지우는 function
-   //    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-   //        return .delete
-   //    }
-   
-   //    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-   //        if editingStyle == .delete {
-   //
-   //            let realm = localRealm.objects(RMO_Habit.self)
-   //            let habit = searchedHabits[indexPath.row]
-   //            let thisId = habit.id
-   //
-   //            try! localRealm.write {
-   //
-   //                let deleteHabit = realm.where {
-   //                    $0.id == thisId
-   //                }
-   //                localRealm.delete(deleteHabit)
-   //
-   //            }
-   //
-   //            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-   //            tableView.beginUpdates()
-   //            searchedHabits.remove(at: indexPath.row)
-   //            tableView.deleteRows(at: [indexPath], with: .fade)
-   //            tableView.endUpdates()
-   //        }
-   //
-   //    }
-   //
-   
+//swipe 해서 지우는 function
+//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .delete
+//    }
+
+//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete {
+//
+//            let realm = localRealm.objects(RMO_Habit.self)
+//            let habit = searchedHabits[indexPath.row]
+//            let thisId = habit.id
+//
+//            try! localRealm.write {
+//
+//                let deleteHabit = realm.where {
+//                    $0.id == thisId
+//                }
+//                localRealm.delete(deleteHabit)
+//
+//            }
+//
+//            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+//            tableView.beginUpdates()
+//            searchedHabits.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//            tableView.endUpdates()
+//        }
+//
+//    }
+//
+
 
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 
+//let today = Date()
+//let todaysDate = dateFormatter.string(from: today)
