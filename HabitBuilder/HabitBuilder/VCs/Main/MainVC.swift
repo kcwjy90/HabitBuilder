@@ -189,7 +189,7 @@ extension MainVC: NewHabitVCDelegate {
         let countDate = dateFormatter.string(from: date)
         let countRealm = localRealm.objects(RMO_Count.self)
         
-        // newHabit을 생성할때 마다 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 오직 없을 경우만 새로운 object에 날짜를 추가해서 그 object 를 RMO_Count에 추가한다.
+        // newHabit을 생성할때 마다 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 오직 없을 경우만 새로운 날짜에 해당하는 object 를 RMO_Count에 추가한다.
         if !countRealm.contains(where: { $0.date == countDate} )
         {
             let newCount = RMO_Count()
@@ -198,6 +198,15 @@ extension MainVC: NewHabitVCDelegate {
             try! localRealm.write {
                 localRealm.add(newCount)
             }
+        }
+        
+        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
+        {return} //결국 filter 를 안쓰고 where을 써버렸네..
+        let existingObj = countRealm[indexNumb]
+        
+        try! localRealm.write {
+            existingObj.total += 1
         }
         
         try! localRealm.write {
@@ -297,21 +306,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //FIXME: still need to fix app dying when habit deleted during search
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        //Complete Option
-        let complete = UIContextualAction(style: .normal, title: "Complete") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("done")
-            actionPerformed(true)
-        }
-        complete.backgroundColor = .systemBlue
-        
-        //remind option.
-        //FIXME: need modal to display time
-        let remind = UIContextualAction(style: .normal, title: "Remind") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("remind")
-            actionPerformed(true)
-        }
-        remind.backgroundColor = .systemOrange
-        
         //FIXME: 나중에 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -319,29 +313,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
 
+        let realm = self.localRealm.objects(RMO_Habit.self)
         
-        //delete option
-        //FIXME: swipe을 해서 delete말고 꼭 눌러서 delete하게끔
-        let delete = UIContextualAction(style: .destructive, title: "Delete") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("delete")
-            
-            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 completed를 +1 한다
+        //Complete Option
+        let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("done")
+            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
             {return} //
             let taskToUpdate = countRealm[indexNumb]
             
             try! self.localRealm.write {
-                taskToUpdate.completed += 1
+                taskToUpdate.success += 1
             }
             print(self.localRealm.objects(RMO_Count.self))
-            
-            
-            //왜 안돼는거야왜왜왜왜왜오애왜
-//            self.compCount += 1
-//            print(self.compCount)
-            //왜 안돼는거야왜왜왜왜왜오애왜
-
-            let realm = self.localRealm.objects(RMO_Habit.self)
+    
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
             
@@ -361,9 +347,87 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             tableView.endUpdates()
             actionPerformed(true)
         }
-        delete.backgroundColor = .systemRed
+        success.backgroundColor = .systemBlue
         
-        return UISwipeActionsConfiguration(actions: [delete, remind, complete])
+        //remind option.
+        //FIXME: need modal to display time
+        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("Remove")
+            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+            {return} //
+            let taskToUpdate = countRealm[indexNumb]
+            
+            try! self.localRealm.write {
+                taskToUpdate.remove += 1
+            }
+            print(self.localRealm.objects(RMO_Count.self))
+            
+            let habit = self.searchedHabits[indexPath.row]
+            let thisId = habit.id
+            
+            try! self.localRealm.write {
+                
+                let deleteHabit = realm.where {
+                    $0.id == thisId
+                }
+                self.localRealm.delete(deleteHabit)
+                
+            }
+            
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+            tableView.beginUpdates()
+            self.searchedHabits.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.endUpdates()
+            actionPerformed(true)
+            actionPerformed(true)
+        }
+        remove.backgroundColor = .systemOrange
+        
+        //delete option
+        //FIXME: swipe을 해서 delete말고 꼭 눌러서 delete하게끔
+        let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+            print("delete")
+            
+            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+            {return} //
+            let taskToUpdate = countRealm[indexNumb]
+            
+            try! self.localRealm.write {
+                taskToUpdate.fail += 1
+            }
+            print(self.localRealm.objects(RMO_Count.self))
+            
+            
+            //왜 안돼는거야왜왜왜왜왜오애왜
+//            self.compCount += 1
+//            print(self.compCount)
+            //왜 안돼는거야왜왜왜왜왜오애왜
+
+            let habit = self.searchedHabits[indexPath.row]
+            let thisId = habit.id
+            
+            try! self.localRealm.write {
+                
+                let deleteHabit = realm.where {
+                    $0.id == thisId
+                }
+                self.localRealm.delete(deleteHabit)
+                
+            }
+            
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+            tableView.beginUpdates()
+            self.searchedHabits.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            tableView.endUpdates()
+            actionPerformed(true)
+        }
+        fail.backgroundColor = .systemRed
+        
+        return UISwipeActionsConfiguration(actions: [success, remove, fail])
     }
     
     

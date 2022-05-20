@@ -27,7 +27,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
 
     
     //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공. 이제 자러가장.
-    let results = ["Completed", "Failed", "Pending"]
+    let results = ["Completed", "Failed", "Working"]
     var counts = [0,0,0]
     var compCount: Int = 0
 
@@ -45,7 +45,9 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return} //
         let taskToUpdate = countRealm[indexNumb]
-        counts[0] = taskToUpdate.completed
+        counts[0] = taskToUpdate.success
+        counts[1] = taskToUpdate.fail
+        counts[2] = taskToUpdate.total - (taskToUpdate.success + taskToUpdate.fail + taskToUpdate.remove)
         
         
         //왜 안돼는거야왜왜왜왜왜오애왜

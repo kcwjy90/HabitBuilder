@@ -13,10 +13,13 @@ import RealmSwift
 
 class RMO_Count: Object {
     @Persisted var date: String
-    @Persisted var completed: Int
+    @Persisted var total: Int
+    @Persisted var remove: Int
+    @Persisted var success: Int
+    @Persisted var fail: Int
     
     convenience init(title: Int) {
         self.init()
-        self.completed = completed
+        self.success = success
     }
 }
