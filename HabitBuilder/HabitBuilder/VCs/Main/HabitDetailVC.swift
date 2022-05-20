@@ -8,10 +8,11 @@
 
 import UIKit
 
+//MARK: update 된 Habit이 담긴 protocol. MainVC나 AllHabitsVC로 간다
 protocol habitDetailVCDelegate: AnyObject {
     func editComp()
-    
 }
+
 class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
@@ -82,6 +83,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    // habitDate 생성
     lazy var habitDate: UIDatePicker = {
         let v = UIDatePicker()
         v.datePickerMode = .date
@@ -105,6 +107,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    // habitTime 생성
     lazy var habitTime: UIDatePicker = {
         let v = UIDatePicker()
         v.datePickerMode = .time
@@ -115,7 +118,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     let localRealm = DBManager.SI.realm!
     
     
-    //CONSTRUCTOR. 이것을 MainVC에서 받지 않으면 아예 작동이 안됨.
+    //MARK: CONSTRUCTOR. 이것을 MainVC나 AllHabitsVC에서 받지 않으면 아예 작동이 안됨.
     var habit: RMO_Habit //RMO_Habit object를 mainVC에서 여기로
     init (habit: RMO_Habit) {
         self.habit = habit //initializing habit
@@ -129,7 +132,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     override func loadView() {
         super.loadView()
         
-        // tapGasture - Dismisses Keyboard
+        //MARK: tapGesture - Dismisses Keyboard
+        //다른은 swipe인데 얘는 gesture인 이유는 VC가 modal이라, keyboard dismiss할때 modal이 dismiss 될까봐
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
         
@@ -174,7 +178,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(50)
         }
         
-        // habitDesc TextField size grid
+        // habitDesc TextView size grid
         habitDesc.snp.makeConstraints { (make) in
             make.top.equalTo(habitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
@@ -182,6 +186,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(160)
         }
         habitDesc.delegate = self
+        //MARK: UITextView는 placeholder가 없어서 따로 placeholder처럼 보이게 만든것. 밑에.
         textViewDidBeginEditing(habitDesc)
         textViewDidEndEditing(habitDesc)
         habitDesc.addPadding()
@@ -269,13 +274,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             {
                 let newCount = RMO_Count()
                 newCount.date = countDate
-
+                
                 try! localRealm.write {
                     localRealm.add(newCount)
                 }
                 print("새로만듬")
                 print(newCount)
-
+                
             }
             
             //예전 habit의 count 수를 -1
@@ -302,7 +307,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                 plusCount.total += 1
                 print("플러스된후")
                 print(plusCount)
-
+                
             }
             
         }
@@ -320,6 +325,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         //        guard let habit = localRealm.objects(RMO_Habit.self).filter(query).first else
         //        { return }
         
+        // 그래서 완성본 위에서는 filter 안쓰고 where 씀
+        
         try! self.localRealm.write {
             taskToUpdate.title = habitTitle.text!
             taskToUpdate.desc = habitDesc.text!
@@ -328,14 +335,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             print(realm)
         }
         
-        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate) //update된걸 scheduler에. 자동적으로 이 전에 저장된건 지워지나봐. 쏘 나이스
-        
+        //MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
         delegate?.editComp()
         dismiss(animated: true, completion: nil)
         
     }
     
-    //밑에 두 func으로 Habit Desc TextView에 placeholder 비슷한것을 넣는다.
+    //MARK: UITextView "Placeholder" 
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
@@ -350,6 +356,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
     }
     
+    //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
     func changeTextColor(_ textView: UITextView) {
         if textView.text == "Description of your New Habit" {
             textView.textColor = UIColor.lightGray

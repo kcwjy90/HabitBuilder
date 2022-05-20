@@ -19,6 +19,7 @@ protocol MainVCDelegate: AnyObject {
 class MainVC: UIViewController, UISearchBarDelegate {
     
     weak var delegate: MainVCDelegate?   // Delegate property var 생성
+    let localRealm = DBManager.SI.realm!
     
     // backView 생성
     lazy var backView: UIView = {
@@ -50,7 +51,6 @@ class MainVC: UIViewController, UISearchBarDelegate {
         let v = UILabel()
         v.text = currentDate
         v.font = UIFont.boldSystemFont(ofSize: 18.0)
-        //        v.backgroundColor = .blue
         return v
     }()
     
@@ -64,34 +64,21 @@ class MainVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    // habit이 검색됨에 따라 tableView에 보여지는걸 다르게 하기 위해서
     var habitSearched: Bool = false
     
-    let localRealm = DBManager.SI.realm!
-    
-    // Habits array. RMO_Habit에서 온 data가 여기 들어감. 지금은 empty.
+    // RMO_Habit에서 온 data를 넣을 empty한 array들
     var habits: [RMO_Habit] = []
-    var searchedHabits: [RMO_Habit]! //일단은 empty []로.
+    var searchedHabits: [RMO_Habit] = []
     
     //왜 안돼는거야왜왜왜왜왜오애왜
-//    var compCount = 1
+    //    var compCount = 1
     //왜 안돼는거야왜왜왜왜왜오애왜
-
     
     override func loadView() {
         super.loadView()
         
         setNaviBar()
-        
-        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
-        
-        // Swip to dismiss tableView
-        todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
-        
-        // tapGasture - Dismisses Keyboard
-        
-        //        let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
-        //        view.addGestureRecognizer(UITapGesture)
-        
         
         searchBar.delegate = self
         
@@ -136,6 +123,10 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
     }
     
+    func dateFormatting() {
+        
+    }
+    
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
@@ -147,9 +138,22 @@ class MainVC: UIViewController, UISearchBarDelegate {
             target: self,
             action: #selector(addItem)
         )
+        
+        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
+        
+        // Swip to dismiss tableView
+        todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
-    //MARK: filter to display Today's Habit
+    //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
+    @objc func addItem(){
+        let v = NewHabitVC()
+        v.delegate = self
+        v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
+        present(v, animated:true)   // modal view 가능케 하는 코드
+    }
+    
+    //MARK: Filter to only display Habits with Today's Habit
     func filterTodaysHabit() {
         habits = localRealm.objects(RMO_Habit.self).filter {
             habit in
@@ -161,22 +165,16 @@ class MainVC: UIViewController, UISearchBarDelegate {
             return habitDate == todaysDate
         }
         
-        searchedHabits = habits //search 된 habit을 다시 habits[] 안으로
+        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
     }
     
-    
-    @objc func addItem(){
-        let v = NewHabitVC()
-        v.delegate = self
-        v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
-        present(v, animated:true)   // modal view 가능케 하는 코드
-    }
 }
 
-// extension 은 class 밖에
+//Extension 은 항상 class 밖에
+//MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
-        print("HabitVC - title : \(title), detail: \(desc)")
+        
         // Get new habit from RMO_Habit
         let newHabit = RMO_Habit()
         newHabit.title = title
@@ -186,14 +184,15 @@ extension MainVC: NewHabitVCDelegate {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
-        let countDate = dateFormatter.string(from: date)
+        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
         let countRealm = localRealm.objects(RMO_Count.self)
         
-        // newHabit을 생성할때 마다 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 오직 없을 경우만 새로운 날짜에 해당하는 object 를 RMO_Count에 추가한다.
-        if !countRealm.contains(where: { $0.date == countDate} )
+        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+        if !countRealm.contains(where: { $0.date == habitDate} )
         {
             let newCount = RMO_Count()
-            newCount.date = countDate
+            newCount.date = habitDate
             
             try! localRealm.write {
                 localRealm.add(newCount)
@@ -202,30 +201,31 @@ extension MainVC: NewHabitVCDelegate {
             }
         }
         
-        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
-        guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
-        {return} //결국 filter 를 안쓰고 where을 써버렸네..
-        let existingObj = countRealm[indexNumb]
-        
-        try! localRealm.write {
-            existingObj.total += 1
-            print("+1")
-            print(existingObj)
-        }
-        
         try! localRealm.write {
             localRealm.add(newHabit)
+            print("무사들어감")
         }
-        // let habits = localRealm.objects(RMO_Habit.self)
         
-        // 새로운 habit을 만들때만 noti를 생성한다.
+        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+        {return}
+        let existCount = countRealm[indexNumb]
+        
+        try! localRealm.write {
+            existCount.total += 1
+            print("+1")
+            print(existCount)
+        }
+        
+        
+        // 새로운 habit을 만들때'만' noti를 생성한다.
         NotificationManger.SI.addScheduleNoti(habit: newHabit)
         
         reloadData()
     }
     
+    //MARK:Get all habits in the realm and reload.
     func reloadData() {
-        // Get all habits in the realm
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
     }
@@ -238,6 +238,7 @@ extension MainVC: NewHabitVCDelegate {
     
 }
 
+//MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
         reloadData()
@@ -250,9 +251,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
-        // cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         let habit = searchedHabits[indexPath.row]
-        let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
+        //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
+        let habitDetailVC = HabitDetailVC(habit: habit) 
         habitDetailVC.delegate = self
         
         habitDetailVC.modalPresentationStyle = .pageSheet
@@ -287,7 +289,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    // SearchBar
+    //MARK: SearchBar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = []
@@ -310,18 +312,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //FIXME: still need to fix app dying when habit deleted during search
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        //FIXME: 나중에 scope을 바꿔야지
+        //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
-
         let realm = self.localRealm.objects(RMO_Habit.self)
         
-        //Complete Option
+        //MARK: Habit을 Success 했으면..
         let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
             print("done")
+            
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
             {return} //
@@ -331,7 +333,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 taskToUpdate.success += 1
             }
             print(self.localRealm.objects(RMO_Count.self))
-    
+            
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
             
@@ -353,8 +355,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         success.backgroundColor = .systemBlue
         
-        //remind option.
-        //FIXME: need modal to display time
+        //MARK: Habit을 Remove 했으면
         let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
             print("Remove")
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
@@ -389,8 +390,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         remove.backgroundColor = .systemOrange
         
-        //delete option
-        //FIXME: swipe을 해서 delete말고 꼭 눌러서 delete하게끔
+        //MARK: Habit을 Fail 했으면..
         let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
             print("delete")
             
@@ -406,10 +406,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             //왜 안돼는거야왜왜왜왜왜오애왜
-//            self.compCount += 1
-//            print(self.compCount)
+            //            self.compCount += 1
+            //            print(self.compCount)
             //왜 안돼는거야왜왜왜왜왜오애왜
-
+            
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
             
@@ -436,13 +436,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     //왜 안돼는거야왜왜왜왜왜오애왜
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        self.delegate?.statusChange(countFromMain: self.compCount)
-//
-//    }
+    //    override func viewWillDisappear(_ animated: Bool) {
+    //        super.viewWillDisappear(animated)
+    //        self.delegate?.statusChange(countFromMain: self.compCount)
+    //
+    //    }
     //왜 안돼는거야왜왜왜왜왜오애왜
-
+    
 }
 
 

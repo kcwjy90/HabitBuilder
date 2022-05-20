@@ -37,11 +37,12 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    // search 됐느냐 안됐느냐에 따라 section이 다르게 나누기 위해.
     var habitSearched: Bool = false
     
     let localRealm = DBManager.SI.realm!
     var habits: [RMO_Habit] = []
-    var searchedHabits: [RMO_Habit]! //일단은 empty []로.
+    var searchedHabits: [RMO_Habit] = []
     
     var sectionedHabit = [Date:Results<RMO_Habit>]() // section하기 위해서
     var itemDates = [Date]() //이것도 section하기 위해서
@@ -49,23 +50,16 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
     override func loadView() {
         super.loadView()
-        
-        print(localRealm.objects(RMO_Habit.self))
-        
-        createSection() //날짜대로 section만드는 func
+                
+        // 날짜대로 section만드는 func
+        createSection()
         
         setNaviBar()
-        
-        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
-        
-        // Swip to dismiss tableView
-        allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
-        
+                
         searchBar.delegate = self
         
-        view.backgroundColor = .red
-        view.addSubview(backView)
         view.backgroundColor = .white
+        view.addSubview(backView)
         backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
@@ -90,7 +84,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
     }
     
-    //Navi Bar 만드는 func. loadview() 밖에!
+    //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         title = "All Habits"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
@@ -101,8 +95,15 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             target: self,
             action: #selector(addItem)
         )
+        
+        overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
+
+        // Swipe to dismiss tableView
+        allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
+    
+    //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
         v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
@@ -110,6 +111,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
+    //MARK: tableView reload 시킴
     func reloadData() {
         // Get all habits in the realm
         habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
@@ -118,7 +120,9 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         allHabitsTableView.reloadData()
     }
     
+    //MARK: Section 나누는 코드
     func createSection() {
+        
         //Find each unique day for which an Item exists in your Realm
         itemDates = localRealm.objects(RMO_Habit.self).reduce(into: [Date](), { results, currentItem in
             let date = currentItem.date
@@ -138,7 +142,8 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             }
         })
         
-        itemDates = itemDates.sorted() //sorting by Date
+        //sorting by Date
+        itemDates = itemDates.sorted()
         
         //Filter each Item in realm based on their date property and assign the results to the dictionary
         sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
@@ -162,7 +167,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
 }
 
-// extension 은 class 밖에
+//MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension AllHabitsVC: NewHabitVCDelegate {
     func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
         //        print("HabitVC - title : \(title), detail: \(desc)")
@@ -183,6 +188,7 @@ extension AllHabitsVC: NewHabitVCDelegate {
     }
 }
 
+//MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension AllHabitsVC: habitDetailVCDelegate {
     func editComp() {
         reloadData()
@@ -191,17 +197,19 @@ extension AllHabitsVC: habitDetailVCDelegate {
 
 
 //Adding tableview and content
-
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
+    //MARK: searched vs unsearched에 따라 section 수가 나뉨.
     func numberOfSections(in tableView: UITableView) -> Int {
-        if habitSearched == true || habits.count == 0 { //search 하고 있을때는 section 이 하나로
+        if habits.count == 0 { return 0 }
+        else if habitSearched == true { //search 하고 있을때는 section 이 하나로
             return 1
         } else {
             return itemDates.count //search 안할때는 itemDates 수에 따라서
         }
     }
     
+    //MARK: searched vs unsearched에 따라 section title이 나뉨.
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if habitSearched == true || habits.count == 0 { //search 하고 있을때는 Heading 이 Search Result로
             return ""
@@ -214,8 +222,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 return nil
             }
         }
-     }
+    }
     
+    //MARK: searched vs unsearched에 따라 section안에 있는 cell 수가 나뉨.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if habitSearched == true || habits.count == 0 {
             return searchedHabits.count //serach 를 하면 searchedHabits row number 를
@@ -228,21 +237,30 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    //MARK: cell을 tap 했을때 무슨일이 일어나나? data들이 HabitDetailVC로 날라간다.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // cell을 tap 하면 이 data들이 HabitDetailVC로 날라간다.
-        var habit: RMO_Habit
+        var habit: RMO_Habit? //? optional 로 안하고 if let/guard let 쓰면 에러 뜸. "Initializer for conditional binding must have Optional type, not 'RMO_Habit'"
         
         if habitSearched == true || habits.count == 0 {
             print(indexPath.row)
             habit = searchedHabits[indexPath.row]
         } else {
-//            FIXME: 옵셔널벗기기가 왜 안돼지?
-            habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
-            
+
+            //옵셔널 벗기기 해서
+            if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
+                habit = sectionedData[indexPath.row]
+            }
         }
         
-        let habitDetailVC = HabitDetailVC(habit: habit) // NewHabitVC의 constructor에 꼭 줘야함
+        //이것을 guard let으로
+        guard let gHabit = habit else {
+            print("error")
+            return
+        }
+        
+        //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
+        let habitDetailVC = HabitDetailVC(habit: gHabit)
         habitDetailVC.delegate = self
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)
@@ -253,6 +271,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return 44.0 //Choose your custom row
     }
     
+    
+    //MARK: cell에 넣을 정보를 어디서 뽑아 오는가?
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
         else {
@@ -279,7 +299,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    //searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
+    //MARK: searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = [] //비어있는 searchedHabits
@@ -298,11 +318,12 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         self.allHabitsTableView.reloadData() //tableView를 reload
     }
     
-    //swipe 해서 지우는 function
+    //MARK: swipe 해서 지우는 function
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
     }
     
+    //MARK: searched vs unsearched 상황에서 delete 하기
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
@@ -330,10 +351,31 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 let realm = localRealm.objects(RMO_Habit.self)
                 
-                //  FIXME: 옵셔널벗기기가 왜 안돼지?
-                let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
-                var toArray = sectionedHabit[itemDates[indexPath.section]]!.toArray() //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
-                let thisId = habit.id
+                var habit: RMO_Habit?
+                var toArray: [RMO_Habit]?
+
+            
+                if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
+                    habit = sectionedData[indexPath.row]
+                }
+                
+                guard let gHabit = habit else {
+                    print("error")
+                    return
+                }
+                
+                //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
+                if let sectionedArray = sectionedHabit[itemDates[indexPath.section]] {
+                    toArray = sectionedArray.toArray()
+                }
+                
+                guard var gToArray = toArray else {
+                    print("error")
+                    return
+                }
+                
+    
+                let thisId = gHabit.id
                 
                 try! localRealm.write {
                     let deleteHabit = realm.where {
@@ -343,7 +385,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 tableView.beginUpdates()
-                toArray.remove(at: indexPath.row)
+                gToArray.remove(at: indexPath.row)
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 tableView.endUpdates()
                 

@@ -14,53 +14,54 @@ import Charts
 
 
 class ProgressVC: UIViewController, ChartViewDelegate {
-
+    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
         return v
     }()
- 
+    
     let localRealm = DBManager.SI.realm!
     var todayPiChart = PieChartView()
-
     
-    //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공. 이제 자러가장.
-    let results = ["Completed", "Failed", "Working"]
+    //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공.
+    let results = ["Succeeded", "Failed", "Working"]
     var counts = [0,0,0]
     var compCount: Int = 0
-
-
+    
+    
     override func loadView() {
         super.loadView()
         
+        setNaviBar()
+        
         todayPiChart.delegate = self
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-        {return} //
-        let taskToUpdate = countRealm[indexNumb]
-        counts[0] = taskToUpdate.success
-        counts[1] = taskToUpdate.fail
-        counts[2] = taskToUpdate.total - (taskToUpdate.success + taskToUpdate.fail + taskToUpdate.remove)
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
         
         
         //왜 안돼는거야왜왜왜왜왜오애왜
-//        counts[0] = compCount
+        //        counts[0] = compCount
         //왜 안돼는거야왜왜왜왜왜오애왜
-
-
         
         customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-        setNaviBar()
+        
     }
-
-    override func viewDidLayoutSubviews() { //이렇게 해야지만 그래프가 뜨는데 왜인지는 모름.
+    
+    override func viewDidLayoutSubviews() { //이렇게 따로 viewDidLayoutSubview에 넣어야지만 그래프가 뜨는데 왜인지는 모름.
         super.viewDidLayoutSubviews()
         
         view.addSubview(backView)
@@ -73,36 +74,36 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
+        // todayPiChart grid
         todayPiChart.snp.makeConstraints{ (make) in
             make.edges.equalTo(backView)
         }
         todayPiChart.center = backView.center
         
-     
-        
     }
     
+    //MARK: Chart Customize하는 func
     func customizeChart(dataPoints: [String], values: [Double]) {
-      
-      // 1. Set ChartDataEntry
-      var dataEntries: [ChartDataEntry] = []
-      for i in 0..<dataPoints.count {
-        let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
-        dataEntries.append(dataEntry)
-      }
-      // 2. Set ChartDataSet
-      let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
+        
+        // 1. Set ChartDataEntry
+        var dataEntries: [ChartDataEntry] = []
+        for i in 0..<dataPoints.count {
+            let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
+            dataEntries.append(dataEntry)
+        }
+        // 2. Set ChartDataSet
+        let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
         pieChartDataSet.colors = ChartColorTemplates.colorful()
         
-      // 3. Set ChartData
-      let pieChartData = PieChartData(dataSet: pieChartDataSet)
-      let format = NumberFormatter()
+        // 3. Set ChartData
+        let pieChartData = PieChartData(dataSet: pieChartDataSet)
+        let format = NumberFormatter()
         format.numberStyle = .percent
-      let formatter = DefaultValueFormatter(formatter: format)
-      pieChartData.setValueFormatter(formatter)
+        let formatter = DefaultValueFormatter(formatter: format)
+        pieChartData.setValueFormatter(formatter)
         
-      // 4. Assign it to the chart’s data
-      todayPiChart.data = pieChartData
+        // 4. Assign it to the chart’s data
+        todayPiChart.data = pieChartData
     }
     
     //Navi Bar 만드는 func.
@@ -111,6 +112,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         navigationController?.navigationBar.backgroundColor = .white
     }
     
+    //MARK: viewWillAppear -> reload graph
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadView() // 이게 있어야 그레프가 업데이트됨
@@ -141,7 +143,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
 //        for x in 0..<10 {
 //            entries.append(ChartDataEntry(x: Double(x), y: Double(x)))
 //        }
- 
+
 //        let set = PieChartDataSet(entries: entries)
 //        set.colors = ChartColorTemplates.joyful()
 //        let data = PieChartData(dataSet: set)

@@ -35,7 +35,8 @@ class NotificationManger: NSObject {
         }
     }
     
-    // Notification 를 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    //MARK: Notification을 정해진 시간에 보내는 content. DATE 말고 시간에 일단 맞춰놨음
+    //FIXME: 날짜와 시간을 합쳐야함. 
     func addScheduleNoti(habit: RMO_Habit) {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.badge = NSNumber(value: 1)

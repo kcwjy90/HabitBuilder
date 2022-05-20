@@ -8,12 +8,10 @@
 
 import UIKit
 
-// 이게 NewHabitVC랑 MainVC랑 연결 시켜주는 거든가?
+//MARK: didCreateNewHabit func for NewHabitVCDelegate Protocol
 protocol NewHabitVCDelegate: AnyObject {
     func didCreateNewHabit(title: String, desc: String, date: Date, time: Date)
-    
 }
-
 
 class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
@@ -29,7 +27,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // backButton 생성
     lazy var backButton: UIButton = {
         let v = UIButton()
-        //        v.backgroundColor = .purple
         v.setTitle("Back", for: .normal)
         v.setTitleColor(.red, for: .normal)
         v.layer.masksToBounds = true
@@ -49,7 +46,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // addHabitButton 생성
     lazy var addHabitButton: UIButton = {
         let v = UIButton()
-        //        v.backgroundColor = .blue
         v.setTitle("Add", for: .normal)
         v.setTitleColor(.blue, for: .normal)
         v.layer.masksToBounds = true
@@ -67,11 +63,10 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    //  newHabitDesc UITextView (Multi line) 생성
+    // newHabitDesc UITextView (Multi line) 생성
     lazy var newHabitDesc: UITextView = {
         let v = UITextView()
         v.backgroundColor = .systemGray5
-        //        v.placeholder = "Description of your Goal"
         v.text = "Description of your New Habit"
         v.textColor = UIColor.lightGray
         v.layer.masksToBounds = true
@@ -129,22 +124,22 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    //FIXME: 일단 얘를 어떻게 처리해야할지 좀더 생각을...Repeat function
     lazy var repeatButton: UIButton = {
         let v = UIButton()
-//        v.layer.borderWidth = 0.5
-//        v.layer.borderColor = UIColor.secondaryLabel.cgColor
+        //        v.layer.borderWidth = 0.5
+        //        v.layer.borderColor = UIColor.secondaryLabel.cgColor
         v.layer.cornerRadius = 15
         v.backgroundColor = .systemGray5
         return v
     }()
-    
+    //FIXME: 위에거랑 동일
     var isChecked: Bool = false
-    
     
     override func loadView() {
         super.loadView()
         
-        // tapGasture - Dismisses Keyboard
+        // tapGesture - Dismisses Keyboard
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
         
@@ -161,7 +156,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(newHabitTimeLabel)
         backView.addSubview(newHabitTime)
         backView.addSubview(repeatButton)
-
+        
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -210,7 +205,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
-        newHabitDesc.delegate = self //placer가 UITextView에는 없어서 placeholder 비슷한것을 생성하기위한 function.
+        newHabitDesc.delegate = self //placeholder가 UITextView에는 없어서 비슷한것을 생성하기위한 function.
         textViewDidBeginEditing(newHabitDesc) //을 넣기 위해서 delegate을 해야함.
         textViewDidEndEditing(newHabitDesc)
         newHabitDesc.addPadding()
@@ -271,15 +266,14 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         //        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
         
-        
-        // Button Actions - AddHabitButton & backButton
+        //MARK: Button Actions - AddHabitButton & backButton & repeatButton
         addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
-
+        
     }
     
-    //밑에 두 func으로 Habit Desc TextView에 placeholder 비슷한것을 넣는다.
+    //MARK: UITextView "Placeholder" 
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
@@ -294,6 +288,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
     }
     
+    //MARK: Button Funcs - Add, Back, Repeat Buttons
     @objc func addButtonPressed(sender: UIButton) {
         
         delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
@@ -312,7 +307,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 }
 
 // for UITextField Padding
-
 extension UITextField {
     func setLeftPaddingPoints(_ amount:CGFloat){
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
@@ -327,6 +321,7 @@ extension UITextField {
     
 }
 
+//UITextView에 padding을 더하기
 extension UITextView {
     func addPadding() {
         self.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)

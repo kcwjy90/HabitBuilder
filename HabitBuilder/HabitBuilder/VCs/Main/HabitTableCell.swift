@@ -8,6 +8,7 @@
 
 import UIKit
 
+//:MARK Cells
 class HabitTableCell: UITableViewCell {
     
     lazy var backView: UIView = {
