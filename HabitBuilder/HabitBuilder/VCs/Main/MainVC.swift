@@ -197,6 +197,8 @@ extension MainVC: NewHabitVCDelegate {
             
             try! localRealm.write {
                 localRealm.add(newCount)
+                print("생성")
+                print(newCount)
             }
         }
         
@@ -207,6 +209,8 @@ extension MainVC: NewHabitVCDelegate {
         
         try! localRealm.write {
             existingObj.total += 1
+            print("+1")
+            print(existingObj)
         }
         
         try! localRealm.write {

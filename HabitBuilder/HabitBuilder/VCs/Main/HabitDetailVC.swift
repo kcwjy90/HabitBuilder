@@ -250,11 +250,62 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     @objc func saveButtonPressed(sender: UIButton) {
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let countRealm = localRealm.objects(RMO_Count.self)
         let realm = localRealm.objects(RMO_Habit.self)
+        
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return} //결국 filter 를 안쓰고 where을 써버렸네..
         let taskToUpdate = realm[indexNumb]
         
+        // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
+        // FIXME: 이걸 guard let으로 못 적나?
+        if taskToUpdate.date != habitDate.date {
+            
+            //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
+            let countDate = dateFormatter.string(from: habitDate.date)
+            if !countRealm.contains(where: { $0.date == countDate} )
+            {
+                let newCount = RMO_Count()
+                newCount.date = countDate
+
+                try! localRealm.write {
+                    localRealm.add(newCount)
+                }
+                print("새로만듬")
+                print(newCount)
+
+            }
+            
+            //예전 habit의 count 수를 -1
+            let removeDate = dateFormatter.string(from: taskToUpdate.date)
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
+            {return}
+            let minusCount = countRealm[indexNumb]
+            
+            try! localRealm.write {
+                print("리무브되기전")
+                print(minusCount)
+                minusCount.total -= 1
+                print("리무브된후")
+                print(minusCount)
+            }
+            
+            //새로운 habit의 count수를 +1
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
+            {return}
+            let plusCount = countRealm[indexNumb]
+            try! localRealm.write {
+                print("플러스되기전")
+                print(plusCount)
+                plusCount.total += 1
+                print("플러스된후")
+                print(plusCount)
+
+            }
+            
+        }
         
         //        option 1
         //        print를 하면 하나가 뜨는게 아니라 habit object가 다~뜸. 왜지? 그리고 여기는 guard 를 붙힐수가 없네...왜지?
@@ -274,6 +325,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             taskToUpdate.desc = habitDesc.text!
             taskToUpdate.date = habitDate.date
             taskToUpdate.time = habitTime.date
+            print(realm)
         }
         
         NotificationManger.SI.addScheduleNoti(habit: taskToUpdate) //update된걸 scheduler에. 자동적으로 이 전에 저장된건 지워지나봐. 쏘 나이스
