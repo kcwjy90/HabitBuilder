@@ -206,20 +206,25 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         if habitSearched == true || habits.count == 0 { //search 하고 있을때는 Heading 이 Search Result로
             return ""
         } else {
-            if let first = sectionedHabit[itemDates[section]]!.first { // search 날짜를 heading으로
+            if let data = sectionedHabit[itemDates[section]], let first = data.first { // search 날짜를 heading으로
                 let dateFormmater = DateFormatter()
                 dateFormmater.dateFormat = "MM/dd/YYYY"
                 return dateFormmater.string(from: first.date)
+            } else {
+                return nil
             }
         }
-        return nil //얘는 그냥 넣어야 되더라고
-    }
+     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if habitSearched == true || habits.count == 0 {
             return searchedHabits.count //serach 를 하면 searchedHabits row number 를
         } else {
-            return sectionedHabit[itemDates[section]]!.count // 안하면 sectionedHabit row number 를
+            if let data = sectionedHabit[itemDates[section]] { // search
+                return data.count  // 안하면 sectionedHabit row number 를
+            } else {
+                return 0 //return 0 를 안넣으면 안되네 또..
+            }
         }
     }
     
@@ -232,6 +237,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             print(indexPath.row)
             habit = searchedHabits[indexPath.row]
         } else {
+//            FIXME: 옵셔널벗기기가 왜 안돼지?
             habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
             
         }
@@ -264,11 +270,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             cell.newHabitDesc.text = desc
             
         } else { //아닌경우는 groupedHabits에서 뽑아온다
-            let itemsForDate = sectionedHabit[itemDates[indexPath.section]]!
-            var habit = itemsForDate[indexPath.row]
-            cell.newHabitTitle.text = habit.title + " - "
-            cell.newHabitDesc.text = habit.desc
-            
+            if let itemsForDate = sectionedHabit[itemDates[indexPath.section]] {
+                var habit = itemsForDate[indexPath.row]
+                cell.newHabitTitle.text = habit.title + " - "
+                cell.newHabitDesc.text = habit.desc
+            }
         }
         return cell
     }
@@ -323,6 +329,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             } else {
                 
                 let realm = localRealm.objects(RMO_Habit.self)
+                
+                //  FIXME: 옵셔널벗기기가 왜 안돼지?
                 let habit = sectionedHabit[itemDates[indexPath.section]]![indexPath.row]
                 var toArray = sectionedHabit[itemDates[indexPath.section]]!.toArray() //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
                 let thisId = habit.id
