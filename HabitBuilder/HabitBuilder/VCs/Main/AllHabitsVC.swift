@@ -201,8 +201,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section 수가 나뉨.
     func numberOfSections(in tableView: UITableView) -> Int {
-        if habits.count == 0 { return 0 }
-        else if habitSearched == true { //search 하고 있을때는 section 이 하나로
+        if habits.count == 0 {
+            return 0
+        }
+        
+        if habitSearched == true { //search 하고 있을때는 section 이 하나로
             return 1
         } else {
             return itemDates.count //search 안할때는 itemDates 수에 따라서
@@ -211,7 +214,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section title이 나뉨.
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if habitSearched == true || habits.count == 0 { //search 하고 있을때는 Heading 이 Search Result로
+        if habits.count == 0 {
+            return ""
+        }
+        
+        if habitSearched == true { //search 하고 있을때는 Heading 이 Search Result로
             return ""
         } else {
             if let data = sectionedHabit[itemDates[section]], let first = data.first { // search 날짜를 heading으로
@@ -226,7 +233,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section안에 있는 cell 수가 나뉨.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if habitSearched == true || habits.count == 0 {
+        if habits.count == 0 {
+            return 0
+        }
+        
+        if habitSearched == true {
             return searchedHabits.count //serach 를 하면 searchedHabits row number 를
         } else {
             if let data = sectionedHabit[itemDates[section]] { // search
@@ -242,7 +253,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         
         var habit: RMO_Habit? //? optional 로 안하고 if let/guard let 쓰면 에러 뜸. "Initializer for conditional binding must have Optional type, not 'RMO_Habit'"
         
-        if habitSearched == true || habits.count == 0 {
+        if habits.count == 0 {
+            return
+        }
+        
+        if habitSearched == true {
             print(indexPath.row)
             habit = searchedHabits[indexPath.row]
         } else {
@@ -279,7 +294,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        if habitSearched == true || habits.count == 0 { //search 가 되었을경우는 searchedHabit 에서만 object를..
+        if habits.count == 0 {
+            return cell
+        }
+        
+        if habitSearched == true { //search 가 되었을경우는 searchedHabit 에서만 object를..
             let newHabit = searchedHabits[indexPath.row]
             var title = newHabit.title
             let desc = newHabit.desc
@@ -300,6 +319,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     //MARK: searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
+    //FIXME: search한 상태에서 cell 을 touch해서 뭔가를 바꾸고 다시 tableview 화면으로 돌아올때 search된 화면이 아니라 이상한 화면이 나옴.
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = [] //비어있는 searchedHabits
@@ -327,7 +347,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
-            if habitSearched == true || habits.count == 0 {
+            if habits.count == 0 {
+                return
+            }
+            
+            if habitSearched == true {
                 
                 let realm = localRealm.objects(RMO_Habit.self)
                 let habit = searchedHabits[indexPath.row]
@@ -373,10 +397,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                     print("error")
                     return
                 }
-                
-    
+            
                 let thisId = gHabit.id
-                
+        
                 try! localRealm.write {
                     let deleteHabit = realm.where {
                         $0.id == thisId
