@@ -48,14 +48,15 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     var itemDates = [Date]() //이것도 section하기 위해서
     
     
+    //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
-                
+        
         // 날짜대로 section만드는 func
         createSection()
         
         setNaviBar()
-                
+        
         searchBar.delegate = self
         
         view.backgroundColor = .white
@@ -84,6 +85,11 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadData()
+    }
+    
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         title = "All Habits"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
@@ -97,7 +103,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         )
         
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
-
+        
         // Swipe to dismiss tableView
         allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
@@ -126,14 +132,16 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         //Find each unique day for which an Item exists in your Realm
         itemDates = localRealm.objects(RMO_Habit.self).reduce(into: [Date](), { results, currentItem in
             let date = currentItem.date
-            let beginningOfDay = Calendar.current.date(from: DateComponents(
+            guard let beginningOfDay = Calendar.current.date(from: DateComponents(
                 year: Calendar.current.component(.year, from: date),
                 month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
-            let endOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0)),
+                  let endOfDay = Calendar.current.date(from: DateComponents(
+                    year: Calendar.current.component(.year, from: date),
+                    month: Calendar.current.component(.month, from: date),
+                    day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))
+            else { return }
+            
             //Only add the date if it doesn't exist in the array yet
             if !results.contains(where: { addedDate->Bool in
                 return addedDate >= beginningOfDay && addedDate <= endOfDay
@@ -147,23 +155,20 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
         //Filter each Item in realm based on their date property and assign the results to the dictionary
         sectionedHabit = itemDates.reduce(into: [Date:Results<RMO_Habit>](), { results, date in
-            let beginningOfDay = Calendar.current.date(from: DateComponents(
+            
+            guard let beginningOfDay = Calendar.current.date(from: DateComponents(
                 year: Calendar.current.component(.year, from: date),
                 month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0))!
-            let endOfDay = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: date),
-                month: Calendar.current.component(.month, from: date),
-                day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))!
+                day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0)),
+                    let endOfDay = Calendar.current.date(from: DateComponents(
+                        year: Calendar.current.component(.year, from: date),
+                        month: Calendar.current.component(.month, from: date),
+                        day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))
+            else { return }
+            
             results[beginningOfDay] = localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfDay, endOfDay)
         })
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        reloadData()
-    }
-    
     
 }
 
@@ -261,7 +266,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             print(indexPath.row)
             habit = searchedHabits[indexPath.row]
         } else {
-
+            
             //옵셔널 벗기기 해서
             if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
                 habit = sectionedData[indexPath.row]
@@ -377,8 +382,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 var habit: RMO_Habit?
                 var toArray: [RMO_Habit]?
-
-            
+                
+                
                 if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
                     habit = sectionedData[indexPath.row]
                 }
@@ -397,9 +402,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                     print("error")
                     return
                 }
-            
+                
                 let thisId = gHabit.id
-        
+                
                 try! localRealm.write {
                     let deleteHabit = realm.where {
                         $0.id == thisId

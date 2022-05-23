@@ -11,14 +11,9 @@ import SnapKit
 import RealmSwift
 import UserNotifications
 
-protocol MainVCDelegate: AnyObject {
-    func statusChange(countFromMain: Int)
-}
-
 
 class MainVC: UIViewController, UISearchBarDelegate {
     
-    weak var delegate: MainVCDelegate?   // Delegate property var 생성
     let localRealm = DBManager.SI.realm!
     
     // backView 생성
@@ -71,10 +66,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit] = []
     
-    //왜 안돼는거야왜왜왜왜왜오애왜
-    //    var compCount = 1
-    //왜 안돼는거야왜왜왜왜왜오애왜
     
+    //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
         
@@ -121,6 +114,12 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         reloadData()
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        reloadData()
     }
     
     func dateFormatting() {
@@ -228,12 +227,6 @@ extension MainVC: NewHabitVCDelegate {
     func reloadData() {
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        reloadData()
     }
     
 }
@@ -404,12 +397,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             print(self.localRealm.objects(RMO_Count.self))
             
-            
-            //왜 안돼는거야왜왜왜왜왜오애왜
-            //            self.compCount += 1
-            //            print(self.compCount)
-            //왜 안돼는거야왜왜왜왜왜오애왜
-            
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
             
@@ -433,15 +420,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         return UISwipeActionsConfiguration(actions: [success, remove, fail])
     }
-    
-    
-    //왜 안돼는거야왜왜왜왜왜오애왜
-    //    override func viewWillDisappear(_ animated: Bool) {
-    //        super.viewWillDisappear(animated)
-    //        self.delegate?.statusChange(countFromMain: self.compCount)
-    //
-    //    }
-    //왜 안돼는거야왜왜왜왜왜오애왜
     
 }
 

@@ -31,6 +31,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     var compCount: Int = 0
     
     
+    //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
         
@@ -38,27 +39,14 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
         todayPiChart.delegate = self
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let today = Date()
-        let todayDate = dateFormatter.string(from: today)
-        let countRealm = self.localRealm.objects(RMO_Count.self)
+        reloadChart()
         
-        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
-        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-        {return}
-        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-        counts[0] = todayCount.success
-        counts[1] = todayCount.fail
-        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
-        
-        
-        //왜 안돼는거야왜왜왜왜왜오애왜
-        //        counts[0] = compCount
-        //왜 안돼는거야왜왜왜왜왜오애왜
-        
-        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-        
+    }
+    
+    //MARK: viewWillAppear -> reload graph
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadChart()  // 이게 있어야 그레프가 업데이트됨
     }
     
     override func viewDidLayoutSubviews() { //이렇게 따로 viewDidLayoutSubview에 넣어야지만 그래프가 뜨는데 왜인지는 모름.
@@ -82,6 +70,26 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
     }
     
+    //MARK: code that creates the piechart. Needs to reload so graph gets updated
+    func reloadChart() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
+
+        
+        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
+        
+    }
     //MARK: Chart Customize하는 func
     func customizeChart(dataPoints: [String], values: [Double]) {
         
@@ -111,32 +119,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
     }
-    
-    //MARK: viewWillAppear -> reload graph
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadView() // 이게 있어야 그레프가 업데이트됨
-    }
 }
-
-//왜 안돼는거야왜왜왜왜왜오애왜
-//extension ProgressVC: MainVCDelegate {
-//    func statusChange (countFromMain: Int) {
-//        let mainVC = MainVC()
-//        mainVC.delegate = self
-//        compCount = compCount + countFromMain
-//        print("comp is")
-//        print(compCount)
-//        print("count from Main is")
-//        print(countFromMain)
-//    }
-//
-//}
-//왜 안돼는거야왜왜왜왜왜오애왜
-
-
-
-
 
 
 //        var entries = [ChartDataEntry]()

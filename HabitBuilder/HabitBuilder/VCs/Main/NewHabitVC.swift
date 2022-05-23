@@ -291,7 +291,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //MARK: Button Funcs - Add, Back, Repeat Buttons
     @objc func addButtonPressed(sender: UIButton) {
         
-        delegate?.didCreateNewHabit(title: newHabitTitle.text!, desc: newHabitDesc.text!, date: newHabitDate.date, time: newHabitTime.date)
+        guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
+        delegate?.didCreateNewHabit(title: titleText, desc: descText, date: newHabitDate.date, time: newHabitTime.date)
         dismiss(animated: true, completion: nil)
         //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     }

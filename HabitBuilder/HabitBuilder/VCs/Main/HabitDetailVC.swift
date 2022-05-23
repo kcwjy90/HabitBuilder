@@ -328,8 +328,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // 그래서 완성본 위에서는 filter 안쓰고 where 씀
         
         try! self.localRealm.write {
-            taskToUpdate.title = habitTitle.text!
-            taskToUpdate.desc = habitDesc.text!
+            guard let titleText = habitTitle.text, let descText = habitDesc.text
+            else { return }
+            taskToUpdate.title = titleText
+            taskToUpdate.desc = descText
             taskToUpdate.date = habitDate.date
             taskToUpdate.time = habitTime.date
             print(realm)
