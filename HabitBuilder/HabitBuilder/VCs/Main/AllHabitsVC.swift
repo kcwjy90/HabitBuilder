@@ -43,6 +43,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     let localRealm = DBManager.SI.realm!
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit] = []
+    var searchedT: String = ""
     
     var sectionedHabit = [Date:Results<RMO_Habit>]() // section하기 위해서
     var itemDates = [Date]() //이것도 section하기 위해서
@@ -160,10 +161,10 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
                 year: Calendar.current.component(.year, from: date),
                 month: Calendar.current.component(.month, from: date),
                 day: Calendar.current.component(.day, from: date), hour: 0, minute: 0, second: 0)),
-                    let endOfDay = Calendar.current.date(from: DateComponents(
-                        year: Calendar.current.component(.year, from: date),
-                        month: Calendar.current.component(.month, from: date),
-                        day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))
+                  let endOfDay = Calendar.current.date(from: DateComponents(
+                    year: Calendar.current.component(.year, from: date),
+                    month: Calendar.current.component(.month, from: date),
+                    day: Calendar.current.component(.day, from: date), hour: 23, minute: 59, second: 59))
             else { return }
             
             results[beginningOfDay] = localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfDay, endOfDay)
@@ -196,7 +197,17 @@ extension AllHabitsVC: NewHabitVCDelegate {
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension AllHabitsVC: habitDetailVCDelegate {
     func editComp() {
-        reloadData()
+        if habitSearched {
+            searchedHabits = habits.filter { habit in
+                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+                return habit.title.lowercased().contains(searchedT.lowercased())
+            }
+            habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+            createSection()
+            self.allHabitsTableView.reloadData()
+        } else {
+            self.reloadData()
+        }
     }
 }
 
@@ -215,7 +226,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             print("설치됨")
             return 1
         } else {
-            print("설치는안됌")
+            print("설치는안돼")
             return itemDates.count //search 안할때는 itemDates 수에 따라서
         }
     }
@@ -335,6 +346,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         
         if searchText != "" { //만약 searchText가 비어있지 않으면
             habitSearched = true
+            searchedT = searchText //search한 text를 저장.
+            
             searchedHabits = habits.filter { habit in //searchedHabits은 Habit 을 filter한것과 =
                 return habit.title.lowercased().contains(searchText.lowercased()) //filter내용은 title = searchText
             }

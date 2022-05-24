@@ -61,6 +61,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
     
     // habit이 검색됨에 따라 tableView에 보여지는걸 다르게 하기 위해서
     var habitSearched: Bool = false
+    var searchedT: String = ""
     
     // RMO_Habit에서 온 data를 넣을 empty한 array들
     var habits: [RMO_Habit] = []
@@ -227,13 +228,22 @@ extension MainVC: NewHabitVCDelegate {
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
     }
-
+    
 }
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
-        reloadData()
+        if habitSearched {
+            searchedHabits = habits.filter { habit in
+                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다. 
+                return habit.title.lowercased().contains(searchedT.lowercased())
+            }
+            self.todaysHabitTableView.reloadData()
+            
+        }  else {
+            self.reloadData()
+        }
     }
 }
 
@@ -255,13 +265,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-     
+        
         if habits.count != 0 {
-                print("search 됨")
-                return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
-             } else {
-                 print("안돼")
-                 return habits.count
+            print("search 됨")
+            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+        } else {
+            print("안돼")
+            return habits.count
         }
     }
     
@@ -295,6 +305,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         if searchText != "" {
             habitSearched = true
+            searchedT = searchText //search한 text를 저장.
             
             searchedHabits = habits.filter { habit in
                 return habit.title.lowercased().contains(searchText.lowercased())
@@ -310,8 +321,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     //FIXME: still need to fix app dying when habit deleted during search
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-
-                
+        
+        let performsFirstActionWithFullSwipe = false
+        
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -428,7 +440,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         fail.backgroundColor = .systemRed
         
-        return UISwipeActionsConfiguration(actions: [success, remove, fail])
+        //        let configuration = UISwipeActionsConfiguration(actions: [remove, fail, success])
+        //        configuration.performsFirstActionWithFullSwipe = false
+        
+        return UISwipeActionsConfiguration(actions: [remove, fail, success])
+        
     }
     
 }
