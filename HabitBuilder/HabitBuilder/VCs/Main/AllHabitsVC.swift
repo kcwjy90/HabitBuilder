@@ -207,12 +207,15 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: searched vs unsearched에 따라 section 수가 나뉨.
     func numberOfSections(in tableView: UITableView) -> Int {
         if habits.count == 0 {
+            print("없음")
             return 0
         }
         
         if habitSearched == true { //search 하고 있을때는 section 이 하나로
+            print("설치됨")
             return 1
         } else {
+            print("설치는안됌")
             return itemDates.count //search 안할때는 itemDates 수에 따라서
         }
     }

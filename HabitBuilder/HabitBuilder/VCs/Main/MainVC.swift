@@ -66,7 +66,6 @@ class MainVC: UIViewController, UISearchBarDelegate {
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit] = []
     
-    
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
@@ -228,7 +227,7 @@ extension MainVC: NewHabitVCDelegate {
         filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
         todaysHabitTableView.reloadData() //reload
     }
-    
+
 }
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
@@ -256,7 +255,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+     
+        if habits.count != 0 {
+                print("search 됨")
+                return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+             } else {
+                 print("안돼")
+                 return habits.count
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -304,7 +310,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     //FIXME: still need to fix app dying when habit deleted during search
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
+
+                
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -345,6 +352,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
             actionPerformed(true)
+            self.filterTodaysHabit() //이거를 넣으니까 search 한상태에서 habit을 없애도 에러가 안남
         }
         success.backgroundColor = .systemBlue
         
@@ -380,6 +388,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             tableView.endUpdates()
             actionPerformed(true)
             actionPerformed(true)
+            self.filterTodaysHabit()
         }
         remove.backgroundColor = .systemOrange
         
@@ -415,6 +424,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
             actionPerformed(true)
+            self.filterTodaysHabit()
         }
         fail.backgroundColor = .systemRed
         
