@@ -215,3 +215,36 @@ import SwiftUI
 //let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
 //view.addGestureRecognizer(UITapGesture)
 //
+
+
+//swipe 하는거 처음 썼던 버전
+//swipe 해서 지우는 function
+//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .delete
+//    }
+
+//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete {
+//
+//            let realm = localRealm.objects(RMO_Habit.self)
+//            let habit = searchedHabits[indexPath.row]
+//            let thisId = habit.id
+//
+//            try! localRealm.write {
+//
+//                let deleteHabit = realm.where {
+//                    $0.id == thisId
+//                }
+//                localRealm.delete(deleteHabit)
+//
+//            }
+//
+//            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+//            tableView.beginUpdates()
+//            searchedHabits.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//            tableView.endUpdates()
+//        }
+//
+//    }
+//

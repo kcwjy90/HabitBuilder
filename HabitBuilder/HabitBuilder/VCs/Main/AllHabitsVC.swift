@@ -179,14 +179,44 @@ extension AllHabitsVC: NewHabitVCDelegate {
         //        print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
-        let fromRMO_Habit = RMO_Habit()
-        fromRMO_Habit.title = title
-        fromRMO_Habit.desc = desc
-        fromRMO_Habit.date = date
-        fromRMO_Habit.time = time
+        let newHabit = RMO_Habit()
+        newHabit.title = title
+        newHabit.desc = desc
+        newHabit.date = date
+        newHabit.time = time
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
+        let countRealm = localRealm.objects(RMO_Count.self)
+        
+        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+        if !countRealm.contains(where: { $0.date == habitDate} )
+        {
+            let newCount = RMO_Count()
+            newCount.date = habitDate
+            
+            try! localRealm.write {
+                localRealm.add(newCount)
+                print("생성")
+                print(newCount)
+            }
+        }
         
         try! localRealm.write {
-            localRealm.add(fromRMO_Habit)
+            localRealm.add(newHabit)
+        }
+        
+        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+        {return}
+        let existCount = countRealm[indexNumb]
+        
+        try! localRealm.write {
+            existCount.total += 1
+            print("+1")
+            print(existCount)
         }
         
         createSection()
@@ -338,7 +368,6 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     //MARK: searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
-    //FIXME: search한 상태에서 cell 을 touch해서 뭔가를 바꾸고 다시 tableview 화면으로 돌아올때 search된 화면이 아니라 이상한 화면이 나옴.
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         searchedHabits = [] //비어있는 searchedHabits
@@ -358,6 +387,12 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         }
         self.allHabitsTableView.reloadData() //tableView를 reload
     }
+    
+    
+    
+    
+    
+    
     
     //MARK: swipe 해서 지우는 function
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {

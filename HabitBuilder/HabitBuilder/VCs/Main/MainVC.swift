@@ -236,7 +236,7 @@ extension MainVC: habitDetailVCDelegate {
     func editComp() {
         if habitSearched {
             searchedHabits = habits.filter { habit in
-                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다. 
+                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
                 return habit.title.lowercased().contains(searchedT.lowercased())
             }
             self.todaysHabitTableView.reloadData()
@@ -256,7 +256,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         let habit = searchedHabits[indexPath.row]
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
-        let habitDetailVC = HabitDetailVC(habit: habit) 
+        let habitDetailVC = HabitDetailVC(habit: habit)
         habitDetailVC.delegate = self
         
         habitDetailVC.modalPresentationStyle = .pageSheet
@@ -318,12 +318,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
-    
-    //FIXME: still need to fix app dying when habit deleted during search
+    //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
-        let performsFirstActionWithFullSwipe = false
-        
+                
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -334,7 +331,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //MARK: Habit을 Success 했으면..
         let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("done")
+            print("Success")
             
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
@@ -406,7 +403,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //MARK: Habit을 Fail 했으면..
         let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("delete")
+            print("Fail")
             
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
@@ -451,37 +448,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 
-
-//swipe 해서 지우는 function
-//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-//        return .delete
-//    }
-
-//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//
-//            let realm = localRealm.objects(RMO_Habit.self)
-//            let habit = searchedHabits[indexPath.row]
-//            let thisId = habit.id
-//
-//            try! localRealm.write {
-//
-//                let deleteHabit = realm.where {
-//                    $0.id == thisId
-//                }
-//                localRealm.delete(deleteHabit)
-//
-//            }
-//
-//            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-//            tableView.beginUpdates()
-//            searchedHabits.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//            tableView.endUpdates()
-//        }
-//
-//    }
-//
 
 
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
