@@ -124,15 +124,31 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    //FIXME: 일단 얘를 어떻게 처리해야할지 좀더 생각을...Repeat function
-    lazy var repeatButton: UIButton = {
-        let v = UIButton()
-        //        v.layer.borderWidth = 0.5
-        //        v.layer.borderColor = UIColor.secondaryLabel.cgColor
+    // repeatBackview 생성
+    lazy var repeatBackView: UIView = {
+        let v = UIView()
         v.layer.cornerRadius = 15
         v.backgroundColor = .systemGray5
         return v
     }()
+    
+    // repeatLabel 생성
+    lazy var repeatLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Repeat"
+        v.textColor = .systemGray
+        return v
+    }()
+    
+    
+    //FIXME: 일단 얘를 어떻게 처리해야할지 좀더 생각을...Repeat function
+    lazy var repeatButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("None >", for: .normal)
+        v.setTitleColor(.black, for: .normal)
+        return v
+    }()
+    
     //FIXME: 위에거랑 동일
     var isChecked: Bool = false
     
@@ -155,6 +171,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(newHabitTimeBackview)
         backView.addSubview(newHabitTimeLabel)
         backView.addSubview(newHabitTime)
+        backView.addSubview(repeatBackView)
+        backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
         
         
@@ -229,7 +247,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // newHabitDate size grid
         newHabitDate.snp.makeConstraints { (make) in
             make.centerY.equalTo(newHabitDateBackview)
-            make.right.equalTo(backView).offset(-34)
+            make.right.equalTo(backView).offset(-30)
             make.height.equalTo(60)
         }
         
@@ -251,14 +269,29 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // newHabitTime size grid
         newHabitTime.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDate.snp.bottom).offset(10)
-            make.right.equalTo(backView).offset(-28)
+            make.right.equalTo(backView).offset(-30)
+            make.height.equalTo(60)
+        }
+        
+        // repeatBackview size grid
+        repeatBackView.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(60)
+        }
+        
+        // repeatLabel size grid
+        repeatLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
         repeatButton.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
-            make.width.height.equalTo(50)
-            make.right.equalTo(backView).offset(-28)
+            make.centerY.equalTo(repeatBackView)
+            make.height.equalTo(40)
+            make.right.equalTo(backView).offset(-30)
         }
         
         
@@ -302,9 +335,14 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
     
     @objc func repeatButtonPressed(sender: UIButton){
-        print("will be repeated")
+        let v = RepeatVC()
+        v.delegate = self
+        v.modalPresentationStyle = .pageSheet
+        present(v, animated:true)   // modal view 가능케 하는 코드  
     }
-    
+}
+
+extension NewHabitVC: RepeatVCDelegate {
 }
 
 // for UITextField Padding
