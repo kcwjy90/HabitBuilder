@@ -192,6 +192,25 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    //뭔 제대로 되는게 없어. 일단 시간이 없으니 나중에
+//     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+//        let cell = tableView.cellForRow(at: indexPath)!
+//        cell.contentView.superview?.backgroundColor = UIColor.yellow
+//        return indexPath
+//    }
+//
+
+    
+//    override func setSelected(_ selected: Bool, animated: Bool) {
+//            super.setSelected(selected, animated: animated)
+//
+//            if selected {
+//                self.contentView.backgroundColor = UIColor.red
+//            } else {
+//                self.contentView.backgroundColor = UIColor.white
+//            }
+//        }
+    
 
 }
 
