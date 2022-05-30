@@ -192,15 +192,29 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    //뭔 제대로 되는게 없어. 일단 시간이 없으니 나중에
+//    //뭔 제대로 되는게 없어. 일단 시간이 없으니 나중에
 //     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
 //        let cell = tableView.cellForRow(at: indexPath)!
-//        cell.contentView.superview?.backgroundColor = UIColor.yellow
+//         if indexPath.row == 0 {
+//             cell.contentView.superview?.backgroundColor = UIColor.white
+//         } else {
+//             cell.contentView.superview?.backgroundColor = UIColor.yellow
+//         }
+//
 //        return indexPath
 //    }
-//
 
-    
+//    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
+//        if let cell = collectionView.cellForItem(at: indexPath) {
+//            cell.contentView.backgroundColor = .orange
+//        }
+//    }
+//
+//    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
+//        if let cell = collectionView.cellForItem(at: indexPath) {
+//            cell.contentView.backgroundColor = nil
+//        }
+//    }
 //    override func setSelected(_ selected: Bool, animated: Bool) {
 //            super.setSelected(selected, animated: animated)
 //
