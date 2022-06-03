@@ -78,13 +78,13 @@ class RepeatVC: UIViewController {
         let v = UITableView()
         v.register(RepeatTableCell.self,
                    forCellReuseIdentifier:"MyCell")
-                    v.delegate = self
-                    v.dataSource = self
+        v.delegate = self
+        v.dataSource = self
         return v
     }()
     
     private var sections = [Section]()
-        
+    
     override func loadView() {
         super.loadView()
         
@@ -157,26 +157,14 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
             return 1
         }
     }
-
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+    
         
-        if indexPath.row == 0 { //이렇게 하지 않으면 cell을 tap한 순간 collapse 된다.
-            sections[indexPath.section].isOpened = !sections[indexPath.section].isOpened
-            tableView.reloadSections([indexPath.section], with: .none)
-        } else {
-            print(indexPath.row)
-        }
-        
-    }
-
-
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
         return 44.0 //Choose your custom row
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? RepeatTableCell
         else {
@@ -185,50 +173,69 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
         
         if indexPath.row == 0 {
             cell.cellTitle.text = sections[indexPath.section].title
+            cell.backgroundColor = UIColor.white
+
         } else {
             cell.cellTitle.text = sections[indexPath.section].options[indexPath.row - 1]
+  
+//            let background = UIView()
+//            background.backgroundColor = UIColor.orange
+//            cell.selectedBackgroundView = background
+//            cell.backgroundColor = UIColor.yellow
         }
         
         return cell
     }
     
-//    //뭔 제대로 되는게 없어. 일단 시간이 없으니 나중에
-//     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-//        let cell = tableView.cellForRow(at: indexPath)!
-//         if indexPath.row == 0 {
-//             cell.contentView.superview?.backgroundColor = UIColor.white
-//         } else {
-//             cell.contentView.superview?.backgroundColor = UIColor.yellow
-//         }
-//
-//        return indexPath
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        tableView.deselectRow(at: indexPath, animated: true)
+                
+        if indexPath.row == 0 { //이렇게 하지 않으면 cell을 tap한 순간 collapse 된다.
+            
+            var prevSection : Int?
+            
+            if prevSection != nil {
 
-//    func collectionView(_ collectionView: UICollectionView, didHighlightItemAt indexPath: IndexPath) {
-//        if let cell = collectionView.cellForItem(at: indexPath) {
-//            cell.contentView.backgroundColor = .orange
-//        }
-//    }
-//
-//    func collectionView(_ collectionView: UICollectionView, didUnhighlightItemAt indexPath: IndexPath) {
-//        if let cell = collectionView.cellForItem(at: indexPath) {
-//            cell.contentView.backgroundColor = nil
-//        }
-//    }
-//    override func setSelected(_ selected: Bool, animated: Bool) {
-//            super.setSelected(selected, animated: animated)
-//
-//            if selected {
-//                self.contentView.backgroundColor = UIColor.red
-//            } else {
-//                self.contentView.backgroundColor = UIColor.white
-//            }
-//        }
+                guard let prevSec = prevSection else {
+                    return
+                }
+                sections[prevSec].isOpened = !sections[prevSec].isOpened
+                sections[indexPath.section].isOpened = !sections[indexPath.section].isOpened
+                tableView.reloadSections([indexPath.section], with: .none)
+
+            } else {
+                
+                print(prevSection) //왜 자꾸 nil 인거지? 아유 짜증나
+                sections[indexPath.section].isOpened = !sections[indexPath.section].isOpened
+                tableView.reloadSections([indexPath.section], with: .none)
+                prevSection = indexPath.section
+            }
+            
+        } else {
     
+            guard let selectedCell:UITableViewCell = tableView.cellForRow(at: indexPath) else {return}
+            selectedCell.contentView.backgroundColor = UIColor.orange //왜 이거는 또 색을 아예 덮어 버리냐...
+            print(indexPath.row)
+            
+        }
+        
+    }
+    
+    
+    func tableView(_ tableView: UITableView, willDeselectRowAt indexPath: IndexPath) -> IndexPath? {
+       
+        if indexPath.row != 0 {
 
+        let cell = tableView.cellForRow(at: indexPath)!
+            cell.backgroundColor = .white
+        }
+        return indexPath
+    }
+    
+    
 }
 
 //해야할것 - RMO_Habit에 repeat을 어떻게 저장할것인가..
-//cell 선택 - 색 바꾸기
+//cell 선택 - 색 바꾸기...unselect는 어떻게 하는것이야 아우 짜증나
 //custom dropdown
-//app realmnoti add
+//다른 section을 tap 하면 전에 열었던 section이 닫히게
