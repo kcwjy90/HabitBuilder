@@ -330,8 +330,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         //realm Noti 에서 쓰는거
         let realm = self.localRealm.objects(RMO_Habit.self) //위에서 옮겨옴
         
-        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 일단 comment
-//        notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
+        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
+//        notificationToken = realm.observe { (changes: RealmCollectionChange) in
 //
 //            let mainvc = MainVC()
 //            let tableView = mainvc.todaysHabitTableView
@@ -388,7 +388,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //            localRealm.add(habit)
 //            print(localRealm)
 //        }
-//
+        print("여기 까지는 문제가 없고 dismiss 되는순간 뭔가 문제가 있음..but there are only 0 sections after the update 이라는 걸 봐서는 section을 손봐야 할것 같은데 모르겠네 ")
+        
+        print(localRealm.objects(RMO_Habit.self))
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         delegate?.didCreateNewHabit(title: titleText, desc: descText, date: newHabitDate.date, time: newHabitTime.date)
         dismiss(animated: true, completion: nil)

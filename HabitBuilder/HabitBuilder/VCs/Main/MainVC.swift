@@ -270,7 +270,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print("search 됨")
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
         } else {
-            print("안돼")
+            print("search 안됨")
             return habits.count
         }
     }

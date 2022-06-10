@@ -112,6 +112,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
         // 4. Assign it to the chart’s data
         todayPiChart.data = pieChartData
+        print("pie chart complete")
     }
     
     //Navi Bar 만드는 func.
