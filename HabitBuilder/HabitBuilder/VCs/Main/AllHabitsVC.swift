@@ -175,7 +175,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
 
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension AllHabitsVC: NewHabitVCDelegate {
-    func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
+    func didCreateNewHabit (title: String, desc: String, date: Date) {
         //        print("HabitVC - title : \(title), detail: \(desc)")
         
         // Get new habit from RMO_Habit
@@ -183,7 +183,6 @@ extension AllHabitsVC: NewHabitVCDelegate {
         newHabit.title = title
         newHabit.desc = desc
         newHabit.date = date
-        newHabit.time = time
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -352,7 +351,6 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             var title = newHabit.title
             let desc = newHabit.desc
             let date = newHabit.date
-            let time = newHabit.time
             
             cell.newHabitTitle.text = title + " - "
             cell.newHabitDesc.text = desc

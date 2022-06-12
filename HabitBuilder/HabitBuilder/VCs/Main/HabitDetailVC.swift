@@ -67,50 +67,26 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    // habitDateBackview 생성
-    lazy var habitDateBackView: UIView = {
+    // habitDateTimeBackview 생성
+    lazy var habitDateTimeBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
         v.backgroundColor = .systemGray5
         return v
     }()
     
-    // habitDateLabel 생성
-    lazy var habitDateLabel: UILabel = {
+    // habitDateTimeLabel 생성
+    lazy var habitDateTimeLabel: UILabel = {
         let v = UILabel()
-        v.text = "Date"
+        v.text = "Date and Time"
         v.textColor = .black
         return v
     }()
     
-    // habitDate 생성
-    lazy var habitDate: UIDatePicker = {
+    // habitDateTime 생성
+    lazy var habitDateTime: UIDatePicker = {
         let v = UIDatePicker()
-        v.datePickerMode = .date
-        v.layer.cornerRadius = 15
-        return v
-    }()
-    
-    // habitTimeBackview 생성
-    lazy var habitTimeBackView: UIView = {
-        let v = UIView()
-        v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
-        return v
-    }()
-    
-    // habitTimeLabel 생성
-    lazy var habitTimeLabel: UILabel = {
-        let v = UILabel()
-        v.text = "Time"
-        v.textColor = .black
-        return v
-    }()
-    
-    // habitTime 생성
-    lazy var habitTime: UIDatePicker = {
-        let v = UIDatePicker()
-        v.datePickerMode = .time
+        v.datePickerMode = .dateAndTime
         v.layer.cornerRadius = 15
         return v
     }()
@@ -142,12 +118,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(saveHabitButton)
         backView.addSubview(habitTitle)
         backView.addSubview(habitDesc)
-        backView.addSubview(habitDateBackView)
-        backView.addSubview(habitDateLabel)
-        backView.addSubview(habitDate)
-        backView.addSubview(habitTimeBackView)
-        backView.addSubview(habitTimeLabel)
-        backView.addSubview(habitTime)
+        backView.addSubview(habitDateTimeBackView)
+        backView.addSubview(habitDateTimeLabel)
+        backView.addSubview(habitDateTime)
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -193,7 +166,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habitDesc.addPadding()
         
         // habitDateBackview size grid
-        habitDateBackView.snp.makeConstraints { (make) in
+        habitDateTimeBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
@@ -201,38 +174,16 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         // habitDateLabel size grid
-        habitDateLabel.snp.makeConstraints { (make) in
+        habitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
         // habitDate size grid
-        habitDate.snp.makeConstraints { (make) in
-            make.centerY.equalTo(habitDateBackView)
+        habitDateTime.snp.makeConstraints { (make) in
+            make.centerY.equalTo(habitDateTimeBackView)
             make.right.equalTo(backView).offset(-34)
-            make.height.equalTo(60)
-        }
-        
-        // habitTimeBackview size grid
-        habitTimeBackView.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateBackView.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(60)
-        }
-        
-        // habitTimeLabel size grid
-        habitTimeLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateBackView.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(39)
-            make.height.equalTo(60)
-        }
-        
-        // habitTime size grid
-        habitTime.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDate.snp.bottom).offset(10)
-            make.right.equalTo(backView).offset(-28)
             make.height.equalTo(60)
         }
         
@@ -240,8 +191,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
-        habitDate.date = habit.date
-        habitTime.date = habit.time
+        habitDateTime.date = habit.date
         
         // Button Actions - backButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
@@ -266,10 +216,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
         // FIXME: 이걸 guard let으로 못 적나?
-        if taskToUpdate.date != habitDate.date {
+        if taskToUpdate.date != habitDateTime.date {
             
             //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
-            let countDate = dateFormatter.string(from: habitDate.date)
+            let countDate = dateFormatter.string(from: habitDateTime.date)
             if !countRealm.contains(where: { $0.date == countDate} )
             {
                 let newCount = RMO_Count()
@@ -332,8 +282,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             else { return }
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
-            taskToUpdate.date = habitDate.date
-            taskToUpdate.time = habitTime.date
+            taskToUpdate.date = habitDateTime.date
             print(realm)
         }
         

@@ -11,7 +11,7 @@ import RealmSwift
 
 //MARK: didCreateNewHabit func for NewHabitVCDelegate Protocol
 protocol NewHabitVCDelegate: AnyObject {
-    func didCreateNewHabit(title: String, desc: String, date: Date, time: Date)
+    func didCreateNewHabit(title: String, desc: String, date: Date)
 }
 
 
@@ -98,52 +98,27 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    // newHabitDateBackview 생성
-    lazy var newHabitDateBackview: UIView = {
+    // newHabitDateTimeBackview 생성
+    lazy var newHabitDateTimeBackview: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
         v.backgroundColor = .systemGray5
         return v
     }()
     
-    // newHabitDateLabel 생성
-    lazy var newHabitDateLabel: UILabel = {
+    // newHabitDateTimeLabel 생성
+    lazy var newHabitDateTimeLabel: UILabel = {
         let v = UILabel()
-        v.text = "Date"
+        v.text = "Date and Time"
         v.textColor = .systemGray
         return v
     }()
     
-    // newHabitDate 생성
-    lazy var newHabitDate: UIDatePicker = {
+    // newHabitDateTime 생성
+    lazy var newHabitDateTime: UIDatePicker = {
         let v = UIDatePicker()
-        v.datePickerMode = .date
+        v.datePickerMode = .dateAndTime
         v.layer.cornerRadius = 15
-        return v
-    }()
-    
-    // newHabitTimeBackview 생성
-    lazy var newHabitTimeBackview: UIView = {
-        let v = UIView()
-        v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
-        return v
-    }()
-    
-    // newHabitTimeLabel 생성
-    lazy var newHabitTimeLabel: UILabel = {
-        let v = UILabel()
-        v.text = "Time"
-        v.textColor = .systemGray
-        return v
-    }()
-    
-    // newHabitTime 생성
-    lazy var newHabitTime: UIDatePicker = {
-        let v = UIDatePicker()
-        v.datePickerMode = .time
-        v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
         return v
     }()
     
@@ -188,12 +163,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(addHabitButton)
         backView.addSubview(newHabitTitle)
         backView.addSubview(newHabitDesc)
-        backView.addSubview(newHabitDateBackview)
-        backView.addSubview(newHabitDateLabel)
-        backView.addSubview(newHabitDate)
-        backView.addSubview(newHabitTimeBackview)
-        backView.addSubview(newHabitTimeLabel)
-        backView.addSubview(newHabitTime)
+        backView.addSubview(newHabitDateTimeBackview)
+        backView.addSubview(newHabitDateTimeLabel)
+        backView.addSubview(newHabitDateTime)
         backView.addSubview(repeatBackView)
         backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
@@ -253,7 +225,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         newHabitDesc.addPadding()
         
         // newHabitDateBackview size grid
-        newHabitDateBackview.snp.makeConstraints { (make) in
+        newHabitDateTimeBackview.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
@@ -261,44 +233,22 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         // newHabitDateLabel size grid
-        newHabitDateLabel.snp.makeConstraints { (make) in
+        newHabitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
         // newHabitDate size grid
-        newHabitDate.snp.makeConstraints { (make) in
-            make.centerY.equalTo(newHabitDateBackview)
-            make.right.equalTo(backView).offset(-30)
-            make.height.equalTo(60)
-        }
-        
-        // newHabitTimeBackview size grid
-        newHabitTimeBackview.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDateBackview.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(60)
-        }
-        
-        // newHabitTimeLabel size grid
-        newHabitTimeLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDateBackview.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(39)
-            make.height.equalTo(60)
-        }
-        
-        // newHabitTime size grid
-        newHabitTime.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDate.snp.bottom).offset(10)
+        newHabitDateTime.snp.makeConstraints { (make) in
+            make.centerY.equalTo(newHabitDateTimeBackview)
             make.right.equalTo(backView).offset(-30)
             make.height.equalTo(60)
         }
         
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
+            make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(60)
@@ -306,7 +256,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // repeatLabel size grid
         repeatLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitTimeBackview.snp.bottom).offset(10)
+            make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
@@ -382,7 +332,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //        habit.title = titleText+"11"
 //        habit.desc = descText
 //        habit.date = newHabitDate.date
-//        habit.time = newHabitTime.date
 //        print(habit)
 //        try! localRealm.write {
 //            localRealm.add(habit)
@@ -392,7 +341,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         print(localRealm.objects(RMO_Habit.self))
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
-        delegate?.didCreateNewHabit(title: titleText, desc: descText, date: newHabitDate.date, time: newHabitTime.date)
+        delegate?.didCreateNewHabit(title: titleText, desc: descText, date: newHabitDateTime.date)
         dismiss(animated: true, completion: nil)
         //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     }

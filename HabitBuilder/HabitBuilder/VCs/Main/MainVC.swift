@@ -172,14 +172,13 @@ class MainVC: UIViewController, UISearchBarDelegate {
 //Extension 은 항상 class 밖에
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension MainVC: NewHabitVCDelegate {
-    func didCreateNewHabit (title: String, desc: String, date: Date, time: Date) {
+    func didCreateNewHabit (title: String, desc: String, date: Date) {
         
         // Get new habit from RMO_Habit
         let newHabit = RMO_Habit()
         newHabit.title = title
         newHabit.desc = desc
         newHabit.date = date
-        newHabit.time = time
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -290,7 +289,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
-        let time = newHabit.time
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
