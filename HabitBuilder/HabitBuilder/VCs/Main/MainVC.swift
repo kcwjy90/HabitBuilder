@@ -11,10 +11,30 @@ import SnapKit
 import RealmSwift
 import UserNotifications
 
+//realm Noti 에서 쓰는거
+enum NewHabitVCStatus {
+    case initialize
+    case loading
+    case loadingSucceed
+    case error
+}
+
+
 
 class MainVC: UIViewController, UISearchBarDelegate {
     
     let localRealm = DBManager.SI.realm!
+    
+    //realm Noti 에서 쓰는거
+    deinit {
+        print("deinit - NewHabitVC")
+        notificationToken?.invalidate()
+    }
+    
+    //realm Noti 에서 쓰는거
+    var status: NewHabitVCStatus = .initialize
+    var notificationToken: NotificationToken? = nil
+
     
     // backView 생성
     lazy var backView: UIView = {
@@ -112,14 +132,45 @@ class MainVC: UIViewController, UISearchBarDelegate {
             make.left.right.bottom.equalTo(backView)
         }
         
-        reloadData()
+        filterTodaysHabit()
+
+//        reloadData()
+        
+        //realm Noti 에서 쓰는거
+        let realm = self.localRealm.objects(RMO_Habit.self) //위에서 옮겨옴
+        
+        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
+        notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
+            guard let tableView = self?.todaysHabitTableView else { return }
+            switch changes {
+            case .initial:
+                // Results are now populated and can be accessed without blocking the UI
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                // Query results have changed, so apply them to the UITableView
+                tableView.performBatchUpdates({
+                    // Always apply updates in the following order: deletions, insertions, then modifications.
+                    // Handling insertions before deletions may result in unexpected behavior.
+                    tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                    tableView.insertRows(at: insertions.map({IndexPath(row: $0, section: 0)}), with: .automatic)
+                    tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
+                }, completion: { finished in
+                    // ...
+                })
+            case .error(let error):
+                // An error occurred while opening the Realm file on the background worker thread
+                fatalError("\(error)")
+            }
+        }
         
     }
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        reloadData()
+//        reloadData()
     }
     
     func dateFormatting() {
@@ -172,62 +223,61 @@ class MainVC: UIViewController, UISearchBarDelegate {
 //Extension 은 항상 class 밖에
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension MainVC: NewHabitVCDelegate {
-    func didCreateNewHabit (title: String, desc: String, date: Date) {
+    func didCreateNewHabit () {
+//
+//        // Get new habit from RMO_Habit
+//        let newHabit = RMO_Habit()
+//        newHabit.title = title
+//        newHabit.desc = desc
+//        newHabit.date = date
+//
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
+//        let countRealm = localRealm.objects(RMO_Count.self)
+//
+//        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+//        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+//        if !countRealm.contains(where: { $0.date == habitDate} )
+//        {
+//            let newCount = RMO_Count()
+//            newCount.date = habitDate
+//
+//            try! localRealm.write {
+//                localRealm.add(newCount)
+//                print("생성")
+//                print(newCount)
+//            }
+//        }
         
-        // Get new habit from RMO_Habit
-        let newHabit = RMO_Habit()
-        newHabit.title = title
-        newHabit.desc = desc
-        newHabit.date = date
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
-        let countRealm = localRealm.objects(RMO_Count.self)
-        
-        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
-        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
-        if !countRealm.contains(where: { $0.date == habitDate} )
-        {
-            let newCount = RMO_Count()
-            newCount.date = habitDate
-            
-            try! localRealm.write {
-                localRealm.add(newCount)
-                print("생성")
-                print(newCount)
-            }
-        }
-        
-        try! localRealm.write {
-            localRealm.add(newHabit)
-            print("무사들어감")
-        }
-        
-        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
-        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
-        {return}
-        let existCount = countRealm[indexNumb]
-        
-        try! localRealm.write {
-            existCount.total += 1
-            print("+1")
-            print(existCount)
-        }
+//        try! localRealm.write {
+//            localRealm.add(newHabit)
+//            print("무사들어감")
+//        }
+//
+//        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+//        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+//        {return}
+//        let existCount = countRealm[indexNumb]
+//        
+//        try! localRealm.write {
+//            existCount.total += 1
+//            print("+1")
+//            print(existCount)
+//        }
         
         
-        // 새로운 habit을 만들때'만' noti를 생성한다.
-        NotificationManger.SI.addScheduleNoti(habit: newHabit)
-        
-        reloadData()
-    }
-    
-    //MARK:Get all habits in the realm and reload.
-    func reloadData() {
-        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
-        todaysHabitTableView.reloadData() //reload
-    }
-    
+//        // 새로운 habit을 만들때'만' noti를 생성한다.
+//        NotificationManger.SI.addScheduleNoti(habit: newHabit)
+//
+//        reloadData()
+//    }
+//    
+//    //MARK:Get all habits in the realm and reload.
+//    func reloadData() {
+//        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
+//        todaysHabitTableView.reloadData() //reload
+    }    
 }
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
@@ -239,10 +289,10 @@ extension MainVC: habitDetailVCDelegate {
                 return habit.title.lowercased().contains(searchedT.lowercased())
             }
             self.todaysHabitTableView.reloadData()
-            
-        }  else {
-            self.reloadData()
         }
+//        }  else {
+//            self.reloadData()
+//        }
     }
 }
 

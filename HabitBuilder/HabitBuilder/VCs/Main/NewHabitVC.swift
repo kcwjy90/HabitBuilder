@@ -11,33 +11,15 @@ import RealmSwift
 
 //MARK: didCreateNewHabit func for NewHabitVCDelegate Protocol
 protocol NewHabitVCDelegate: AnyObject {
-    func didCreateNewHabit(title: String, desc: String, date: Date)
+    func didCreateNewHabit()
 }
 
-
-//realm Noti 에서 쓰는거
-enum NewHabitVCStatus {
-    case initialize
-    case loading
-    case loadingSucceed
-    case error
-}
 
 class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     //realm Noti 에서 쓰는거
     let localRealm = DBManager.SI.realm!
-
-    //realm Noti 에서 쓰는거
-    deinit {
-        print("deinit - NewHabitVC")
-        notificationToken?.invalidate()
-    }
     
-    //realm Noti 에서 쓰는거
-    var status: NewHabitVCStatus = .initialize
-    var notificationToken: NotificationToken? = nil
-
     weak var delegate: NewHabitVCDelegate?   // Delegate property var 생성
     
     // backview 생성
@@ -277,35 +259,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
         
-        //realm Noti 에서 쓰는거
-        let realm = self.localRealm.objects(RMO_Habit.self) //위에서 옮겨옴
-        
-        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
-//        notificationToken = realm.observe { (changes: RealmCollectionChange) in
-//
-//            let mainvc = MainVC()
-//            let tableView = mainvc.todaysHabitTableView
-//            switch changes {
-//            case .initial:
-//                // Results are now populated and can be accessed without blocking the UI
-//                tableView.reloadData()
-//            case .update(_, let deletions, let insertions, let modifications):
-//                // Query results have changed, so apply them to the UITableView
-//                tableView.performBatchUpdates({
-//                    // Always apply updates in the following order: deletions, insertions, then modifications.
-//                    // Handling insertions before deletions may result in unexpected behavior.
-//                    tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-//                    tableView.insertRows(at: insertions.map({IndexPath(row: $0, section: 0)}), with: .automatic)
-//                    tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
-//                }, completion: { finished in
-//                    // ...
-//                })
-//            case .error(let error):
-//                // An error occurred while opening the Realm file on the background worker thread
-//                fatalError("\(error)")
-//            }
-//        }
-        
     }
     
     //MARK: UITextView "Placeholder" 
@@ -326,22 +279,51 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //MARK: Button Funcs - Add, Back, Repeat Buttons
     @objc func addButtonPressed(sender: UIButton) {
         
-        //일단 app 이 죽으니까 comment
-//        guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
-//        let habit = RMO_Habit()
-//        habit.title = titleText+"11"
-//        habit.desc = descText
-//        habit.date = newHabitDate.date
-//        print(habit)
-//        try! localRealm.write {
-//            localRealm.add(habit)
-//            print(localRealm)
-//        }
-        print("여기 까지는 문제가 없고 dismiss 되는순간 뭔가 문제가 있음..but there are only 0 sections after the update 이라는 걸 봐서는 section을 손봐야 할것 같은데 모르겠네 ")
-        
-        print(localRealm.objects(RMO_Habit.self))
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
-        delegate?.didCreateNewHabit(title: titleText, desc: descText, date: newHabitDateTime.date)
+        let habit = RMO_Habit()
+        habit.title = titleText+"11"
+        habit.desc = descText
+        habit.date = newHabitDateTime.date
+        print(habit)
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let habitDate = dateFormatter.string(from: newHabitDateTime.date)
+        let countRealm = localRealm.objects(RMO_Count.self)
+        
+        
+        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+        if !countRealm.contains(where: { $0.date == habitDate} )
+        {
+            let newCount = RMO_Count()
+            newCount.date = habitDate
+            
+            try! localRealm.write {
+                localRealm.add(newCount)
+                print("생성")
+                print(newCount)
+            }
+        }
+        
+        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+        guard let inNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+        {return}
+        let existCount = countRealm[inNumb]
+        
+        try! localRealm.write {
+            existCount.total += 1
+            print("+1")
+            print(existCount)
+        }
+        
+        try! localRealm.write {
+            localRealm.add(habit)
+            print("habit added to localrealm")
+        }
+        
+ 
+        delegate?.didCreateNewHabit()
         dismiss(animated: true, completion: nil)
         //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     }
