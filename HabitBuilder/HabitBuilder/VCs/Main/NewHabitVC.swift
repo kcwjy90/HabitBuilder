@@ -281,7 +281,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         let habit = RMO_Habit()
-        habit.title = titleText+"11"
+        habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
         print(habit)

@@ -134,6 +134,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         filterTodaysHabit()
 
+
 //        reloadData()
         
         //realm Noti 에서 쓰는거
@@ -224,6 +225,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
+        
+        filterTodaysHabit() //이거넣으니까 된다! 미쳤다!
 //
 //        // Get new habit from RMO_Habit
 //        let newHabit = RMO_Habit()
@@ -272,7 +275,7 @@ extension MainVC: NewHabitVCDelegate {
 //
 //        reloadData()
 //    }
-//    
+//
 //    //MARK:Get all habits in the realm and reload.
 //    func reloadData() {
 //        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
@@ -403,12 +406,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
             }
             
-            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-            tableView.beginUpdates()
-            self.searchedHabits.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.endUpdates()
-            actionPerformed(true)
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
+//            tableView.beginUpdates()
+//            self.searchedHabits.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//            tableView.endUpdates()
+//            actionPerformed(true)
             self.filterTodaysHabit() //이거를 넣으니까 search 한상태에서 habit을 없애도 에러가 안남
         }
         success.backgroundColor = .systemBlue
@@ -438,13 +441,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
             }
             
-            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-            tableView.beginUpdates()
-            self.searchedHabits.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.endUpdates()
-            actionPerformed(true)
-            actionPerformed(true)
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
+//            tableView.beginUpdates()
+//            self.searchedHabits.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//            tableView.endUpdates()
+//            actionPerformed(true)
+//            actionPerformed(true)
             self.filterTodaysHabit()
         }
         remove.backgroundColor = .systemOrange
@@ -475,12 +478,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
             }
             
-            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-            tableView.beginUpdates()
-            self.searchedHabits.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.endUpdates()
-            actionPerformed(true)
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
+//            tableView.beginUpdates()
+//            self.searchedHabits.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
+//            tableView.endUpdates()
+//            actionPerformed(true)
             self.filterTodaysHabit()
         }
         fail.backgroundColor = .systemRed
