@@ -137,8 +137,17 @@ class MainVC: UIViewController, UISearchBarDelegate {
 
 //        reloadData()
         
-        //realm Noti 에서 쓰는거
-        let realm = self.localRealm.objects(RMO_Habit.self) //위에서 옮겨옴
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//        let todaysDate = dateFormatter.string(from: Date())
+
+//        let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == 'todaysDate'")
+        // 이렇게 해서 ("dateString == todaysDate") 하니까 "Property 'todaysDate' not found in object of type 'RMO_Habit'"이라는 에러가 떠서 안되고
+        // ("dateString == 'todaysDate' ") 하면 앱이 실행은 된는데 업데이트가 안되고...
+        // ("dateString = '6/14/2022' ") 라고 하면 엄청 잘되긴 하는데 그러면 date이 dynamic 하지가 않고
+
+
+        let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == todayString")
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
@@ -148,12 +157,13 @@ class MainVC: UIViewController, UISearchBarDelegate {
                 // Results are now populated and can be accessed without blocking the UI
                 tableView.reloadData()
             case .update(_, let deletions, let insertions, let modifications):
+                
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
                     // Always apply updates in the following order: deletions, insertions, then modifications.
                     // Handling insertions before deletions may result in unexpected behavior.
                     tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    tableView.insertRows(at: insertions.map({IndexPath(row: $0, section: 0)}), with: .automatic)
+                    tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
                 }, completion: { finished in
                     // ...
@@ -206,14 +216,24 @@ class MainVC: UIViewController, UISearchBarDelegate {
     
     //MARK: Filter to only display Habits with Today's Habit
     func filterTodaysHabit() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todaysDate = dateFormatter.string(from: today)
+        
         habits = localRealm.objects(RMO_Habit.self).filter {
             habit in
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
-            let habitDate = dateFormatter.string(from: habit.date)
-            let today = Date()
-            let todaysDate = dateFormatter.string(from: today)
-            return habitDate == todaysDate
+            return habit.dateString == todaysDate
+        }
+        
+        //지금 밑에 5줄이 뭐하는 줄이냐면... 140-147에서 localrealm filter을 할때 ("dateString == 'todaysDate' ")가 작동을 안하더라고...
+        //그래서 임시방편으로 RMO_Habit에 있는 dateString(예> 4/30/2022) 이 todaysDate(4/30/2022)과 == 하면, dateString을 todaysDate으로 업데이트
+        //그러면 이제 realmNoti 가 위에서 RMO_Habit에 있는 todayString 과 똑같은 dateString을 가진 애들을 뽑아준다.
+        let rr = localRealm.objects(RMO_Habit.self).filter("dateString == 'todaysDate' ")
+        if let r = rr.first {
+        try! localRealm.write {
+                r.dateString = todaysDate
+            }
         }
         
         searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
@@ -226,7 +246,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
 extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
         
-        filterTodaysHabit() //이거넣으니까 된다! 미쳤다!
+        filterTodaysHabit() //이거넣으니까 된다! 미쳤다
 //
 //        // Get new habit from RMO_Habit
 //        let newHabit = RMO_Habit()

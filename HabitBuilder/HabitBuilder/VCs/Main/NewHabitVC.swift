@@ -284,11 +284,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
-        print(habit)
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let habitDate = dateFormatter.string(from: newHabitDateTime.date)
+        habit.dateString = habitDate
+        habit.todayString = dateFormatter.string(from: Date())
+                
         let countRealm = localRealm.objects(RMO_Count.self)
         
         

@@ -16,6 +16,9 @@ class RMO_Habit: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
     @Persisted var date: Date = Date()
+    @Persisted var dateString: String = ""
+    @Persisted var todayString: String = ""
+
     
     convenience init(title: String) {
         self.init()
