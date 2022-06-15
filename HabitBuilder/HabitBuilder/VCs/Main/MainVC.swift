@@ -146,6 +146,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         // ("dateString == 'todaysDate' ") 하면 앱이 실행은 된는데 업데이트가 안되고...
         // ("dateString = '6/14/2022' ") 라고 하면 엄청 잘되긴 하는데 그러면 date이 dynamic 하지가 않고
 
+        updateTodaysDate()
 
         let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == todayString")
         
@@ -218,13 +219,23 @@ class MainVC: UIViewController, UISearchBarDelegate {
     func filterTodaysHabit() {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
-        let today = Date()
-        let todaysDate = dateFormatter.string(from: today)
+        let todaysDate = dateFormatter.string(from: Date())
         
         habits = localRealm.objects(RMO_Habit.self).filter {
             habit in
             return habit.dateString == todaysDate
         }
+        
+        //이거 지우기
+        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
+        //이거 지우기
+
+    }
+    
+    func updateTodaysDate() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let todaysDate = dateFormatter.string(from: Date())
         
         //지금 밑에 5줄이 뭐하는 줄이냐면... 140-147에서 localrealm filter을 할때 ("dateString == 'todaysDate' ")가 작동을 안하더라고...
         //그래서 임시방편으로 RMO_Habit에 있는 dateString(예> 4/30/2022) 이 todaysDate(4/30/2022)과 == 하면, dateString을 todaysDate으로 업데이트
@@ -236,10 +247,10 @@ class MainVC: UIViewController, UISearchBarDelegate {
             }
         }
         
-        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
     }
-    
 }
+
+
 
 //Extension 은 항상 class 밖에
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
@@ -338,7 +349,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        //이거 지우기
         if habits.count != 0 {
+        //이거 지우기
+
+        //이거 언코멘트
+//        if habitSearched {
+        //이거 언코멘트
+
             print("search 됨")
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
         } else {
@@ -358,6 +376,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
+        //이거 지우기///
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
         let desc = newHabit.desc
@@ -365,6 +384,33 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         cell.newHabitTitle.text = title + " - "
         cell.newHabitDesc.text = desc
+        //이거 지우기//
+    
+        /////언코멘트
+//        if habitSearched {
+//
+//            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+//            let title = newHabit.title
+//            let desc = newHabit.desc
+//            let date = newHabit.date
+//
+//            cell.newHabitTitle.text = title + " - "
+//            cell.newHabitDesc.text = desc
+//
+//        } else {
+//
+//            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+//            let title = newHabit.title
+//            let desc = newHabit.desc
+//            let date = newHabit.date
+//
+//            cell.newHabitTitle.text = title + " - "
+//            cell.newHabitDesc.text = desc
+//
+//        }
+        /////언코멘트
+
+       
         
         return cell
     }
@@ -382,7 +428,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 return habit.title.lowercased().contains(searchText.lowercased())
             }
         } else {
+            
+            ////이거 지우기
             self.searchedHabits = self.habits
+            ////이거 지우기
             habitSearched = false
         }
         self.todaysHabitTableView.reloadData()
@@ -440,6 +489,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
             print("Remove")
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
+            
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
             {return} //
             let taskToUpdate = countRealm[indexNumb]
