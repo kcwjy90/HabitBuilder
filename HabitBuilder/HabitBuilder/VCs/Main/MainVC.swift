@@ -226,8 +226,20 @@ class MainVC: UIViewController, UISearchBarDelegate {
             return habit.dateString == todaysDate
         }
         
+        if habitSearched {
+            
+            if searchedHabits.count != 0 {
+                searchedHabits = habits.filter { habit in
+                    //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+                    return habit.title.lowercased().contains(searchedT.lowercased())
+                }
+            } else {
+                return 
+            }
+           
+        }
         //이거 지우기
-        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
+//        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
         //이거 지우기
 
     }
@@ -336,8 +348,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
+        var habit: RMO_Habit
+        
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        let habit = searchedHabits[indexPath.row]
+        if habitSearched {
+            habit = searchedHabits[indexPath.row]
+        } else {
+            habit = habits[indexPath.row]
+        }
+        
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         habitDetailVC.delegate = self
@@ -350,11 +369,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         //이거 지우기
-        if habits.count != 0 {
+//        if habits.count != 0 {
         //이거 지우기
 
         //이거 언코멘트
-//        if habitSearched {
+        if habitSearched {
         //이거 언코멘트
 
             print("search 됨")
@@ -377,37 +396,37 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         //이거 지우기///
-        let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
-        let title = newHabit.title
-        let desc = newHabit.desc
-        let date = newHabit.date
-        
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
+//        let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+//        let title = newHabit.title
+//        let desc = newHabit.desc
+//        let date = newHabit.date
+//
+//        cell.newHabitTitle.text = title + " - "
+//        cell.newHabitDesc.text = desc
         //이거 지우기//
     
         /////언코멘트
-//        if habitSearched {
-//
-//            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
-//            let title = newHabit.title
-//            let desc = newHabit.desc
-//            let date = newHabit.date
-//
-//            cell.newHabitTitle.text = title + " - "
-//            cell.newHabitDesc.text = desc
-//
-//        } else {
-//
-//            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
-//            let title = newHabit.title
-//            let desc = newHabit.desc
-//            let date = newHabit.date
-//
-//            cell.newHabitTitle.text = title + " - "
-//            cell.newHabitDesc.text = desc
-//
-//        }
+        if habitSearched {
+
+            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            let title = newHabit.title
+            let desc = newHabit.desc
+            let date = newHabit.date
+
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+
+        } else {
+
+            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            let title = newHabit.title
+            let desc = newHabit.desc
+            let date = newHabit.date
+
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+
+        }
         /////언코멘트
 
        
@@ -430,7 +449,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             
             ////이거 지우기
-            self.searchedHabits = self.habits
+//            self.searchedHabits = self.habits
             ////이거 지우기
             habitSearched = false
         }
@@ -463,7 +482,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             print(self.localRealm.objects(RMO_Count.self))
             
-            let habit = self.searchedHabits[indexPath.row]
+            var habit: RMO_Habit
+
+            if self.habitSearched {
+                habit = self.searchedHabits[indexPath.row]
+            } else {
+                habit = self.habits[indexPath.row]
+            }
+            
             let thisId = habit.id
             
             try! self.localRealm.write {
@@ -472,9 +498,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     $0.id == thisId
                 }
                 self.localRealm.delete(deleteHabit)
-                
             }
-            
+                
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
 //            tableView.beginUpdates()
 //            self.searchedHabits.remove(at: indexPath.row)
@@ -499,7 +524,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             print(self.localRealm.objects(RMO_Count.self))
             
-            let habit = self.searchedHabits[indexPath.row]
+            
+            var habit: RMO_Habit
+
+            if self.habitSearched {
+                habit = self.searchedHabits[indexPath.row]
+                
+            } else {
+                habit = self.habits[indexPath.row]
+              
+            }
+            
             let thisId = habit.id
             
             try! self.localRealm.write {
@@ -508,8 +543,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     $0.id == thisId
                 }
                 self.localRealm.delete(deleteHabit)
-                
             }
+            
             
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
 //            tableView.beginUpdates()
@@ -536,7 +571,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             print(self.localRealm.objects(RMO_Count.self))
             
-            let habit = self.searchedHabits[indexPath.row]
+            
+            var habit: RMO_Habit
+
+            if self.habitSearched {
+                habit = self.searchedHabits[indexPath.row]
+                
+            } else {
+                habit = self.habits[indexPath.row]
+              
+            }
+            
             let thisId = habit.id
             
             try! self.localRealm.write {
@@ -545,7 +590,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     $0.id == thisId
                 }
                 self.localRealm.delete(deleteHabit)
-                
             }
             
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
