@@ -149,6 +149,9 @@ class MainVC: UIViewController, UISearchBarDelegate {
         updateTodaysDate()
 
         let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == todayString")
+        //여기서 뭔가 filter를 적용해서, searchText가 존재할경우 거기에 해당하는 cell들만 불러와서 notificationToken을 실행해야 될것 같은데 (예> "mon"를 검색하면 "monkey" "monday" 만뜨고, "monday"를 지울경우 indexPath = 2 가 지워지는 걸로.
+//        문제는 filter를 235번에 있는 방식으로 filter을 적용을 하면 "LazyFilterSequence<Results<RMO_Habit>' has no   member 'observe' 라고 떠서 에러가 난다. 
+        
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
