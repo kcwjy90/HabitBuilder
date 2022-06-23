@@ -18,6 +18,7 @@ class RMO_Habit: Object {
     @Persisted var date: Date = Date()
     @Persisted var dateString: String = ""
     @Persisted var todayString: String = ""
+    @Persisted var isRepeat: Bool 
 
     
     convenience init(title: String) {
