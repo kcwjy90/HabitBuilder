@@ -34,7 +34,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
     //realm Noti 에서 쓰는거
     var status: NewHabitVCStatus = .initialize
     var notificationToken: NotificationToken? = nil
-
+    
     
     // backView 생성
     lazy var backView: UIView = {
@@ -133,25 +133,20 @@ class MainVC: UIViewController, UISearchBarDelegate {
         }
         
         filterTodaysHabit()
-
-
-//        reloadData()
         
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let todaysDate = dateFormatter.string(from: Date())
-
-//        let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == 'todaysDate'")
-        // 이렇게 해서 ("dateString == todaysDate") 하니까 "Property 'todaysDate' not found in object of type 'RMO_Habit'"이라는 에러가 떠서 안되고
-        // ("dateString == 'todaysDate' ") 하면 앱이 실행은 된는데 업데이트가 안되고...
-        // ("dateString = '6/14/2022' ") 라고 하면 엄청 잘되긴 하는데 그러면 date이 dynamic 하지가 않고
-
-        updateTodaysDate()
-
-        let realm = self.localRealm.objects(RMO_Habit.self).filter("dateString == todayString")
-        //여기서 뭔가 filter를 적용해서, searchText가 존재할경우 거기에 해당하는 cell들만 불러와서 notificationToken을 실행해야 될것 같은데 (예> "mon"를 검색하면 "monkey" "monday" 만뜨고, "monday"를 지울경우 indexPath = 2 가 지워지는 걸로.
-//        문제는 filter를 235번에 있는 방식으로 filter을 적용을 하면 "LazyFilterSequence<Results<RMO_Habit>' has no   member 'observe' 라고 떠서 에러가 난다. 
+        let today = Date()
         
+        guard let beginningOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
+              let endOfToday = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: today),
+                month: Calendar.current.component(.month, from: today),
+                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+        else { return }
+        
+        let realm = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
@@ -185,7 +180,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-//        reloadData()
+        //        reloadData()
     }
     
     func dateFormatting() {
@@ -226,7 +221,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         habits = localRealm.objects(RMO_Habit.self).filter {
             habit in
-            return habit.dateString == todaysDate
+            return dateFormatter.string(from:habit.date) == todaysDate
         }
         
         if habitSearched {
@@ -237,30 +232,13 @@ class MainVC: UIViewController, UISearchBarDelegate {
                     return habit.title.lowercased().contains(searchedT.lowercased())
                 }
             } else {
-                return 
+                return
             }
-           
+            
         }
         //이거 지우기
-//        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
+        //        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
         //이거 지우기
-
-    }
-    
-    func updateTodaysDate() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let todaysDate = dateFormatter.string(from: Date())
-        
-        //지금 밑에 5줄이 뭐하는 줄이냐면... 140-147에서 localrealm filter을 할때 ("dateString == 'todaysDate' ")가 작동을 안하더라고...
-        //그래서 임시방편으로 RMO_Habit에 있는 dateString(예> 4/30/2022) 이 todaysDate(4/30/2022)과 == 하면, dateString을 todaysDate으로 업데이트
-        //그러면 이제 realmNoti 가 위에서 RMO_Habit에 있는 todayString 과 똑같은 dateString을 가진 애들을 뽑아준다.
-        let rr = localRealm.objects(RMO_Habit.self).filter("dateString == 'todaysDate' ")
-        if let r = rr.first {
-        try! localRealm.write {
-                r.dateString = todaysDate
-            }
-        }
         
     }
 }
@@ -273,60 +251,60 @@ extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
         
         filterTodaysHabit() //이거넣으니까 된다! 미쳤다
-//
-//        // Get new habit from RMO_Habit
-//        let newHabit = RMO_Habit()
-//        newHabit.title = title
-//        newHabit.desc = desc
-//        newHabit.date = date
-//
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
-//        let countRealm = localRealm.objects(RMO_Count.self)
-//
-//        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
-//        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
-//        if !countRealm.contains(where: { $0.date == habitDate} )
-//        {
-//            let newCount = RMO_Count()
-//            newCount.date = habitDate
-//
-//            try! localRealm.write {
-//                localRealm.add(newCount)
-//                print("생성")
-//                print(newCount)
-//            }
-//        }
+        //
+        //        // Get new habit from RMO_Habit
+        //        let newHabit = RMO_Habit()
+        //        newHabit.title = title
+        //        newHabit.desc = desc
+        //        newHabit.date = date
+        //
+        //        let dateFormatter = DateFormatter()
+        //        dateFormatter.dateFormat = "MM/dd/yyyy"
+        //        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
+        //        let countRealm = localRealm.objects(RMO_Count.self)
+        //
+        //        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+        //        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+        //        if !countRealm.contains(where: { $0.date == habitDate} )
+        //        {
+        //            let newCount = RMO_Count()
+        //            newCount.date = habitDate
+        //
+        //            try! localRealm.write {
+        //                localRealm.add(newCount)
+        //                print("생성")
+        //                print(newCount)
+        //            }
+        //        }
         
-//        try! localRealm.write {
-//            localRealm.add(newHabit)
-//            print("무사들어감")
-//        }
-//
-//        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
-//        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
-//        {return}
-//        let existCount = countRealm[indexNumb]
-//        
-//        try! localRealm.write {
-//            existCount.total += 1
-//            print("+1")
-//            print(existCount)
-//        }
+        //        try! localRealm.write {
+        //            localRealm.add(newHabit)
+        //            print("무사들어감")
+        //        }
+        //
+        //        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+        //        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+        //        {return}
+        //        let existCount = countRealm[indexNumb]
+        //
+        //        try! localRealm.write {
+        //            existCount.total += 1
+        //            print("+1")
+        //            print(existCount)
+        //        }
         
         
-//        // 새로운 habit을 만들때'만' noti를 생성한다.
-//        NotificationManger.SI.addScheduleNoti(habit: newHabit)
-//
-//        reloadData()
-//    }
-//
-//    //MARK:Get all habits in the realm and reload.
-//    func reloadData() {
-//        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
-//        todaysHabitTableView.reloadData() //reload
-    }    
+        //        // 새로운 habit을 만들때'만' noti를 생성한다.
+        //        NotificationManger.SI.addScheduleNoti(habit: newHabit)
+        //
+        //        reloadData()
+        //    }
+        //
+        //    //MARK:Get all habits in the realm and reload.
+        //    func reloadData() {
+        //        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
+        //        todaysHabitTableView.reloadData() //reload
+    }
 }
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
@@ -339,9 +317,9 @@ extension MainVC: habitDetailVCDelegate {
             }
             self.todaysHabitTableView.reloadData()
         }
-//        }  else {
-//            self.reloadData()
-//        }
+        //        }  else {
+        //            self.reloadData()
+        //        }
     }
 }
 
@@ -372,13 +350,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         //이거 지우기
-//        if habits.count != 0 {
+        //        if habits.count != 0 {
         //이거 지우기
-
+        
         //이거 언코멘트
         if habitSearched {
-        //이거 언코멘트
-
+            //이거 언코멘트
+            
             print("search 됨")
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
         } else {
@@ -399,40 +377,40 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         //이거 지우기///
-//        let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
-//        let title = newHabit.title
-//        let desc = newHabit.desc
-//        let date = newHabit.date
-//
-//        cell.newHabitTitle.text = title + " - "
-//        cell.newHabitDesc.text = desc
+        //        let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+        //        let title = newHabit.title
+        //        let desc = newHabit.desc
+        //        let date = newHabit.date
+        //
+        //        cell.newHabitTitle.text = title + " - "
+        //        cell.newHabitDesc.text = desc
         //이거 지우기//
-    
+        
         /////언코멘트
         if habitSearched {
-
+            
             let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
             let date = newHabit.date
-
+            
             cell.newHabitTitle.text = title + " - "
             cell.newHabitDesc.text = desc
-
+            
         } else {
-
+            
             let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
             let date = newHabit.date
-
+            
             cell.newHabitTitle.text = title + " - "
             cell.newHabitDesc.text = desc
-
+            
         }
         /////언코멘트
-
-       
+        
+        
         
         return cell
     }
@@ -452,7 +430,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             
             ////이거 지우기
-//            self.searchedHabits = self.habits
+            //            self.searchedHabits = self.habits
             ////이거 지우기
             habitSearched = false
         }
@@ -462,7 +440,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-                
+        
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -486,7 +464,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print(self.localRealm.objects(RMO_Count.self))
             
             var habit: RMO_Habit
-
+            
             if self.habitSearched {
                 habit = self.searchedHabits[indexPath.row]
             } else {
@@ -502,13 +480,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 self.localRealm.delete(deleteHabit)
             }
-                
+            
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
-//            tableView.beginUpdates()
-//            self.searchedHabits.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//            tableView.endUpdates()
-//            actionPerformed(true)
+            //            tableView.beginUpdates()
+            //            self.searchedHabits.remove(at: indexPath.row)
+            //            tableView.deleteRows(at: [indexPath], with: .fade)
+            //            tableView.endUpdates()
+            //            actionPerformed(true)
             self.filterTodaysHabit() //이거를 넣으니까 search 한상태에서 habit을 없애도 에러가 안남
         }
         success.backgroundColor = .systemBlue
@@ -529,13 +507,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             var habit: RMO_Habit
-
+            
             if self.habitSearched {
                 habit = self.searchedHabits[indexPath.row]
                 
             } else {
                 habit = self.habits[indexPath.row]
-              
+                
             }
             
             let thisId = habit.id
@@ -550,12 +528,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
-//            tableView.beginUpdates()
-//            self.searchedHabits.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//            tableView.endUpdates()
-//            actionPerformed(true)
-//            actionPerformed(true)
+            //            tableView.beginUpdates()
+            //            self.searchedHabits.remove(at: indexPath.row)
+            //            tableView.deleteRows(at: [indexPath], with: .fade)
+            //            tableView.endUpdates()
+            //            actionPerformed(true)
+            //            actionPerformed(true)
             self.filterTodaysHabit()
         }
         remove.backgroundColor = .systemOrange
@@ -576,13 +554,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             var habit: RMO_Habit
-
+            
             if self.habitSearched {
                 habit = self.searchedHabits[indexPath.row]
                 
             } else {
                 habit = self.habits[indexPath.row]
-              
+                
             }
             
             let thisId = habit.id
@@ -596,11 +574,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             
             //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
-//            tableView.beginUpdates()
-//            self.searchedHabits.remove(at: indexPath.row)
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-//            tableView.endUpdates()
-//            actionPerformed(true)
+            //            tableView.beginUpdates()
+            //            self.searchedHabits.remove(at: indexPath.row)
+            //            tableView.deleteRows(at: [indexPath], with: .fade)
+            //            tableView.endUpdates()
+            //            actionPerformed(true)
             self.filterTodaysHabit()
         }
         fail.backgroundColor = .systemRed

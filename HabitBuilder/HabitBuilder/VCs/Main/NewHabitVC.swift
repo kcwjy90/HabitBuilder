@@ -288,8 +288,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let habitDate = dateFormatter.string(from: newHabitDateTime.date)
-        habit.dateString = habitDate
-        habit.todayString = dateFormatter.string(from: Date())
                 
         let countRealm = localRealm.objects(RMO_Count.self)
         
@@ -324,6 +322,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             print("habit added to localrealm")
         }
         
+        NotificationManger.SI.addScheduleNoti(habit: habit)
  
         delegate?.didCreateNewHabit()
         dismiss(animated: true, completion: nil)

@@ -44,6 +44,7 @@ class NotificationManger: NSObject {
         notificationContent.body = habit.desc
         
         let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
+//        let dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: habit.date)
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
         let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
         

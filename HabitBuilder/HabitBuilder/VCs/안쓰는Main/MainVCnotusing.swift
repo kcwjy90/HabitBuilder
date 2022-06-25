@@ -248,3 +248,21 @@ import SwiftUI
 //
 //    }
 //
+
+
+
+//RMO_Habit에 있는 todayString을 update할때 썼던거
+//func updateTodaysDate() {
+//    let dateFormatter = DateFormatter()
+//    dateFormatter.dateFormat = "MM/dd/yyyy"
+//    let todaysDate = dateFormatter.string(from: Date())
+//
+//    //지금 밑에 5줄이 뭐하는 줄이냐면... 140-147에서 localrealm filter을 할때 ("dateString == 'todaysDate' ")가 작동을 안하더라고...
+//    //그래서 임시방편으로 RMO_Habit에 있는 dateString(예> 4/30/2022) 이 todaysDate(4/30/2022)과 == 하면, dateString을 todaysDate으로 업데이트
+//    //그러면 이제 realmNoti 가 위에서 RMO_Habit에 있는 todayString 과 똑같은 dateString을 가진 애들을 뽑아준다.
+//    let rr = localRealm.objects(RMO_Habit.self).filter("dateString == 'todaysDate' ")
+//    if let r = rr.first {
+//    try! localRealm.write {
+//            r.dateString = todaysDate
+//        }
+//    }
