@@ -42,10 +42,17 @@ class NotificationManger: NSObject {
         
         notificationContent.title = habit.title
         notificationContent.body = habit.desc
+
+        let dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: habit.date)
         
-        let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
-//        let dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: habit.date)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
+        
+//        var date = DateComponents()
+//        date.hour = 21
+//        date.minute = 30
+//
+//
+//        let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: true)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: true)
         let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
         
         self.userNotificationCenter.add(request) { (error) in

@@ -250,7 +250,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
 extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
         
-        filterTodaysHabit() //이거넣으니까 된다! 미쳤다
+        //이거넣으니까 된다! 미쳤다
+        filterTodaysHabit()
         //
         //        // Get new habit from RMO_Habit
         //        let newHabit = RMO_Habit()
