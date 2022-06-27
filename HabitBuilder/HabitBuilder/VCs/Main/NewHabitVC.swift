@@ -129,6 +129,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    var repeatType: Int = 0
+    
     //FIXME: 위에거랑 동일
     var isChecked: Bool = false
     
@@ -249,8 +251,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
         }
         
-        
-        
         //        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
         
         
@@ -284,6 +284,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
+        habit.repeatType = self.repeatType
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -325,6 +326,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         NotificationManger.SI.addScheduleNoti(habit: habit)
  
         delegate?.didCreateNewHabit()
+        print(localRealm.objects(RMO_Habit.self))
         dismiss(animated: true, completion: nil)
         //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
     }
@@ -341,7 +343,11 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
 }
 
+
 extension NewHabitVC: RepeatVCDelegate {
+    func didAddRepeat(type: Int) {
+        repeatType = type
+    }
 }
 
 // for UITextField Padding

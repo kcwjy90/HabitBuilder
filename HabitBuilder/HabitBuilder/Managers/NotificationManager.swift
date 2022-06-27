@@ -44,7 +44,7 @@ class NotificationManger: NSObject {
         notificationContent.body = habit.desc
 
         let dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: habit.date)
-        
+
         
 //        var date = DateComponents()
 //        date.hour = 21
