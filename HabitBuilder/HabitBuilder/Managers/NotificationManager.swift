@@ -35,6 +35,7 @@ class NotificationManger: NSObject {
         }
     }
     
+    
     //MARK: Notification을 정해진 시간에 보내는 content.
     func addScheduleNoti(habit: RMO_Habit) {
         let notificationContent = UNMutableNotificationContent()
@@ -43,18 +44,18 @@ class NotificationManger: NSObject {
         notificationContent.title = habit.title
         notificationContent.body = habit.desc
 
-        let dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: habit.date)
+//        let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
 
-        
-//        var date = DateComponents()
-//        date.hour = 21
-//        date.minute = 30
-//
-//
-//        let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: true)
+
+        var dateComp = DateComponents()
+        dateComp.hour = Calendar.current.dateComponents([.hour], from: habit.date).hashValue
+        dateComp.minute = Calendar.current.dateComponents([.minute], from: habit.date).hashValue
+    
+
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: true)
         let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
         
+        UNUserNotificationCenter.current().delegate = self
         self.userNotificationCenter.add(request) { (error) in
             if (error != nil)
             {
@@ -63,6 +64,9 @@ class NotificationManger: NSObject {
             }
         }
     }
+    
+    
+    
     
     // HabitBuilder 실행 중에도 notification 받을수 있게 하는 code
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
