@@ -44,14 +44,25 @@ class NotificationManger: NSObject {
         notificationContent.title = habit.title
         notificationContent.body = habit.desc
 
-//        let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
-
+        let cal = Calendar.current
+        
+        let calY = cal.component(.year, from: habit.date)
+        let calM = cal.component(.month, from: habit.date)
+        let calD = cal.component(.day, from: habit.date)
+        let calH = cal.component(.hour, from: habit.date)
+        let calMi = cal.component(.minute, from: habit.date)
 
         var dateComp = DateComponents()
-        dateComp.hour = Calendar.current.dateComponents([.hour], from: habit.date).hashValue
-        dateComp.minute = Calendar.current.dateComponents([.minute], from: habit.date).hashValue
-    
+        
+//        dateComp.year = calY
+//        dateComp.month = calM
+//        dateComp.day = calD
+        dateComp.hour = calH
+        dateComp.minute = calMi
 
+//        dateComp.year = Calendar.current.dateComponents([.year], from: habit.date).hashValue
+        // 이렇게 하면 찍히지 않음
+             
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: true)
         let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
         
