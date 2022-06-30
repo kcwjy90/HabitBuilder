@@ -43,7 +43,17 @@ class NotificationManger: NSObject {
         
         notificationContent.title = habit.title
         notificationContent.body = habit.desc
-
+        
+        
+        guard let repeatType = habit.repeatType else { return }
+        
+        execTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
+        
+    }
+    
+    
+    func execTrigger(repeatType: RepeatType, habit: RMO_Habit, nc: UNMutableNotificationContent) {
+        
         let cal = Calendar.current
         
         let calM = cal.component(.month, from: habit.date)
@@ -52,70 +62,57 @@ class NotificationManger: NSObject {
         let calD = cal.component(.day, from: habit.date)
         let calH = cal.component(.hour, from: habit.date)
         let calMi = cal.component(.minute, from: habit.date)
-
-        var dateComp = DateComponents()
-
-        if habit.repeatType == 0 {
-            
-            let date = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
-            let trigger = UNCalendarNotificationTrigger(dateMatching: date, repeats: false)
-            let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
-            
-            UNUserNotificationCenter.current().delegate = self
-            self.userNotificationCenter.add(request) { (error) in
-                if (error != nil)
-                {
-                    print("Error" + error.debugDescription)
-                    return
-                }
-            }
-            
-        } else {
-            
-            let i: Int = habit.repeatType
-            switch i {
-//            case 1:
-//                dateComp.hour = calH
-//                dateComp.minute = calMi
-            case 2:
-                dateComp.weekday = calWd
-                dateComp.hour = calH
-                dateComp.minute = calMi
-            case 3:
-                dateComp.weekOfMonth = calW
-                dateComp.day = calD
-                dateComp.hour = calH
-                dateComp.minute = calMi
-            case 4:
-                dateComp.month = calM
-                dateComp.day = calD
-                dateComp.hour = calH
-                dateComp.minute = calMi
-            default:
-                dateComp.hour = calH
-                dateComp.minute = calMi
-            }
-            
-            //        dateComp.year = Calendar.current.dateComponents([.year], from: habit.date).hashValue
-                    // 이렇게 하면 찍히지 않음
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: true)
-            let request = UNNotificationRequest(identifier: habit.id, content: notificationContent, trigger: trigger)
-            
-            UNUserNotificationCenter.current().delegate = self
-            self.userNotificationCenter.add(request) { (error) in
-                if (error != nil)
-                {
-                    print("Error" + error.debugDescription)
-                    return
-                }
-            }
-            
+        
+        var repeats: Bool = false
+        
+        let noRepeat = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
+        var yesRepeat = DateComponents()
+        
+        var dateComponent = DateComponents()
+        
+        switch repeatType {
+        case .none:
+            repeats = false
+            dateComponent = noRepeat
+        case .daily:
+            repeats = true
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        case .weekly:
+            repeats = true
+            yesRepeat.weekday = calWd
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        case .monthly:
+            repeats = true
+            yesRepeat.weekOfMonth = calW
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        case .yearly:
+            repeats = true
+            yesRepeat.month = calM
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
         }
-    
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponent, repeats: repeats)
+        let request = UNNotificationRequest(identifier: habit.id, content: nc, trigger: trigger)
+        
+        UNUserNotificationCenter.current().delegate = self
+        self.userNotificationCenter.add(request) { (error) in
+            if (error != nil)
+            {
+                print("Error" + error.debugDescription)
+                return
+            }
+        }
     }
-    
-    
     
     
     // HabitBuilder 실행 중에도 notification 받을수 있게 하는 code
@@ -123,8 +120,8 @@ class NotificationManger: NSObject {
         completionHandler([.alert, .badge, .sound])
     }
     
-    
 }
+
 
 
 //Mark: UNUserNotificationCenterDelegate

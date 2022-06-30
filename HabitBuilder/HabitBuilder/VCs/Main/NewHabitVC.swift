@@ -129,7 +129,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    var repeatType: Int = 0
+    var repTyp: RepeatType = .none
     
     //FIXME: 위에거랑 동일
     var isChecked: Bool = false
@@ -284,7 +284,10 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
-        habit.repeatType = self.repeatType
+        
+        
+        
+        habit.repeatType = self.repTyp
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -345,8 +348,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 
 
 extension NewHabitVC: RepeatVCDelegate {
-    func didAddRepeat(type: Int) {
-        repeatType = type
+    func didAddRepeat(repeatType: RepeatType) {
+        repTyp = repeatType
     }
 }
 

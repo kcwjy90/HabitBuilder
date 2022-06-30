@@ -12,7 +12,7 @@ import RealmSwift
 import UserNotifications
 
 protocol RepeatVCDelegate: AnyObject {
-        func didAddRepeat(type: Int)
+    func didAddRepeat(repeatType: RepeatType)
 }
 
 let repeatSelection: [String] = ["None", "Daily", "Weekly", "Monthly", "Yearly"]
@@ -152,7 +152,8 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     
-        delegate?.didAddRepeat(type: indexPath.row)
+        guard let repeatType = RepeatType(rawValue: indexPath.row) else { return }
+        delegate?.didAddRepeat(repeatType: repeatType)
         self.dismiss(animated: true, completion: nil)
     }
 
