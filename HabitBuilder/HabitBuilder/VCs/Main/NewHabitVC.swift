@@ -124,8 +124,15 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //FIXME: 일단 얘를 어떻게 처리해야할지 좀더 생각을...Repeat function
     lazy var repeatButton: UIButton = {
         let v = UIButton()
-        v.setTitle("None >", for: .normal)
-        v.setTitleColor(.black, for: .normal)
+//        v.setTitle("None >", for: .normal)
+//        v.setTitleColor(.black, for: .normal)
+        return v
+    }()
+    
+    lazy var repeatTypeLabel: UILabel = {
+        let v = UILabel()
+        v.text = "None >"
+        v.textColor = .black
         return v
     }()
     
@@ -153,6 +160,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(repeatBackView)
         backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
+        backView.addSubview(repeatTypeLabel)
+
         
         
         // backView grid
@@ -246,6 +255,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         repeatButton.snp.makeConstraints { (make) in
+            make.centerY.equalTo(repeatBackView)
+            make.width.equalTo(repeatTypeLabel)
+            make.height.equalTo(40)
+            make.right.equalTo(backView).offset(-30)
+        }
+        
+        repeatTypeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
             make.height.equalTo(40)
             make.right.equalTo(backView).offset(-30)
@@ -350,6 +366,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 extension NewHabitVC: RepeatVCDelegate {
     func didAddRepeat(repeatType: RepeatType) {
         repTyp = repeatType
+        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
+        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
     }
 }
 
