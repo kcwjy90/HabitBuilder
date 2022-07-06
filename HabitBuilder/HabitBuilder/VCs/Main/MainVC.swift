@@ -488,3 +488,5 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 
+
+//7/5 - 1) delete 하면 noti도 사라지는거 2) delete하는 방식을 바꿈 - habitDetailVC 에 button들을 만들어서 success or fail

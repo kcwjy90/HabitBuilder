@@ -120,15 +120,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    
-    //FIXME: 일단 얘를 어떻게 처리해야할지 좀더 생각을...Repeat function
+    // repeatButton 생성
     lazy var repeatButton: UIButton = {
         let v = UIButton()
-//        v.setTitle("None >", for: .normal)
-//        v.setTitleColor(.black, for: .normal)
         return v
     }()
     
+    // repeatTypeLabel 생성
     lazy var repeatTypeLabel: UILabel = {
         let v = UILabel()
         v.text = "None >"
@@ -254,6 +252,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(60)
         }
         
+        // repeatButton size grid
         repeatButton.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
             make.width.equalTo(repeatTypeLabel)
@@ -261,6 +260,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
         }
         
+        // repeatTypeLabel size grid
         repeatTypeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
             make.height.equalTo(40)

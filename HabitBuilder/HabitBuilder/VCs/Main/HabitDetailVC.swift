@@ -91,6 +91,39 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    // repeatBackview 생성
+    lazy var repeatBackView: UIView = {
+        let v = UIView()
+        v.layer.cornerRadius = 15
+        v.backgroundColor = .systemGray5
+        return v
+    }()
+    
+    // repeatLabel 생성
+    lazy var repeatLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Repeat"
+        v.textColor = .systemGray
+        return v
+    }()
+    
+    // repeatButton 생성
+    lazy var repeatButton: UIButton = {
+        let v = UIButton()
+        return v
+    }()
+    
+    // repeatTypeLabel 생성
+    lazy var repeatTypeLabel: UILabel = {
+        let v = UILabel()
+        v.text = "None >"
+        v.textColor = .black
+        return v
+    }()
+    
+    var repTyp: RepeatType = .none
+
+    
     let localRealm = DBManager.SI.realm!
     
     
@@ -121,6 +154,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(habitDateTimeBackView)
         backView.addSubview(habitDateTimeLabel)
         backView.addSubview(habitDateTime)
+        backView.addSubview(repeatBackView)
+        backView.addSubview(repeatLabel)
+        backView.addSubview(repeatButton)
+        backView.addSubview(repeatTypeLabel)
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -187,20 +224,61 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(60)
         }
         
+        // repeatBackview size grid
+        repeatBackView.snp.makeConstraints { (make) in
+            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
+            make.height.equalTo(60)
+        }
+        
+        // repeatLabel size grid
+        repeatLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
+            make.left.equalTo(backView).offset(39)
+            make.height.equalTo(60)
+        }
+        
+        // repeatButton size grid
+        repeatButton.snp.makeConstraints { (make) in
+            make.centerY.equalTo(repeatBackView)
+            make.width.equalTo(repeatTypeLabel)
+            make.height.equalTo(40)
+            make.right.equalTo(backView).offset(-30)
+        }
+        
+        // repeatTypeLabel size grid
+        repeatTypeLabel.snp.makeConstraints { (make) in
+            make.centerY.equalTo(repeatBackView)
+            make.height.equalTo(40)
+            make.right.equalTo(backView).offset(-30)
+        }
         
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
         habitDateTime.date = habit.date
         
+        guard let rt = habit.repeatType else { return }
+        let repeatTypeString = String(describing: rt)
+        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+                
         // Button Actions - backButton & saveHabitButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
-        
+        repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
+
     }
     
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func repeatButtonPressed(sender: UIButton){
+        let v = RepeatVC()
+        v.delegate = self
+        v.modalPresentationStyle = .pageSheet
+        present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     @objc func saveButtonPressed(sender: UIButton) {
@@ -283,6 +361,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
             taskToUpdate.date = habitDateTime.date
+            taskToUpdate.repeatType = repTyp
             print(realm)
         }
         
@@ -318,3 +397,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
     
 }
+
+extension HabitDetailVC: RepeatVCDelegate {
+    func didAddRepeat(repeatType: RepeatType) {
+        repTyp = repeatType
+        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
+        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+    }
+}
+
