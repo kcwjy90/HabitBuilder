@@ -123,6 +123,38 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     var repTyp: RepeatType = .none
 
+    // successButton 생성
+    lazy var successButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("Success", for: .normal)
+        v.setTitleColor(.white, for: .normal)
+        v.backgroundColor = .blue
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
+    
+    // failButton 생성
+    lazy var failButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("Fail", for: .normal)
+        v.setTitleColor(.white, for: .normal)
+        v.backgroundColor = .red
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
+    
+    // deleteButton 생성
+    lazy var deleteButton: UIButton = {
+        let v = UIButton()
+        v.setTitle("Delete", for: .normal)
+        v.setTitleColor(.white, for: .normal)
+        v.backgroundColor = .black
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 20
+        return v
+    }()
     
     let localRealm = DBManager.SI.realm!
     
@@ -158,7 +190,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
         backView.addSubview(repeatTypeLabel)
-        
+        backView.addSubview(successButton)
+        backView.addSubview(failButton)
+        backView.addSubview(deleteButton)
+
         // backView grid
         backView.snp.makeConstraints { (make) in
             make.edges.equalTo(view)
@@ -252,6 +287,27 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.centerY.equalTo(repeatBackView)
             make.height.equalTo(40)
             make.right.equalTo(backView).offset(-30)
+        }
+        
+        failButton.snp.makeConstraints { (make) in
+            make.bottom.equalTo(deleteButton.snp.top).offset(-50)
+            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.left.equalTo(backView).offset(50)
+        }
+        
+        successButton.snp.makeConstraints { (make) in
+            make.bottom.equalTo(deleteButton.snp.top).offset(-50)
+            make.height.equalTo(50)
+            make.width.equalTo(100)
+            make.right.equalTo(backView).offset(-50)
+        }
+        
+        deleteButton.snp.makeConstraints { (make) in
+            make.bottom.equalTo(backView.snp.bottom).offset(-30)
+            make.height.equalTo(40)
+            make.width.equalTo(150)
+            make.centerX.equalTo(backView)
         }
         
         habitTitle.text = habit.title
