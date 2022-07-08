@@ -323,6 +323,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
+        failButton.addTarget(self, action: #selector(failButtonPressed), for: .touchUpInside)
+        successButton.addTarget(self, action: #selector(successButtonPressed), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteButtonPressed), for: .touchUpInside)
+
 
     }
     
@@ -335,6 +339,18 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.delegate = self
         v.modalPresentationStyle = .pageSheet
         present(v, animated:true)   // modal view 가능케 하는 코드
+    }
+    
+    @objc func failButtonPressed(sender: UIButton){
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func successButtonPressed(sender: UIButton){
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func deleteButtonPressed(sender: UIButton){
+        self.dismiss(animated: true, completion: nil)
     }
     
     @objc func saveButtonPressed(sender: UIButton) {
