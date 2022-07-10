@@ -341,11 +341,53 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
+    
     @objc func failButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
     
     @objc func successButtonPressed(sender: UIButton){
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        let realm = self.localRealm.objects(RMO_Habit.self)
+
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return} //
+        let taskToUpdate = countRealm[indexNumb]
+        
+        try! self.localRealm.write {
+            taskToUpdate.success += 1
+        }
+        print(self.localRealm.objects(RMO_Count.self))
+        
+        
+        let thisId = habit.id
+        let thisHabit = realm.firstIndex(where: { $0.id == thisId})
+        guard let h = thisHabit else {return}
+
+        //delete은 되는데, error가 남. 무슨 에러지?
+//        try! self.localRealm.write {
+//
+//            let deleteHabit = realm[h]
+//            self.localRealm.delete(deleteHabit)
+//        }
+        
+//        try! self.localRealm.write {
+//
+//            let deleteHabit = realm.where {
+//                $0.id == thisId
+//            }
+//            self.localRealm.delete(deleteHabit)
+//        }
+//    ERROR:
+//        Cannot convert value of type 'Bool' to closure result type 'Query<Bool>'
+//        Referencing operator function '==' on 'StringProtocol' requires that 'Query<String>' conform to 'StringProtocol'
+//
+        
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -353,6 +395,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
+ 
     @objc func saveButtonPressed(sender: UIButton) {
         
         let dateFormatter = DateFormatter()
