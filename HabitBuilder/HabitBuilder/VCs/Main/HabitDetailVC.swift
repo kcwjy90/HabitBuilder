@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import RealmSwift
+import SwiftUI
+
 
 //MARK: update 된 Habit이 담긴 protocol. MainVC나 AllHabitsVC로 간다
 protocol habitDetailVCDelegate: AnyObject {
@@ -366,27 +369,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         
         let thisId = habit.id
-        let thisHabit = realm.firstIndex(where: { $0.id == thisId})
-        guard let h = thisHabit else {return}
-
-        //delete은 되는데, error가 남. 무슨 에러지?
-//        try! self.localRealm.write {
-//
-//            let deleteHabit = realm[h]
-//            self.localRealm.delete(deleteHabit)
-//        }
         
-//        try! self.localRealm.write {
-//
-//            let deleteHabit = realm.where {
-//                $0.id == thisId
-//            }
-//            self.localRealm.delete(deleteHabit)
-//        }
-//    ERROR:
-//        Cannot convert value of type 'Bool' to closure result type 'Query<Bool>'
-//        Referencing operator function '==' on 'StringProtocol' requires that 'Query<String>' conform to 'StringProtocol'
-//
+        try! self.localRealm.write {
+
+            let deleteHabit = realm.where {
+                $0.id == thisId
+            }
+            self.localRealm.delete(deleteHabit)
+        }
+        
         
         self.dismiss(animated: true, completion: nil)
     }

@@ -227,7 +227,6 @@ class MainVC: UIViewController, UISearchBarDelegate {
 }
 
 
-
 //Extension 은 항상 class 밖에
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension MainVC: NewHabitVCDelegate {
