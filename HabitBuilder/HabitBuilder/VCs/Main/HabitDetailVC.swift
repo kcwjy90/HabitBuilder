@@ -16,6 +16,7 @@ protocol habitDetailVCDelegate: AnyObject {
     func editComp()
 }
 
+
 class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
@@ -382,29 +383,22 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
+    
     @objc func deleteButtonPressed(sender: UIButton){
         
-        confirmDelete()
-        
-//        self.dismiss(animated: true, completion: confirmDelete)
-    }
-    
-    
-    
-    // when deletePressed, confirmation pops up
-    func confirmDelete() {
         let alert = UIAlertController(
             title: "Delete this Habit",
             message: "",
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Confirm", style: .destructive))
+        alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+            super.dismiss(animated: true, completion: nil)
+        }))
         
         present(alert, animated: true, completion: nil)
+        
     }
-    
-    
     
  
     @objc func saveButtonPressed(sender: UIButton) {
@@ -523,6 +517,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
     
 }
+
 
 extension HabitDetailVC: RepeatVCDelegate {
     func didAddRepeat(repeatType: RepeatType) {
