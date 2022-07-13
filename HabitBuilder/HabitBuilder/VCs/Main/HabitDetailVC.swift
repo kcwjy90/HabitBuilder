@@ -19,7 +19,7 @@ protocol habitDetailVCDelegate: AnyObject {
 class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
-    
+        
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -383,8 +383,28 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
     
     @objc func deleteButtonPressed(sender: UIButton){
-        self.dismiss(animated: true, completion: nil)
+        
+        confirmDelete()
+        
+//        self.dismiss(animated: true, completion: confirmDelete)
     }
+    
+    
+    
+    // when deletePressed, confirmation pops up
+    func confirmDelete() {
+        let alert = UIAlertController(
+            title: "Delete this Habit",
+            message: "",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Confirm", style: .destructive))
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
     
  
     @objc func saveButtonPressed(sender: UIButton) {
