@@ -19,8 +19,11 @@ protocol habitDetailVCDelegate: AnyObject {
 
 class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
-    weak var delegate: habitDetailVCDelegate?   // Delegate property var 생성
-        
+    let localRealm = DBManager.SI.realm!
+    
+    // Delegate property var 생성
+    weak var delegate: habitDetailVCDelegate?
+    
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -125,8 +128,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    //default Repeat Type when user creates Habit
     var repTyp: RepeatType = .none
-
+    
     // successButton 생성
     lazy var successButton: UIButton = {
         let v = UIButton()
@@ -160,25 +164,26 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
-    let localRealm = DBManager.SI.realm!
     
     
-    //MARK: CONSTRUCTOR. 이것을 MainVC나 AllHabitsVC에서 받지 않으면 아예 작동이 안됨.
-    var habit: RMO_Habit //RMO_Habit object를 mainVC에서 여기로
+    //MARK: CONSTRUCTOR. 이것을 MainVC나 AllHabitsVC에서 받지 않으면 아예 작동이 안됨. Needed to receive selected Habit information from TableView to display in the HabitDetail VC
+    var habit: RMO_Habit //RMO_Habit object를 mainVC, AllHabitsVC 에서 여기로
     init (habit: RMO_Habit) {
         self.habit = habit //initializing habit
         super .init(nibName: nil, bundle: nil)
     }
     
-    required init?(coder: NSCoder) { //위의 코드랑 꼭 같이 가야함
+    //위의 코드랑 꼭 같이 가야함
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     override func loadView() {
         super.loadView()
         
         //MARK: tapGesture - Dismisses Keyboard
-        //다른은 swipe인데 얘는 gesture인 이유는 VC가 modal이라, keyboard dismiss할때 modal이 dismiss 될까봐
+        //Used Gesture instead of Swipe to prevent from dismissing the HabitDetailVC modal when dismising the keyboard by Swipe.
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
         
@@ -197,13 +202,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(successButton)
         backView.addSubview(failButton)
         backView.addSubview(deleteButton)
-
+        
         // backView grid
         backView.snp.makeConstraints { (make) in
             make.edges.equalTo(view)
         }
         
-        // backToMainButton size grid
+        // backButton size grid
         backButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.left.equalTo(backView)
@@ -211,7 +216,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(40)
         }
         
-        // addHabitButton size grid
+        // saveHabitButton size grid
         saveHabitButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.right.equalTo(backView)
@@ -234,14 +239,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(160)
         }
+        //MARK: UITextView는 placeholder가 없어서 따로 placeholder처럼 보이게 만든것. Function is at the bottom
         habitDesc.delegate = self
-        //MARK: UITextView는 placeholder가 없어서 따로 placeholder처럼 보이게 만든것. 밑에.
         textViewDidBeginEditing(habitDesc)
         textViewDidEndEditing(habitDesc)
         habitDesc.addPadding()
         habitDesc.addPadding()
         
-        // habitDateBackview size grid
+        
+        // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
@@ -249,14 +255,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(60)
         }
         
-        // habitDateLabel size grid
+        // habitDateTimeLabel size grid
         habitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
-        // habitDate size grid
+        // habitDateTime size grid
         habitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateTimeBackView)
             make.right.equalTo(backView).offset(-34)
@@ -293,6 +299,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
         }
         
+        // failButton size grid
         failButton.snp.makeConstraints { (make) in
             make.bottom.equalTo(deleteButton.snp.top).offset(-50)
             make.height.equalTo(50)
@@ -300,6 +307,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.left.equalTo(backView).offset(50)
         }
         
+        // successButton size grid
         successButton.snp.makeConstraints { (make) in
             make.bottom.equalTo(deleteButton.snp.top).offset(-50)
             make.height.equalTo(50)
@@ -307,6 +315,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-50)
         }
         
+        // deleteButton size grid
         deleteButton.snp.makeConstraints { (make) in
             make.bottom.equalTo(backView.snp.bottom).offset(-30)
             make.height.equalTo(40)
@@ -314,6 +323,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.centerX.equalTo(backView)
         }
         
+        // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
@@ -322,18 +332,19 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         guard let rt = habit.repeatType else { return }
         let repeatTypeString = String(describing: rt)
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
-                
-        // Button Actions - backButton & saveHabitButton
+        
+        
+        // Button Actions - backButton, saveHabitButton, repeatButton, failButton, successButton, deleteButton
         backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
         saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
         failButton.addTarget(self, action: #selector(failButtonPressed), for: .touchUpInside)
         successButton.addTarget(self, action: #selector(successButtonPressed), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector(deleteButtonPressed), for: .touchUpInside)
-
-
+        
     }
     
+    // MARK: functions for above buttons
     @objc func backButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
@@ -345,20 +356,21 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
-    
+    //FIXME: failButtonPressed, successButtonPressed, deleteButtonPressed all being worked on after fixing how to work realm noti.
     @objc func failButtonPressed(sender: UIButton){
         self.dismiss(animated: true, completion: nil)
     }
     
     @objc func successButtonPressed(sender: UIButton){
         
+        //FIXME: 이거를 밖으로 빼고 싶은데..function 안에 있는 constants를 어떻게 refer 하지?
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
-
+        
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return} //
         let taskToUpdate = countRealm[indexNumb]
@@ -371,14 +383,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         let thisId = habit.id
         
-//        try! self.localRealm.write {
-//
-//            let deleteHabit = realm.where {
-//                $0.id == thisId
-//            }
-//            self.localRealm.delete(deleteHabit)
-//        }
-//        
+        //        try! self.localRealm.write {
+        //
+        //            let deleteHabit = realm.where {
+        //                $0.id == thisId
+        //            }
+        //            self.localRealm.delete(deleteHabit)
+        //        }
+        //
         
         self.dismiss(animated: true, completion: nil)
     }
@@ -386,6 +398,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     @objc func deleteButtonPressed(sender: UIButton){
         
+        //MARK: creating Alert with two buttons - Cancel: to cancel delete. Confirm: to Delete
+        //FIXME: Still need to add delete functionality
         let alert = UIAlertController(
             title: "Delete this Habit",
             message: "",
@@ -400,7 +414,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
     }
     
- 
+    
     @objc func saveButtonPressed(sender: UIButton) {
         
         let dateFormatter = DateFormatter()
@@ -408,12 +422,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let countRealm = localRealm.objects(RMO_Count.self)
         let realm = localRealm.objects(RMO_Habit.self)
         
+        //Filtering the habit where ID matches
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
-        {return} //결국 filter 를 안쓰고 where을 써버렸네..
+        {return}
         let taskToUpdate = realm[indexNumb]
         
         // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
-        // FIXME: 이걸 guard let으로 못 적나?
         if taskToUpdate.date != habitDateTime.date {
             
             //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
@@ -475,6 +489,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // 그래서 완성본 위에서는 filter 안쓰고 where 씀
         
+        //MARK: updating Habit
         try! self.localRealm.write {
             guard let titleText = habitTitle.text, let descText = habitDesc.text
             else { return }
@@ -491,7 +506,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
     }
     
-    //MARK: UITextView "Placeholder" 
+    //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
@@ -499,6 +514,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
     }
     
+    //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
             textView.text = "Description of your New Habit"
@@ -508,6 +524,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
     func changeTextColor(_ textView: UITextView) {
+        
         if textView.text == "Description of your New Habit" {
             textView.textColor = UIColor.lightGray
             
@@ -519,8 +536,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 }
 
 
+//MARK: Receiving Updated Repeat Type from RepeatVC
 extension HabitDetailVC: RepeatVCDelegate {
-    func didAddRepeat(repeatType: RepeatType) {
+    
+    func didChangeRepeatType(repeatType: RepeatType) {
         repTyp = repeatType
         let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"

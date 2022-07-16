@@ -30,19 +30,20 @@ class HabitTableCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier )
         
-        //아 이것들이 왜 필요한가 했는데, 얘네들이 없으면 tableview에서 안보이는구나..
+        //Cell은 왜 굳이 addSubView가 필요할까 했는데, 이게 없으면 tableview에서 안 보임
         addSubview(backView)
+        backView.addSubview(newHabitTitle)
+        backView.addSubview(newHabitDesc)
+        
         backView.snp.makeConstraints{ (make) in
             make.edges.equalTo(self)
         }
         
-        backView.addSubview(newHabitTitle)
         newHabitTitle.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.left.equalTo(backView).offset(10)
         }
         
-        backView.addSubview(newHabitDesc)
         newHabitDesc.snp.makeConstraints{ (make) in
             make.top.equalTo(newHabitTitle)
             make.left.equalTo(newHabitTitle.snp.right)

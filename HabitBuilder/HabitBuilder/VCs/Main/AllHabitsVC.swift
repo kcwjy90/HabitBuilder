@@ -13,6 +13,8 @@ import SwiftUI
 
 class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
+    let localRealm = DBManager.SI.realm!
+
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -40,7 +42,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     // search 됐느냐 안됐느냐에 따라 section이 다르게 나누기 위해.
     var habitSearched: Bool = false
     
-    let localRealm = DBManager.SI.realm!
+    // Different RMO_Habits vars are needed to divide habits into different sections by date and also filter when Habit is searched
     var habits: [RMO_Habit] = []
     var searchedHabits: [RMO_Habit] = []
     var searchedT: String = ""
@@ -60,23 +62,22 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
         searchBar.delegate = self
         
-        view.backgroundColor = .white
         view.addSubview(backView)
         backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
-        // BackView grid
+        // BackView size grid
         backView.snp.makeConstraints { (make) in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        // searchBar grid
+        // searchBar size grid
         searchBar.snp.makeConstraints { (make) in
             make.top.left.right.equalTo(backView)
             make.height.equalTo(44)
         }
         
-        // todaysHabitTableView grid
+        // allHabitsTableView size grid
         allHabitsTableView.snp.makeConstraints { (make) in
             make.top.equalTo(searchBar.snp.bottom)
             make.left.right.bottom.equalTo(backView)
@@ -113,8 +114,8 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
-        v.delegate = self   //와.. 이거 하나 comment out 했더니 막 아무것도 안됐는데...
-        v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
+        v.delegate = self
+        v.modalPresentationStyle = .pageSheet // changed from fullscreen to pagesheet
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     

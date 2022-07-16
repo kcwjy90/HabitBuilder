@@ -15,6 +15,8 @@ import Charts
 
 class ProgressVC: UIViewController, ChartViewDelegate {
     
+    let localRealm = DBManager.SI.realm!
+
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -22,10 +24,9 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         return v
     }()
     
-    let localRealm = DBManager.SI.realm!
+    // for pieChart
     var todayPiChart = PieChartView()
-    
-    //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공.
+    // 3 Labels for the pieChart
     let results = ["Succeeded", "Failed", "Working"]
     var counts = [0,0,0]
     var compCount: Int = 0
@@ -36,9 +37,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         super.loadView()
         
         setNaviBar()
-        
         todayPiChart.delegate = self
-        
         reloadChart()
         
     }
@@ -70,8 +69,9 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
     }
     
-    //MARK: code that creates the piechart. Needs to reload so graph gets updated
+    //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
     func reloadChart() {
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
@@ -86,11 +86,11 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         counts[1] = todayCount.fail
         counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
 
-        
         customizeChart(dataPoints: results, values: counts.map{ Double($0) })
         
     }
-    //MARK: Chart Customize하는 func
+    
+    //MARK: Chart Customizing.
     func customizeChart(dataPoints: [String], values: [Double]) {
         
         // 1. Set ChartDataEntry
@@ -114,20 +114,10 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         todayPiChart.data = pieChartData
     }
     
-    //Navi Bar 만드는 func.
+    //MARK: Navi Bar
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
     }
 }
 
-
-//        var entries = [ChartDataEntry]()
-//        for x in 0..<10 {
-//            entries.append(ChartDataEntry(x: Double(x), y: Double(x)))
-//        }
-
-//        let set = PieChartDataSet(entries: entries)
-//        set.colors = ChartColorTemplates.joyful()
-//        let data = PieChartData(dataSet: set)
-//        pieChart.data = data

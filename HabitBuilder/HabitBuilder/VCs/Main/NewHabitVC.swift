@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-//MARK: didCreateNewHabit func for NewHabitVCDelegate Protocol
+//MARK: Protocol to send newly created Habit to MainVC/AllHabitVC
 protocol NewHabitVCDelegate: AnyObject {
     func didCreateNewHabit()
 }
@@ -20,7 +20,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //realm Noti 에서 쓰는거
     let localRealm = DBManager.SI.realm!
     
-    weak var delegate: NewHabitVCDelegate?   // Delegate property var 생성
+    // Delegate property var 생성
+    weak var delegate: NewHabitVCDelegate?
     
     // backview 생성
     lazy var backView: UIView = {
@@ -134,10 +135,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         return v
     }()
     
+    //default Repeat Type when user creates Habit
     var repTyp: RepeatType = .none
     
-    //FIXME: 위에거랑 동일
-    var isChecked: Bool = false
     
     override func loadView() {
         super.loadView()
@@ -159,7 +159,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
         backView.addSubview(repeatTypeLabel)
-
         
         
         // backView grid
@@ -167,7 +166,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.edges.equalTo(view)
         }
         
-        // backToMainButton size grid
+        // backButton size grid
         backButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.left.equalTo(backView)
@@ -198,6 +197,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
         }
+        //giving Padding to TextField
         newHabitTitle.setLeftPaddingPoints(10)
         newHabitTitle.setRightPaddingPoints(10)
         
@@ -215,7 +215,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         newHabitDesc.addPadding()
         newHabitDesc.addPadding()
         
-        // newHabitDateBackview size grid
+        
+        // newHabitDateTimeBackview size grid
         newHabitDateTimeBackview.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(16)
@@ -223,14 +224,14 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.height.equalTo(60)
         }
         
-        // newHabitDateLabel size grid
+        // newHabitDateTimeLabel size grid
         newHabitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
         
-        // newHabitDate size grid
+        // newHabitDateTime size grid
         newHabitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(newHabitDateTimeBackview)
             make.right.equalTo(backView).offset(-30)
@@ -267,8 +268,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
         }
         
-        //        newHabitDateTime.timeZone = TimeZone.init(identifier: "PST") // have to do this inside of loadview. 더 이상 필요없지만 일단 혹시나
-        
         
         //MARK: Button Actions - AddHabitButton & backButton & repeatButton
         addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
@@ -277,38 +276,21 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
     }
     
-    //MARK: UITextView "Placeholder" 
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == UIColor.lightGray {
-            textView.text = nil
-            textView.textColor = UIColor.black
-        }
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            textView.text = "Description of your New Habit"
-            textView.textColor = UIColor.lightGray
-        }
-    }
-    
     //MARK: Button Funcs - Add, Back, Repeat Buttons
     @objc func addButtonPressed(sender: UIButton) {
         
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         let habit = RMO_Habit()
+        
         habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
-        
-        
-        
         habit.repeatType = self.repTyp
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let habitDate = dateFormatter.string(from: newHabitDateTime.date)
-                
+        
         let countRealm = localRealm.objects(RMO_Count.self)
         
         
@@ -342,12 +324,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             print("habit added to localrealm")
         }
         
+        //MARK: adding notification to Scheduler
         NotificationManger.SI.addScheduleNoti(habit: habit)
- 
-        delegate?.didCreateNewHabit()
+        
+        delegate?.didCreateNewHabit()         //to MainVC/AllHabitsVC
         print(localRealm.objects(RMO_Habit.self))
         dismiss(animated: true, completion: nil)
-        //와우 modal 에서 ADD 를 누르면 다시 main viewcontroller로 돌아오게 해주는 마법같은 한 줄 보소
+        
     }
     
     @objc func backButtonPressed(sender: UIButton){
@@ -358,20 +341,39 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let v = RepeatVC()
         v.delegate = self
         v.modalPresentationStyle = .pageSheet
-        present(v, animated:true)   // modal view 가능케 하는 코드  
+        present(v, animated:true)   // modal view 가능케 하는 코드
+    }
+    
+    
+    //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            textView.textColor = UIColor.black
+        }
+    }
+    
+    //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description of your New Habit"
+            textView.textColor = UIColor.lightGray
+        }
     }
 }
 
 
+//MARK: Receiving updated repeatType from ReapetVC
 extension NewHabitVC: RepeatVCDelegate {
-    func didAddRepeat(repeatType: RepeatType) {
+    func didChangeRepeatType(repeatType: RepeatType) {
         repTyp = repeatType
         let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
     }
 }
 
-// for UITextField Padding
+
+//MARK: Adding padding to UITextField
 extension UITextField {
     func setLeftPaddingPoints(_ amount:CGFloat){
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: amount, height: self.frame.size.height))
@@ -386,7 +388,7 @@ extension UITextField {
     
 }
 
-//UITextView에 padding을 더하기
+//MARK: Adding padding to UITextView
 extension UITextView {
     func addPadding() {
         self.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)

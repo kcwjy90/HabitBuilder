@@ -11,17 +11,18 @@ import SnapKit
 import RealmSwift
 import UserNotifications
 
+//MARK: Protocol to send updated Repeat Type to HabitDetailVC
 protocol RepeatVCDelegate: AnyObject {
-    func didAddRepeat(repeatType: RepeatType)
+    func didChangeRepeatType(repeatType: RepeatType)
 }
 
+// Types of Repeat available for user to choose
 let repeatSelection: [String] = ["None", "Daily", "Weekly", "Monthly", "Yearly"]
 
 class RepeatVC: UIViewController {
     
-    weak var delegate: RepeatVCDelegate?   // Delegate property var 생성
-    
-    let localRealm = DBManager.SI.realm!
+    // Delegate property var 생성
+    weak var delegate: RepeatVCDelegate?
     
     // backView 생성
     lazy var backView: UIView = {
@@ -49,17 +50,6 @@ class RepeatVC: UIViewController {
         return v
     }()
     
-    // saveButton 생성
-    lazy var saveButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Save", for: .normal)
-        v.setTitleColor(.blue, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
-    
     // repeatTableView 생성
     lazy var repeatTableView: UITableView = {
         let v = UITableView()
@@ -73,21 +63,18 @@ class RepeatVC: UIViewController {
     
     override func loadView() {
         super.loadView()
-
         
         view.addSubview(backView)
         backView.addSubview(backButton)
         backView.addSubview(pageLabel)
-        backView.addSubview(saveButton)
         backView.addSubview(repeatTableView)
-        backView.backgroundColor = .white
         
-        // BackView grid
+        // backView grid
         backView.snp.makeConstraints { (make) in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        // backToMainButton size grid
+        // backButton size grid
         backButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backView).offset(10)
             make.left.equalTo(backView)
@@ -102,22 +89,15 @@ class RepeatVC: UIViewController {
             make.height.equalTo(40)
         }
         
-        // addHabitButton size grid
-        saveButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.right.equalTo(backView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
-        }
-        
         // repeatTableView grid
         repeatTableView.snp.makeConstraints { (make) in
             make.top.equalTo(pageLabel.snp.bottom).offset(10)
             make.left.right.bottom.equalTo(backView)
         }
         
-        //MARK: Button Actions - AddHabitButton & backButton & repeatButton
-        backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)        
+        //MARK: Button Actions - backButton
+        backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+        
     }
     
     @objc func backButtonPressed(sender: UIButton){
@@ -133,7 +113,6 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return repeatSelection.count
     }
-    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
@@ -151,11 +130,14 @@ extension RepeatVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    
+        
         guard let repeatType = RepeatType(rawValue: indexPath.row) else { return }
-        delegate?.didAddRepeat(repeatType: repeatType)
+        
+        //Once user selects the Repeat Type, it gets sent to HabitDetailVC using RepeatVCDelegate protocol
+        delegate?.didChangeRepeatType(repeatType: repeatType)
         self.dismiss(animated: true, completion: nil)
+        
     }
-
+    
 }
 
