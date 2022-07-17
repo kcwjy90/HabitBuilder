@@ -401,37 +401,53 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print("Remove")
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
             
-            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-            {return} //
-            let taskToUpdate = countRealm[indexNumb]
+            let alert = UIAlertController(
+                title: "Delete this Habit",
+                message: "",
+                preferredStyle: .alert)
             
-            try! self.localRealm.write {
-                taskToUpdate.remove += 1
-            }
-            print(self.localRealm.objects(RMO_Count.self))
-            
-            
-            var habit: RMO_Habit
-            
-            if self.habitSearched {
-                habit = self.searchedHabits[indexPath.row]
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
                 
-            } else {
-                habit = self.habits[indexPath.row]
+                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+                {return} //
+                let taskToUpdate = countRealm[indexNumb]
                 
-            }
-            
-            let thisId = habit.id
-            
-            try! self.localRealm.write {
-                
-                let deleteHabit = realm.where {
-                    $0.id == thisId
+                try! self.localRealm.write {
+                    taskToUpdate.remove += 1
                 }
-                self.localRealm.delete(deleteHabit)
-            }
+                print(self.localRealm.objects(RMO_Count.self))
+                
+                
+                var habit: RMO_Habit
+                
+                if self.habitSearched {
+                    habit = self.searchedHabits[indexPath.row]
+                    
+                } else {
+                    habit = self.habits[indexPath.row]
+                    
+                }
+                
+                let thisId = habit.id
+                
+                try! self.localRealm.write {
+                    
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    self.localRealm.delete(deleteHabit)
+                }
+                
+                self.filterTodaysHabit()
+
+                
+            }))
+            
+            self.present(alert, animated: true, completion: nil)
+            
+            
         
-            self.filterTodaysHabit()
         }
         remove.backgroundColor = .systemOrange
         
