@@ -147,6 +147,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
         else { return }
         
         let realm = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+
+       
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
@@ -156,6 +158,12 @@ class MainVC: UIViewController, UISearchBarDelegate {
                 // Results are now populated and can be accessed without blocking the UI
                 tableView.reloadData()
             case .update(_, let deletions, let insertions, let modifications):
+                
+                if self?.habitSearched == true {
+                    print(self?.searchedHabits)
+                    print(realm)
+        //            let realm = self.localRealm.objects(RMO_Habit.self).filter()
+                }
                 
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
