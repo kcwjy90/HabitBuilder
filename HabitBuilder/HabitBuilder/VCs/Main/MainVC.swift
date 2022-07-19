@@ -25,6 +25,9 @@ class MainVC: UIViewController, UISearchBarDelegate {
     
     let localRealm = DBManager.SI.realm!
     
+    //임시방편으로 이렇게 declare하고
+    var rr = DBManager.SI.realm!.objects(RMO_Habit.self)
+    
     //realm Noti 에서 쓰는거
     deinit {
         print("deinit - NewHabitVC")
@@ -134,54 +137,13 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         filterTodaysHabit()
         
-        let today = Date()
         
-        guard let beginningOfToday = Calendar.current.date(from: DateComponents(
-            year: Calendar.current.component(.year, from: today),
-            month: Calendar.current.component(.month, from: today),
-            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
-              let endOfToday = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: today),
-                month: Calendar.current.component(.month, from: today),
-                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
-        else { return }
         
-        let realm = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
-
-       
+        please()
         
-        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
-        notificationToken = realm.observe { [weak self] (changes: RealmCollectionChange) in
-            guard let tableView = self?.todaysHabitTableView else { return }
-            switch changes {
-            case .initial:
-                // Results are now populated and can be accessed without blocking the UI
-                tableView.reloadData()
-            case .update(_, let deletions, let insertions, let modifications):
-                
-                if self?.habitSearched == true {
-                    print(self?.searchedHabits)
-                    print(realm)
-        //            let realm = self.localRealm.objects(RMO_Habit.self).filter()
-                }
-                
-                // Query results have changed, so apply them to the UITableView
-                tableView.performBatchUpdates({
-                    // Always apply updates in the following order: deletions, insertions, then modifications.
-                    // Handling insertions before deletions may result in unexpected behavior.
-                    tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
-                }, completion: { finished in
-                    // ...
-                })
-            case .error(let error):
-                // An error occurred while opening the Realm file on the background worker thread
-                fatalError("\(error)")
-            }
-        }
+        
     }
-
+    
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
@@ -227,6 +189,8 @@ class MainVC: UIViewController, UISearchBarDelegate {
                     //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
                     return habit.title.lowercased().contains(searchedT.lowercased())
                 }
+                print("여긴가")
+                (rr) = after()
             } else {
                 return
             }
@@ -242,7 +206,7 @@ extension MainVC: NewHabitVCDelegate {
         
         //이거넣으니까 된다! 미쳤다
         filterTodaysHabit()
-
+        
     }
 }
 
@@ -350,10 +314,92 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         self.todaysHabitTableView.reloadData()
     }
     
+    func please() {
+        
+        let today = Date()
+        
+        guard let beginningOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
+              let endOfToday = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: today),
+                month: Calendar.current.component(.month, from: today),
+                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+        else { return }
+        
+        
+        rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+                
+//         (rr) = after()
+        print("처음 호출 realm = \(rr)")
+        
+        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
+        notificationToken = rr.observe { [weak self] (changes: RealmCollectionChange) in
+            print("noti 들어와서= \(self?.rr.count)")
+            print("noti 들어와서 = \(self?.rr)")
+            guard let tableView = self?.todaysHabitTableView else { return }
+            
+
+            
+            switch changes {
+            case .initial:
+                // Results are now populated and can be accessed without blocking the UI
+                tableView.reloadData()
+            case .update(_, let deletions, let insertions, let modifications):
+                
+                
+                
+                // Query results have changed, so apply them to the UITableView
+                tableView.performBatchUpdates({
+                    // Always apply updates in the following order: deletions, insertions, then modifications.
+                    // Handling insertions before deletions may result in unexpected behavior.
+                    tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                    tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                    tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
+                }, completion: { finished in
+                    // ...
+                })
+            case .error(let error):
+                // An error occurred while opening the Realm file on the background worker thread
+                fatalError("\(error)")
+            }
+        }
+    }
+    
+    
+    func after () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
+        
+        let today = Date()
+        
+        let beginningOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0))
+        let endOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+        
+        if habitSearched == true {
+             rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).where {
+                ($0.title.contains(searchedT, options: .caseInsensitive))
+            }
+            
+            print("rr got updated")
+            print("true - \(rr.count)")
+            print("새로운 rr= \(rr)")
+
+        }
+        
+        return(rr)
+        
+    }
     
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
+        print(indexPath.row)
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -448,14 +494,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 self.filterTodaysHabit()
-
+                
                 
             }))
             
             self.present(alert, animated: true, completion: nil)
             
             
-        
+            
         }
         remove.backgroundColor = .systemOrange
         

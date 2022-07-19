@@ -382,15 +382,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         
         let thisId = habit.id
+        print(realm)
+                try! self.localRealm.write {
         
-        //        try! self.localRealm.write {
-        //
-        //            let deleteHabit = realm.where {
-        //                $0.id == thisId
-        //            }
-        //            self.localRealm.delete(deleteHabit)
-        //        }
-        //
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    self.localRealm.delete(deleteHabit)
+                }
+        print(realm)
         
         self.dismiss(animated: true, completion: nil)
     }
