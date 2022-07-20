@@ -378,11 +378,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         try! self.localRealm.write {
             taskToUpdate.success += 1
         }
-        print(self.localRealm.objects(RMO_Count.self))
+//        print(self.localRealm.objects(RMO_Count.self))
         
         
         let thisId = habit.id
-        print(realm)
+//        print(realm)
                 try! self.localRealm.write {
         
                     let deleteHabit = realm.where {
@@ -390,8 +390,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                     }
                     self.localRealm.delete(deleteHabit)
                 }
-        print(realm)
+//        print(realm)
         
+        delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -440,8 +441,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                 try! localRealm.write {
                     localRealm.add(newCount)
                 }
-                print("새로만듬")
-                print(newCount)
+//                print("새로만듬")
+//                print(newCount)
                 
             }
             
@@ -452,11 +453,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             let minusCount = countRealm[indexNumb]
             
             try! localRealm.write {
-                print("리무브되기전")
-                print(minusCount)
+//                print("리무브되기전")
+//                print(minusCount)
                 minusCount.total -= 1
-                print("리무브된후")
-                print(minusCount)
+//                print("리무브된후")
+//                print(minusCount)
             }
             
             //새로운 habit의 count수를 +1
@@ -464,11 +465,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             {return}
             let plusCount = countRealm[indexNumb]
             try! localRealm.write {
-                print("플러스되기전")
-                print(plusCount)
+//                print("플러스되기전")
+//                print(plusCount)
                 plusCount.total += 1
-                print("플러스된후")
-                print(plusCount)
+//                print("플러스된후")
+//                print(plusCount)
                 
             }
             
@@ -497,7 +498,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             taskToUpdate.desc = descText
             taskToUpdate.date = habitDateTime.date
             taskToUpdate.repeatType = repTyp
-            print(realm)
+//            print(realm)
         }
         
         //MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)

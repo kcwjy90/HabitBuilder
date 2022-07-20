@@ -139,10 +139,11 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         
         
-        please()
+        realmNoti()
         
         
     }
+    
     
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
@@ -189,8 +190,12 @@ class MainVC: UIViewController, UISearchBarDelegate {
                     //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
                     return habit.title.lowercased().contains(searchedT.lowercased())
                 }
+                print("ole\(rr.count)")
                 print("여긴가")
                 (rr) = after()
+                print("new\(rr.count)")
+                
+                
             } else {
                 return
             }
@@ -213,16 +218,23 @@ extension MainVC: NewHabitVCDelegate {
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
-        if habitSearched {
-            searchedHabits = habits.filter { habit in
-                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
-                return habit.title.lowercased().contains(searchedT.lowercased())
-            }
-            self.todaysHabitTableView.reloadData()
-        }
+        
+        print(todaysHabitTableView.numberOfRows(inSection: 0))
+        filterTodaysHabit() // 7/19 HabitDetailVC에서 일단 Success를 누르면 tableview가 로드 될때 에러가 안나게 해줌.
+        
+        //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
+//        if habitSearched {
+//            searchedHabits = habits.filter { habit in
+//                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+//                return habit.title.lowercased().contains(searchedT.lowercased())
+//            }
+//            self.todaysHabitTableView.reloadData()
+//        }
         //        }  else {
         //            self.reloadData()
         //        }
+        //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
+
     }
 }
 
@@ -255,6 +267,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         if habitSearched {
             print("search 됨")
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+
         } else {
             print("search 안됨")
             return habits.count
@@ -277,7 +290,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
-            let date = newHabit.date
             
             cell.newHabitTitle.text = title + " - "
             cell.newHabitDesc.text = desc
@@ -287,7 +299,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
-            let date = newHabit.date
             
             cell.newHabitTitle.text = title + " - "
             cell.newHabitDesc.text = desc
@@ -311,10 +322,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             habitSearched = false
         }
-        self.todaysHabitTableView.reloadData()
+        self.todaysHabitTableView.reloadData() // search 했고 안했고를 반영해주는 reload
     }
     
-    func please() {
+    func realmNoti() {
         
         let today = Date()
         
@@ -328,20 +339,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
         else { return }
         
-        
+        //rr = realm when it's not searched
         rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
-                
-//         (rr) = after()
-        print("처음 호출 realm = \(rr)")
-        
+                        
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = rr.observe { [weak self] (changes: RealmCollectionChange) in
             print("noti 들어와서= \(self?.rr.count)")
-            print("noti 들어와서 = \(self?.rr)")
             guard let tableView = self?.todaysHabitTableView else { return }
-            
-
-            
+            print("지금 여기 몇개의 로우가 있을까요? - \(tableView.numberOfRows(inSection: 0))")
+            print("지우기 바로 전 rr 은 - \(self?.rr)")
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI
@@ -352,18 +358,28 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
+                    
+                    print("delete하기 바로 직전에 여기에는 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
+
                     // Always apply updates in the following order: deletions, insertions, then modifications.
                     // Handling insertions before deletions may result in unexpected behavior.
                     tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
+                    
+
                 }, completion: { finished in
-                    // ...
+
                 })
+                
+                
             case .error(let error):
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")
             }
+            
+            print("끝나고 나니 여기 로우가 이만큼 있네요 - \(tableView.numberOfRows(inSection: 0))")
+
         }
     }
     
@@ -386,9 +402,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 ($0.title.contains(searchedT, options: .caseInsensitive))
             }
             
-            print("rr got updated")
-            print("true - \(rr.count)")
+//            print("true - \(rr.count)")
             print("새로운 rr= \(rr)")
+            
 
         }
         

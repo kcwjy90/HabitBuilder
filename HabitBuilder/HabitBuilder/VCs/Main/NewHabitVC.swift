@@ -303,8 +303,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             
             try! localRealm.write {
                 localRealm.add(newCount)
-                print("생성")
-                print(newCount)
+//                print("생성")
+//                print(newCount)
             }
         }
         
@@ -315,20 +315,20 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         try! localRealm.write {
             existCount.total += 1
-            print("+1")
-            print(existCount)
+//            print("+1")
+//            print(existCount)
         }
         
         try! localRealm.write {
             localRealm.add(habit)
-            print("habit added to localrealm")
+//            print("habit added to localrealm")
         }
         
         //MARK: adding notification to Scheduler
         NotificationManger.SI.addScheduleNoti(habit: habit)
         
         delegate?.didCreateNewHabit()         //to MainVC/AllHabitsVC
-        print(localRealm.objects(RMO_Habit.self))
+//        print(localRealm.objects(RMO_Habit.self))
         dismiss(animated: true, completion: nil)
         
     }
