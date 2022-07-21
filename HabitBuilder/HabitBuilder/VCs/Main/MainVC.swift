@@ -354,7 +354,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 tableView.reloadData()
             case .update(_, let deletions, let insertions, let modifications):
                 
-                
+                //이상한 점
+                // 순서가 A, B, C 일경우 A 를 필터해서 지우는건 가능한데, C를 필터해서 지우는게 안되네...
                 
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
