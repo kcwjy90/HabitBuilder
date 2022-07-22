@@ -192,7 +192,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
                 }
                 print("ole\(rr.count)")
                 print("여긴가")
-                (rr) = after()
+                (rr) = after() // updating rr so we are targeting filtered realm that only shows searched items
                 print("new\(rr.count)")
                 
                 
@@ -253,6 +253,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             habit = habits[indexPath.row]
         }
         
+        print(indexPath.row)
+        
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         habitDetailVC.delegate = self
@@ -266,6 +268,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         if habitSearched {
             print("search 됨")
+
+// 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
+
+
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
 
         } else {
@@ -353,23 +359,23 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 // Results are now populated and can be accessed without blocking the UI
                 tableView.reloadData()
             case .update(_, let deletions, let insertions, let modifications):
-                
-                //이상한 점
-                // 순서가 A, B, C 일경우 A 를 필터해서 지우는건 가능한데, C를 필터해서 지우는게 안되네...
+                                
                 
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
                     
                     print("delete하기 바로 직전에 여기에는 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
-
                     // Always apply updates in the following order: deletions, insertions, then modifications.
                     // Handling insertions before deletions may result in unexpected behavior.
                     tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                    print("delete하기 바로 후엔 여기에는 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
+
                     tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
                     
 
                 }, completion: { finished in
+                    print("complete 되고 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
 
                 })
                 
@@ -548,6 +554,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             
             let thisId = habit.id
+            
             
             try! self.localRealm.write {
                 

@@ -393,6 +393,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //        print(realm)
         
         delegate?.editComp()
+        
         self.dismiss(animated: true, completion: nil)
     }
     
