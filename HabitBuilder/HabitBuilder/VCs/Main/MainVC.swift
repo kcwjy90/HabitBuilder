@@ -267,15 +267,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if habitSearched {
-            print("search 됨")
+            print("search 됨 \(searchedHabits.count)")
 
 // 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
-
 
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
 
         } else {
-            print("search 안됨")
+            print("search 안됨 \(habits.count)")
             return habits.count
         }
     }
