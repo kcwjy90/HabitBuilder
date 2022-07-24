@@ -137,10 +137,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
         
         filterTodaysHabit()
         
-        
-        
-        realmNoti()
-        
+        //문제는 여기다가 realmNoti()를 적용한 탓이었어!!!!!!!!!
         
     }
     
@@ -192,7 +189,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
                 }
                 print("Searched 되기전 old rr.count - \(rr.count)")
                 (rr) = rrUpdateAfterFilter() // updating rr so we are targeting filtered realm that only shows searched items
-                print("searched 된후 new new rr.count - \(rr.count)")
+                print("searched 된후 new rr.count - \(rr.count)")
                 
                 
             } else {
@@ -211,6 +208,9 @@ extension MainVC: NewHabitVCDelegate {
         //이거넣으니까 된다! 미쳤다
         filterTodaysHabit()
         
+        realmNoti() //여기도 이게 들어가야 되네!
+
+        
     }
 }
 
@@ -220,6 +220,8 @@ extension MainVC: habitDetailVCDelegate {
         
         print("editComp 에서 막 들어온 numberOfRows- \(todaysHabitTableView.numberOfRows(inSection: 0))")
         filterTodaysHabit() // 7/19 HabitDetailVC에서 일단 Success를 누르면 tableview가 로드 될때 에러가 안나게 해줌.
+        
+        realmNoti()
         
         //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
 //        if habitSearched {
@@ -330,6 +332,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         self.todaysHabitTableView.reloadData() // search 했고 안했고를 반영해주는 reload
     }
     
+//MARK: Realm Notification function
     func realmNoti() {
         
         let today = Date()
@@ -346,7 +349,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //rr = realm when it's not searched
         rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
-                        
+                
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = rr.observe { [weak self] (changes: RealmCollectionChange) in
             print("noti 들어와서 rr.count= \(self?.rr.count)")
@@ -390,6 +393,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
+//MARK: rr Functio to update AFTER filtered
     func rrUpdateAfterFilter () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
         
         let today = Date()
@@ -408,7 +412,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 ($0.title.contains(searchedT, options: .caseInsensitive))
             }
             
-//            print("true - \(rr.count)")
             print("새로운 rr= \(rr)")
         }
         return(rr)
