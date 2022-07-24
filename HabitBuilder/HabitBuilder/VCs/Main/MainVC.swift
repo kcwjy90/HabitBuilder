@@ -190,10 +190,9 @@ class MainVC: UIViewController, UISearchBarDelegate {
                     //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
                     return habit.title.lowercased().contains(searchedT.lowercased())
                 }
-                print("ole\(rr.count)")
-                print("여긴가")
-                (rr) = after() // updating rr so we are targeting filtered realm that only shows searched items
-                print("new\(rr.count)")
+                print("Searched 되기전 old rr.count - \(rr.count)")
+                (rr) = rrUpdateAfterFilter() // updating rr so we are targeting filtered realm that only shows searched items
+                print("searched 된후 new new rr.count - \(rr.count)")
                 
                 
             } else {
@@ -219,7 +218,7 @@ extension MainVC: NewHabitVCDelegate {
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
         
-        print(todaysHabitTableView.numberOfRows(inSection: 0))
+        print("editComp 에서 막 들어온 numberOfRows- \(todaysHabitTableView.numberOfRows(inSection: 0))")
         filterTodaysHabit() // 7/19 HabitDetailVC에서 일단 Success를 누르면 tableview가 로드 될때 에러가 안나게 해줌.
         
         //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
@@ -253,7 +252,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             habit = habits[indexPath.row]
         }
         
-        print(indexPath.row)
+        print("지금 tap 헀음. 현제 IndexPath.row는 \(indexPath.row)")
         
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
@@ -267,14 +266,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if habitSearched {
-            print("search 됨 \(searchedHabits.count)")
+            print("search 됨 - searchedHabtits.count =  \(searchedHabits.count)")
 
 // 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
 
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
 
         } else {
-            print("search 안됨 \(habits.count)")
+            print("search 안됨 - habits.count =  \(habits.count)")
             return habits.count
         }
     }
@@ -324,6 +323,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             searchedHabits = habits.filter { habit in
                 return habit.title.lowercased().contains(searchText.lowercased())
             }
+            
         } else {
             habitSearched = false
         }
@@ -349,10 +349,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         notificationToken = rr.observe { [weak self] (changes: RealmCollectionChange) in
-            print("noti 들어와서= \(self?.rr.count)")
+            print("noti 들어와서 rr.count= \(self?.rr.count)")
             guard let tableView = self?.todaysHabitTableView else { return }
-            print("지금 여기 몇개의 로우가 있을까요? - \(tableView.numberOfRows(inSection: 0))")
-            print("지우기 바로 전 rr 은 - \(self?.rr)")
+            print("아직 .update 가기전 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
+            print("지우기 바로 전 rr의 값은 - \(self?.rr)")
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI
@@ -363,18 +363,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
                     
-                    print("delete하기 바로 직전에 여기에는 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
+                    print("delete하기 바로 직전 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
                     // Always apply updates in the following order: deletions, insertions, then modifications.
                     // Handling insertions before deletions may result in unexpected behavior.
                     tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    print("delete하기 바로 후엔 여기에는 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
+                    print("delete하기 바로 후엔 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
 
                     tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
                     
 
                 }, completion: { finished in
-                    print("complete 되고 과연 몇개가? - \(tableView.numberOfRows(inSection: 0))")
+                    print("complete 하고 나서 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
 
                 })
                 
@@ -384,13 +384,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 fatalError("\(error)")
             }
             
-            print("끝나고 나니 여기 로우가 이만큼 있네요 - \(tableView.numberOfRows(inSection: 0))")
+            print("realmNoti func이 완전히 끝나고 numberOfRows- \(tableView.numberOfRows(inSection: 0))")
 
         }
     }
     
     
-    func after () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
+    func rrUpdateAfterFilter () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
         
         let today = Date()
         
@@ -410,10 +410,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
 //            print("true - \(rr.count)")
             print("새로운 rr= \(rr)")
-            
-
         }
-        
         return(rr)
         
     }
@@ -421,7 +418,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        print(indexPath.row)
+//        print(indexPath.row)
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -442,7 +439,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             try! self.localRealm.write {
                 taskToUpdate.success += 1
             }
-            print(self.localRealm.objects(RMO_Count.self))
+            print("Success 한 count - \(self.localRealm.objects(RMO_Count.self))")
             
             var habit: RMO_Habit
             
