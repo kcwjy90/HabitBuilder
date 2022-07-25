@@ -20,7 +20,8 @@ enum NewHabitVCStatus {
 }
 
 
-class MainVC: UIViewController {
+
+class MainVC: UIViewController, UISearchBarDelegate {
     
     let localRealm = DBManager.SI.realm!
     
@@ -42,6 +43,13 @@ class MainVC: UIViewController {
     lazy var backView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
+        return v
+    }()
+    
+    // searchBar 생성
+    lazy var searchBar : UISearchBar = {
+        let v = UISearchBar()
+        v.searchBarStyle = .minimal
         return v
     }()
     
@@ -74,17 +82,25 @@ class MainVC: UIViewController {
         return v
     }()
     
+    // habit이 검색됨에 따라 tableView에 보여지는걸 다르게 하기 위해서
+    var habitSearched: Bool = false
+    var searchedT: String = ""
+    
     // RMO_Habit에서 온 data를 넣을 empty한 array들
-    var habits: Results<RMO_Habit>? = nil
+    var habits: [RMO_Habit] = []
+    var searchedHabits: [RMO_Habit] = []
     
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
         
         setNaviBar()
-                
+        
+        searchBar.delegate = self
+        
         view.addSubview(backView)
         view.backgroundColor = .white
+        backView.addSubview(searchBar)
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -94,9 +110,16 @@ class MainVC: UIViewController {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
+        // searchBar grid
+        searchBar.snp.makeConstraints { (make) in
+            make.top.left.right.equalTo(backView)
+            make.height.equalTo(44)
+        }
+        
         // dateLabelBackView backveiw grid
         dateLabelBackView.snp.makeConstraints{ (make) in
-            make.top.left.right.equalTo(backView)
+            make.top.equalTo(searchBar.snp.bottom)
+            make.left.right.equalTo(backView)
             make.height.equalTo(52)
         }
         
@@ -112,7 +135,9 @@ class MainVC: UIViewController {
             make.left.right.bottom.equalTo(backView)
         }
         
-        realmNoti()
+        filterTodaysHabit()
+        
+        //문제는 여기다가 realmNoti()를 적용한 탓이었어!!!!!!!!!
         
     }
     
@@ -144,6 +169,34 @@ class MainVC: UIViewController {
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
+    //MARK: Filter to only display Habits with Today's Habit
+    func filterTodaysHabit() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let todaysDate = dateFormatter.string(from: Date())
+        
+        habits = localRealm.objects(RMO_Habit.self).filter {
+            habit in
+            return dateFormatter.string(from:habit.date) == todaysDate
+        }
+        
+        if habitSearched {
+            
+            if searchedHabits.count != 0 {
+                searchedHabits = habits.filter { habit in
+                    //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+                    return habit.title.lowercased().contains(searchedT.lowercased())
+                }
+                print("Searched 되기전 old rr.count - \(rr.count)")
+                (rr) = rrUpdateAfterFilter() // updating rr so we are targeting filtered realm that only shows searched items
+                print("searched 된후 new rr.count - \(rr.count)")
+                
+                
+            } else {
+                return
+            }
+        }
+    }
 }
 
 
@@ -152,6 +205,12 @@ class MainVC: UIViewController {
 extension MainVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
         
+        //이거넣으니까 된다! 미쳤다
+        filterTodaysHabit()
+        
+        realmNoti() //여기도 이게 들어가야 되네!
+
+        
     }
 }
 
@@ -159,6 +218,24 @@ extension MainVC: NewHabitVCDelegate {
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
         
+        print("editComp 에서 막 들어온 numberOfRows- \(todaysHabitTableView.numberOfRows(inSection: 0))")
+        filterTodaysHabit() // 7/19 HabitDetailVC에서 일단 Success를 누르면 tableview가 로드 될때 에러가 안나게 해줌.
+        
+        realmNoti()
+        
+        //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
+//        if habitSearched {
+//            searchedHabits = habits.filter { habit in
+//                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+//                return habit.title.lowercased().contains(searchedT.lowercased())
+//            }
+//            self.todaysHabitTableView.reloadData()
+//        }
+        //        }  else {
+        //            self.reloadData()
+        //        }
+        //위에것이 있음으로 더 이상 이것은 필요가 없어졌다=================
+
     }
 }
 
@@ -168,10 +245,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
-        guard let habit = habits?[indexPath.row] else { return }
-        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        var habit: RMO_Habit
         
-            
+        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
+        if habitSearched {
+            habit = searchedHabits[indexPath.row]
+        } else {
+            habit = habits[indexPath.row]
+        }
+        
+        print("지금 tap 헀음. 현제 IndexPath.row는 \(indexPath.row)")
+        
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         habitDetailVC.delegate = self
@@ -183,8 +267,17 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let habitList = self.habits else { return 0 }
-        return habitList.count
+        if habitSearched {
+            print("search 됨 - searchedHabtits.count =  \(searchedHabits.count)")
+
+// 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
+
+            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+
+        } else {
+            print("search 안됨 - habits.count =  \(habits.count)")
+            return habits.count
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -193,24 +286,53 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell,
-              let habitList = self.habits
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
         else {
             return UITableViewCell()
         }
         
-        let newHabit = habitList[indexPath.row]
-        let title = newHabit.title
-        let desc = newHabit.desc
-        
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
-        
+        if habitSearched {
+            
+            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            let title = newHabit.title
+            let desc = newHabit.desc
+            
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+            
+        } else {
+            
+            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            let title = newHabit.title
+            let desc = newHabit.desc
+            
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+            
+        }
         return cell
     }
     
+    //MARK: SearchBar
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        searchedHabits = []
+        
+        if searchText != "" {
+            habitSearched = true
+            searchedT = searchText //search한 text를 저장.
+            
+            searchedHabits = habits.filter { habit in
+                return habit.title.lowercased().contains(searchText.lowercased())
+            }
+            
+        } else {
+            habitSearched = false
+        }
+        self.todaysHabitTableView.reloadData() // search 했고 안했고를 반영해주는 reload
+    }
     
-    //MARK: Realm Notification function
+//MARK: Realm Notification function
     func realmNoti() {
         
         let today = Date()
@@ -219,40 +341,44 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             year: Calendar.current.component(.year, from: today),
             month: Calendar.current.component(.month, from: today),
             day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
-              
-                let endOfToday = Calendar.current.date(from: DateComponents(
-                    year: Calendar.current.component(.year, from: today),
-                    month: Calendar.current.component(.month, from: today),
-                    day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+              let endOfToday = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: today),
+                month: Calendar.current.component(.month, from: today),
+                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
         else { return }
         
-
-        habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
-        
+        //rr = realm when it's not searched
+        rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+                
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
-        guard let hList = self.habits else {return}
-        notificationToken = hList.observe { [weak self] (changes: RealmCollectionChange) in
+        notificationToken = rr.observe { [weak self] (changes: RealmCollectionChange) in
+            print("noti 들어와서 rr.count= \(self?.rr.count)")
             guard let tableView = self?.todaysHabitTableView else { return }
-            
+            print("아직 .update 가기전 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
+            print("지우기 바로 전 rr의 값은 - \(self?.rr)")
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI
                 tableView.reloadData()
             case .update(_, let deletions, let insertions, let modifications):
-                
+                                
                 
                 // Query results have changed, so apply them to the UITableView
                 tableView.performBatchUpdates({
                     
+                    print("delete하기 바로 직전 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
                     // Always apply updates in the following order: deletions, insertions, then modifications.
                     // Handling insertions before deletions may result in unexpected behavior.
                     tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                    print("delete하기 바로 후엔 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
+
                     tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
                     tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
                     
-                    
+
                 }, completion: { finished in
-                    
+                    print("complete 하고 나서 numberOfRows - \(tableView.numberOfRows(inSection: 0))")
+
                 })
                 
                 
@@ -261,15 +387,41 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 fatalError("\(error)")
             }
             
+            print("realmNoti func이 완전히 끝나고 numberOfRows- \(tableView.numberOfRows(inSection: 0))")
+
         }
     }
     
     
-    
+//MARK: rr Functio to update AFTER filtered
+    func rrUpdateAfterFilter () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
+        
+        let today = Date()
+        
+        let beginningOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0))
+        let endOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+        
+        if habitSearched == true {
+             rr = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).where {
+                ($0.title.contains(searchedT, options: .caseInsensitive))
+            }
+            
+            print("새로운 rr= \(rr)")
+        }
+        return(rr)
+        
+    }
     
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
+//        print(indexPath.row)
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -294,8 +446,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             var habit: RMO_Habit
             
-            guard let h = self.habits else {return}
-            habit = h[indexPath.row]
+            if self.habitSearched {
+                habit = self.searchedHabits[indexPath.row]
+            } else {
+                habit = self.habits[indexPath.row]
+            }
             
             let thisId = habit.id
             
@@ -307,6 +462,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 self.localRealm.delete(deleteHabit)
             }
             
+            //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드+++Realm noti 가 있음으로 밑에게 필요가 없어짐.
+            //            tableView.beginUpdates()
+            //            self.searchedHabits.remove(at: indexPath.row)
+            //            tableView.deleteRows(at: [indexPath], with: .fade)
+            //            tableView.endUpdates()
+            //            actionPerformed(true)
+            self.filterTodaysHabit() //이거를 넣으니까 search 한상태에서 habit을 없애도 에러가 안남
         }
         success.backgroundColor = .systemBlue
         
@@ -335,10 +497,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
                 var habit: RMO_Habit
                 
-                guard let h = self.habits else {return}
-                habit = h[indexPath.row]
-                
-                
+                if self.habitSearched {
+                    habit = self.searchedHabits[indexPath.row]
+                    
+                } else {
+                    habit = self.habits[indexPath.row]
+                    
+                }
                 
                 let thisId = habit.id
                 
@@ -349,6 +514,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     }
                     self.localRealm.delete(deleteHabit)
                 }
+                
+                self.filterTodaysHabit()
+                
                 
             }))
             
@@ -376,10 +544,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             var habit: RMO_Habit
             
-            guard let h = self.habits else {return}
-            habit = h[indexPath.row]
-            
-            
+            if self.habitSearched {
+                habit = self.searchedHabits[indexPath.row]
+                
+            } else {
+                habit = self.habits[indexPath.row]
+                
+            }
             
             let thisId = habit.id
             
@@ -392,6 +563,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 self.localRealm.delete(deleteHabit)
             }
             
+            self.filterTodaysHabit()
         }
         fail.backgroundColor = .systemRed
         
@@ -409,3 +581,4 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
 
 
+//7/5 - 1) delete 하면 noti도 사라지는거 2) delete하는 방식을 바꿈 - habitDetailVC 에 button들을 만들어서 success or fail

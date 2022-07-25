@@ -63,6 +63,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         
         view.addSubview(backView)
+        view.backgroundColor = .white
         backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
