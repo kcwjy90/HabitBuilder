@@ -46,11 +46,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          progressVC.title = "Progress"
          progressVC.tabBarItem.image = UIImage(named: "progress")
          
+         let searchVC = searchVC()
+         let searchNavi = UINavigationController(rootViewController: searchVC)
+         searchVC.title = "Search Habits"
+         searchVC.tabBarItem.image = UIImage(named: "search")
+
+         
 //         settingVC.tabBarItem = UITabBarItem(tabBarSystemItem: .contacts, tag: 0)
                 
          self.window!.rootViewController = tabBarController
          
-         tabBarController.setViewControllers([defaultNavi, allHabitsNavi, progressNavi], animated: false)
+         tabBarController.setViewControllers([defaultNavi, allHabitsNavi, searchNavi, progressNavi], animated: false)
          
                   
          self.window!.makeKeyAndVisible()

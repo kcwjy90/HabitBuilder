@@ -14,11 +14,18 @@ import SwiftUI
 class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
     let localRealm = DBManager.SI.realm!
-    
+
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
+        return v
+    }()
+    
+    // searchBar 생성
+    lazy var searchBar : UISearchBar = {
+        let v = UISearchBar()
+        v.searchBarStyle = .minimal
         return v
     }()
     
@@ -32,7 +39,13 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    // search 됐느냐 안됐느냐에 따라 section이 다르게 나누기 위해.
+    var habitSearched: Bool = false
+    
+    // Different RMO_Habits vars are needed to divide habits into different sections by date and also filter when Habit is searched
     var habits: [RMO_Habit] = []
+    var searchedHabits: [RMO_Habit] = []
+    var searchedT: String = ""
     
     var sectionedHabit = [Date:Results<RMO_Habit>]() // section하기 위해서
     var itemDates = [Date]() //이것도 section하기 위해서
@@ -47,8 +60,11 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         
         setNaviBar()
         
+        searchBar.delegate = self
+        
         view.addSubview(backView)
         view.backgroundColor = .white
+        backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
         // BackView size grid
@@ -56,9 +72,16 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
+        // searchBar size grid
+        searchBar.snp.makeConstraints { (make) in
+            make.top.left.right.equalTo(backView)
+            make.height.equalTo(44)
+        }
+        
         // allHabitsTableView size grid
         allHabitsTableView.snp.makeConstraints { (make) in
-            make.top.left.right.bottom.equalTo(backView)
+            make.top.equalTo(searchBar.snp.bottom)
+            make.left.right.bottom.equalTo(backView)
         }
         
         reloadData()
@@ -101,6 +124,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     func reloadData() {
         // Get all habits in the realm
         habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+        searchedHabits = habits
         createSection() // Section을 다시 reload해서 만약 날짜가 edit 되었으면 section도 update시킴
         allHabitsTableView.reloadData()
     }
@@ -154,57 +178,67 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
 //MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
 extension AllHabitsVC: NewHabitVCDelegate {
     func didCreateNewHabit () {
-        //        //        print("HabitVC - title : \(title), detail: \(desc)")
-        //
-        //        // Get new habit from RMO_Habit
-        //        let newHabit = RMO_Habit()
-        //        newHabit.title = title
-        //        newHabit.desc = desc
-        //        newHabit.date = date
-        //
-        //        let dateFormatter = DateFormatter()
-        //        dateFormatter.dateFormat = "MM/dd/yyyy"
-        //        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
-        //        let countRealm = localRealm.objects(RMO_Count.self)
-        //
-        //        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
-        //        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
-        //        if !countRealm.contains(where: { $0.date == habitDate} )
-        //        {
-        //            let newCount = RMO_Count()
-        //            newCount.date = habitDate
-        //
-        //            try! localRealm.write {
-        //                localRealm.add(newCount)
-        //                print("생성")
-        //                print(newCount)
-        //            }
-        //        }
-        //
-        //        try! localRealm.write {
-        //            localRealm.add(newHabit)
-        //        }
-        //
-        //        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
-        //        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
-        //        {return}
-        //        let existCount = countRealm[indexNumb]
-        //
-        //        try! localRealm.write {
-        //            existCount.total += 1
-        //            print("+1")
-        //            print(existCount)
-        //        }
-        //
-        //        createSection()
-        //        reloadData()
+//        //        print("HabitVC - title : \(title), detail: \(desc)")
+//        
+//        // Get new habit from RMO_Habit
+//        let newHabit = RMO_Habit()
+//        newHabit.title = title
+//        newHabit.desc = desc
+//        newHabit.date = date
+//        
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
+//        let countRealm = localRealm.objects(RMO_Count.self)
+//        
+//        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
+//        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+//        if !countRealm.contains(where: { $0.date == habitDate} )
+//        {
+//            let newCount = RMO_Count()
+//            newCount.date = habitDate
+//            
+//            try! localRealm.write {
+//                localRealm.add(newCount)
+//                print("생성")
+//                print(newCount)
+//            }
+//        }
+//        
+//        try! localRealm.write {
+//            localRealm.add(newHabit)
+//        }
+//        
+//        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
+//        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
+//        {return}
+//        let existCount = countRealm[indexNumb]
+//        
+//        try! localRealm.write {
+//            existCount.total += 1
+//            print("+1")
+//            print(existCount)
+//        }
+//        
+//        createSection()
+//        reloadData()
     }
 }
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension AllHabitsVC: habitDetailVCDelegate {
     func editComp() {
-        self.reloadData()
+        if habitSearched {
+            searchedHabits = habits.filter { habit in
+                //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
+                return habit.title.lowercased().contains(searchedT.lowercased())
+            }
+            habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+            createSection()
+            self.allHabitsTableView.reloadData()
+        } else {
+            self.reloadData()
+        }
     }
 }
 
@@ -217,7 +251,13 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         if habits.count == 0 {
             print("없음")
             return 0
+        }
+        
+        if habitSearched == true { //search 하고 있을때는 section 이 하나로
+            print("설치됨")
+            return 1
         } else {
+            print("설치는안돼")
             return itemDates.count //search 안할때는 itemDates 수에 따라서
         }
     }
@@ -228,15 +268,17 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return ""
         }
         
-        
-        if let data = sectionedHabit[itemDates[section]], let first = data.first { // search 날짜를 heading으로
-            let dateFormmater = DateFormatter()
-            dateFormmater.dateFormat = "MM/dd/YYYY"
-            return dateFormmater.string(from: first.date)
+        if habitSearched == true { //search 하고 있을때는 Heading 이 Search Result로
+            return ""
         } else {
-            return nil
+            if let data = sectionedHabit[itemDates[section]], let first = data.first { // search 날짜를 heading으로
+                let dateFormmater = DateFormatter()
+                dateFormmater.dateFormat = "MM/dd/YYYY"
+                return dateFormmater.string(from: first.date)
+            } else {
+                return nil
+            }
         }
-        
     }
     
     //MARK: searched vs unsearched에 따라 section안에 있는 cell 수가 나뉨.
@@ -245,12 +287,15 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return 0
         }
         
-        if let data = sectionedHabit[itemDates[section]] { // search
-            return data.count  // 안하면 sectionedHabit row number 를
+        if habitSearched == true {
+            return searchedHabits.count //serach 를 하면 searchedHabits row number 를
         } else {
-            return 0 //return 0 를 안넣으면 안되네 또..
+            if let data = sectionedHabit[itemDates[section]] { // search
+                return data.count  // 안하면 sectionedHabit row number 를
+            } else {
+                return 0 //return 0 를 안넣으면 안되네 또..
+            }
         }
-        
     }
     
     //MARK: cell을 tap 했을때 무슨일이 일어나나? data들이 HabitDetailVC로 날라간다.
@@ -262,13 +307,16 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return
         }
         
-        
-        
-        //옵셔널 벗기기 해서
-        if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
-            habit = sectionedData[indexPath.row]
+        if habitSearched == true {
+            print(indexPath.row)
+            habit = searchedHabits[indexPath.row]
+        } else {
+            
+            //옵셔널 벗기기 해서
+            if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
+                habit = sectionedData[indexPath.row]
+            }
         }
-        
         
         //이것을 guard let으로
         guard let gHabit = habit else {
@@ -300,15 +348,48 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }
         
-        
-        if let itemsForDate = sectionedHabit[itemDates[indexPath.section]] {
-            var habit = itemsForDate[indexPath.row]
-            cell.newHabitTitle.text = habit.title + " - "
-            cell.newHabitDesc.text = habit.desc
+        if habitSearched == true { //search 가 되었을경우는 searchedHabit 에서만 object를..
+            let newHabit = searchedHabits[indexPath.row]
+            var title = newHabit.title
+            let desc = newHabit.desc
+            let date = newHabit.date
+            
+            cell.newHabitTitle.text = title + " - "
+            cell.newHabitDesc.text = desc
+            
+        } else { //아닌경우는 groupedHabits에서 뽑아온다
+            if let itemsForDate = sectionedHabit[itemDates[indexPath.section]] {
+                var habit = itemsForDate[indexPath.row]
+                cell.newHabitTitle.text = habit.title + " - "
+                cell.newHabitDesc.text = habit.desc
+            }
         }
-        
         return cell
     }
+    
+    //MARK: searchBar가 비어있느냐 안 비어있느냐에 따라 display되는 habit이 다름
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        searchedHabits = [] //비어있는 searchedHabits
+        let habits = localRealm.objects(RMO_Habit.self).toArray() // RMO_Habit 을 array로
+        
+        if searchText != "" { //만약 searchText가 비어있지 않으면
+            habitSearched = true
+            searchedT = searchText //search한 text를 저장.
+            
+            searchedHabits = habits.filter { habit in //searchedHabits은 Habit 을 filter한것과 =
+                return habit.title.lowercased().contains(searchText.lowercased()) //filter내용은 title = searchText
+            }
+        } else {
+            self.searchedHabits = self.habits // searchText가 비어 있으면 searchedHabits = habits.
+            habitSearched = false
+            
+        }
+        self.allHabitsTableView.reloadData() //tableView를 reload
+    }
+    
+    
+    
     
     
     
@@ -326,48 +407,68 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                 return
             }
             
-            
-            
-            let realm = localRealm.objects(RMO_Habit.self)
-            
-            var habit: RMO_Habit?
-            var toArray: [RMO_Habit]?
-            
-            
-            if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
-                habit = sectionedData[indexPath.row]
-            }
-            
-            guard let gHabit = habit else {
-                print("error")
-                return
-            }
-            
-            //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
-            if let sectionedArray = sectionedHabit[itemDates[indexPath.section]] {
-                toArray = sectionedArray.toArray()
-            }
-            
-            guard var gToArray = toArray else {
-                print("error")
-                return
-            }
-            
-            let thisId = gHabit.id
-            
-            try! localRealm.write {
-                let deleteHabit = realm.where {
-                    $0.id == thisId
+            if habitSearched == true {
+                
+                let realm = localRealm.objects(RMO_Habit.self)
+                let habit = searchedHabits[indexPath.row]
+                let thisId = habit.id
+                
+                try! localRealm.write {
+                    
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    localRealm.delete(deleteHabit)
+                    
+                    //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                    tableView.beginUpdates()
+                    searchedHabits.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    tableView.endUpdates()
                 }
-                localRealm.delete(deleteHabit)
+                
+            } else {
+                
+                let realm = localRealm.objects(RMO_Habit.self)
+                
+                var habit: RMO_Habit?
+                var toArray: [RMO_Habit]?
+                
+                
+                if let sectionedData = sectionedHabit[itemDates[indexPath.section]] {
+                    habit = sectionedData[indexPath.row]
+                }
+                
+                guard let gHabit = habit else {
+                    print("error")
+                    return
+                }
+                
+                //일단 toArray로 해야만 .remove를 쓸수 있기 때문에 이렇게 꼭 써야하고, 왜 인지는 모르겠는데 toArray를 try!localRealm.write 코드 아래에서 실행할경우 마지막 row를 지울떄 error가 남
+                if let sectionedArray = sectionedHabit[itemDates[indexPath.section]] {
+                    toArray = sectionedArray.toArray()
+                }
+                
+                guard var gToArray = toArray else {
+                    print("error")
+                    return
+                }
+                
+                let thisId = gHabit.id
+                
+                try! localRealm.write {
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    localRealm.delete(deleteHabit)
+                }
+                
+                tableView.beginUpdates()
+                gToArray.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.endUpdates()
+                
             }
-            
-            tableView.beginUpdates()
-            gToArray.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.endUpdates()
-            
-            
         }
     }
 }
