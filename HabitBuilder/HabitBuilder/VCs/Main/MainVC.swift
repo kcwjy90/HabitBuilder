@@ -24,9 +24,6 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
-    //임시방편으로 이렇게 declare하고
-    var rr = DBManager.SI.realm!.objects(RMO_Habit.self)
-    
     //realm Noti 에서 쓰는거
     deinit {
         print("deinit - NewHabitVC")
@@ -36,7 +33,6 @@ class MainVC: UIViewController {
     //realm Noti 에서 쓰는거
     var status: NewHabitVCStatus = .initialize
     var notificationToken: NotificationToken? = nil
-    
     
     // backView 생성
     lazy var backView: UIView = {
@@ -74,7 +70,7 @@ class MainVC: UIViewController {
         return v
     }()
     
-    // RMO_Habit에서 온 data를 넣을 empty한 array들
+    // RMO_Habit에서 온 data를 result로 가져온다?
     var habits: Results<RMO_Habit>? = nil
     
     //MARK: ViewController Life Cycle
@@ -82,7 +78,7 @@ class MainVC: UIViewController {
         super.loadView()
         
         setNaviBar()
-                
+        
         view.addSubview(backView)
         view.backgroundColor = .white
         backView.addSubview(dateLabelBackView)
@@ -136,6 +132,7 @@ class MainVC: UIViewController {
         todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
+    
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
@@ -155,7 +152,7 @@ extension MainVC: NewHabitVCDelegate {
     }
 }
 
-//MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
+//MARK: HabitDetail에서 Habit을 수정 할경우.
 extension MainVC: habitDetailVCDelegate {
     func editComp() {
         
@@ -166,12 +163,10 @@ extension MainVC: habitDetailVCDelegate {
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
         guard let habit = habits?[indexPath.row] else { return }
+                
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        
-            
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         habitDetailVC.delegate = self
@@ -210,7 +205,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
-    //MARK: Realm Notification function
+//MARK: Realm Notification function
     func realmNoti() {
         
         let today = Date()
@@ -220,13 +215,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             month: Calendar.current.component(.month, from: today),
             day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
               
-                let endOfToday = Calendar.current.date(from: DateComponents(
-                    year: Calendar.current.component(.year, from: today),
-                    month: Calendar.current.component(.month, from: today),
-                    day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+            let endOfToday = Calendar.current.date(from: DateComponents(
+            year: Calendar.current.component(.year, from: today),
+            month: Calendar.current.component(.month, from: today),
+            day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+       
         else { return }
         
-
+        
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
@@ -252,19 +248,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     
                     
                 }, completion: { finished in
-                    
                 })
-                
                 
             case .error(let error):
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")
             }
-            
         }
     }
-    
-    
     
     
     //MARK: SWIPE action
