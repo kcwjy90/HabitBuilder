@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 class searchVC: UIViewController, UISearchBarDelegate {
     
@@ -42,9 +43,8 @@ class searchVC: UIViewController, UISearchBarDelegate {
     var searchedT: String = ""
     
     // RMO_Habit에서 온 data를 넣을 empty한 array들
-    var habits: [RMO_Habit] = []
-    var searchedHabits: [RMO_Habit] = []
-    
+    var habits: Results<RMO_Habit>? = nil
+        
     
     override func loadView() {
         super.loadView()
@@ -101,8 +101,7 @@ class searchVC: UIViewController, UISearchBarDelegate {
     //MARK: tableView reload 시킴
     func reloadData() {
         // Get all habits in the realm
-        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        searchedHabits = habits
+        habits = self.localRealm.objects(RMO_Habit.self)
         searchedTableView.reloadData()
     }
     
@@ -120,18 +119,9 @@ extension searchVC: habitDetailVCDelegate {
 extension searchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
-        
-        var habit: RMO_Habit
-        
+
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        if habitSearched {
-            habit = searchedHabits[indexPath.row]
-        } else {
-            habit = habits[indexPath.row]
-        }
-        
-        print("지금 tap 헀음. 현제 IndexPath.row는 \(indexPath.row)")
+        guard let habit = habits?[indexPath.row] else { return }
         
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
@@ -145,17 +135,16 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if habitSearched {
-            print("search 됨 - searchedHabtits.count =  \(searchedHabits.count)")
-            
-            // 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
-            
-            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
-            
+            habits = self.localRealm.objects(RMO_Habit.self).where {
+                ($0.title.contains(searchedT, options: .caseInsensitive))
+            }
         } else {
-            print("search 안됨 - habits.count =  \(habits.count)")
-            return habits.count
+            habits = self.localRealm.objects(RMO_Habit.self)
         }
+        return habits!.count
+        
     }
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
@@ -170,7 +159,10 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
         
         if habitSearched {
             
-            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            habits = self.localRealm.objects(RMO_Habit.self).where {
+                ($0.title.contains(searchedT, options: .caseInsensitive))
+            }
+            let newHabit = habits![indexPath.row]
             let title = newHabit.title
             let desc = newHabit.desc
             
@@ -179,7 +171,8 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
             
         } else {
             
-            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
+            habits = self.localRealm.objects(RMO_Habit.self)
+            let newHabit = habits![indexPath.row]
             let title = newHabit.title
             let desc = newHabit.desc
             
@@ -193,19 +186,40 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: SearchBar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
-        searchedHabits = []
+        habits = self.localRealm.objects(RMO_Habit.self)
         
         if searchText != "" {
             habitSearched = true
             searchedT = searchText //search한 text를 저장.
             
-            searchedHabits = habits.filter { habit in
-                return habit.title.lowercased().contains(searchText.lowercased())
+            habits = self.localRealm.objects(RMO_Habit.self).where {
+                ($0.title.contains(searchedT, options: .caseInsensitive))
             }
-            
         } else {
+            
             habitSearched = false
         }
+        
+        
         self.searchedTableView.reloadData() // search 했고 안했고를 반영해주는 reload
     }
+    
+    
+    //MARK: rr Functio to update AFTER filtered
+    //        func rrUpdateAfterFilter () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
+    //
+    //
+    //            if habitSearched == true {
+    //                 hbs = self.localRealm.objects(RMO_Habit.self).where {
+    //                    ($0.title.contains(searchedT, options: .caseInsensitive))
+    //                }
+    //
+    //                print("새로운 rr= \(hbs)")
+    //            }
+    //
+    //            //FIXME: 고쳐야함
+    //            return(hbs!)
+    //
+    //        }
+    
 }
