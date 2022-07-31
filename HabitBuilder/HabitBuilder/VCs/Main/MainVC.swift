@@ -136,27 +136,10 @@ class MainVC: UIViewController {
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
-        v.delegate = self
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
-}
-
-
-//Extension 은 항상 class 밖에
-//MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
-extension MainVC: NewHabitVCDelegate {
-    func didCreateNewHabit () {
-        
-    }
-}
-
-//MARK: HabitDetail에서 Habit을 수정 할경우.
-extension MainVC: habitDetailVCDelegate {
-    func editComp() {
-        
-    }
 }
 
 //Adding tableview and content
@@ -169,7 +152,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
-        habitDetailVC.delegate = self
         
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)
@@ -178,8 +160,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let habitList = self.habits else { return 0 }
-        return habitList.count
+        guard let theHabits = self.habits else { return 0 }
+        return theHabits.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -189,12 +171,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell,
-              let habitList = self.habits
+              let theHabits = self.habits
         else {
             return UITableViewCell()
         }
         
-        let newHabit = habitList[indexPath.row]
+        let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
         
@@ -226,8 +208,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
-        guard let hList = self.habits else {return}
-        notificationToken = hList.observe { [weak self] (changes: RealmCollectionChange) in
+        guard let theHabits = self.habits else {return}
+        notificationToken = theHabits.observe { [weak self] (changes: RealmCollectionChange) in
             guard let tableView = self?.todaysHabitTableView else { return }
             
             switch changes {
