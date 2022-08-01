@@ -17,6 +17,17 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     
     let localRealm = DBManager.SI.realm!
 
+    //realm Noti 에서 쓰는거
+    deinit {
+        print("deinit - NewHabitVC")
+        notificationToken?.invalidate()
+    }
+    
+    //realm Noti 에서 쓰는거
+    var status: NewHabitVCStatus = .initialize
+    var notificationToken: NotificationToken? = nil
+    
+    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -67,6 +78,8 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         }
         todayPiChart.center = backView.center
         
+//        realmNoti()
+
     }
     
     //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted

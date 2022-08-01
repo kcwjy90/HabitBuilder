@@ -15,6 +15,16 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
     let localRealm = DBManager.SI.realm!
     
+    //realm Noti 에서 쓰는거
+    deinit {
+        print("deinit - NewHabitVC")
+        notificationToken?.invalidate()
+    }
+    
+    //realm Noti 에서 쓰는거
+    var status: NewHabitVCStatus = .initialize
+    var notificationToken: NotificationToken? = nil
+    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -32,6 +42,8 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
+    // RMO_Habit에서 온 data를 result로 가져온다?
+    var hbs: Results<RMO_Habit>? = nil
     var habits: [RMO_Habit] = []
     
     var sectionedHabit = [Date:Results<RMO_Habit>]() // section하기 위해서
@@ -310,6 +322,57 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    //MARK: Realm Notification function
+        func realmNoti() {
+            
+            let today = Date()
+            
+            guard let beginningOfToday = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: today),
+                month: Calendar.current.component(.month, from: today),
+                day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
+                  
+                let endOfToday = Calendar.current.date(from: DateComponents(
+                year: Calendar.current.component(.year, from: today),
+                month: Calendar.current.component(.month, from: today),
+                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+           
+            else { return }
+            
+            
+            hbs = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+            
+            //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
+            guard let theHabits = self.hbs else {return}
+            notificationToken = theHabits.observe { [weak self] (changes: RealmCollectionChange) in
+                guard let tableView = self?.allHabitsTableView else { return }
+                
+                switch changes {
+                case .initial:
+                    // Results are now populated and can be accessed without blocking the UI
+                    tableView.reloadData()
+                case .update(_, let deletions, let insertions, let modifications):
+                    
+                    
+                    // Query results have changed, so apply them to the UITableView
+                    tableView.performBatchUpdates({
+                        
+                        // Always apply updates in the following order: deletions, insertions, then modifications.
+                        // Handling insertions before deletions may result in unexpected behavior.
+                        tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                        tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
+                        tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
+                        
+                        
+                    }, completion: { finished in
+                    })
+                    
+                case .error(let error):
+                    // An error occurred while opening the Realm file on the background worker thread
+                    fatalError("\(error)")
+                }
+            }
+        }
     
     
     
