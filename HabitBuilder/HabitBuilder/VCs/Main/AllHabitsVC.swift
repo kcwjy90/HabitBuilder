@@ -50,6 +50,7 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     var itemDates = [Date]() //이것도 section하기 위해서
     
     
+    
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
@@ -73,9 +74,11 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
             make.top.left.right.bottom.equalTo(backView)
         }
         
+        realmNoti()
         reloadData()
         
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -104,7 +107,6 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
-        v.delegate = self
         v.modalPresentationStyle = .pageSheet // changed from fullscreen to pagesheet
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
@@ -226,7 +228,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section 수가 나뉨.
     func numberOfSections(in tableView: UITableView) -> Int {
-        if habits.count == 0 {
+        guard let theHabits = hbs else {return 0}
+        print(theHabits.count)
+        if theHabits.count == 0 {
             print("없음")
             return 0
         } else {
@@ -236,7 +240,10 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section title이 나뉨.
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if habits.count == 0 {
+        
+        
+        guard let theHabits = hbs else {return nil}
+        if theHabits.count == 0 {
             return ""
         }
         
@@ -253,7 +260,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: searched vs unsearched에 따라 section안에 있는 cell 수가 나뉨.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if habits.count == 0 {
+        guard let theHabits = hbs else {return 0}
+        if theHabits.count == 0 {
             return 0
         }
         
@@ -270,7 +278,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         
         var habit: RMO_Habit? //? optional 로 안하고 if let/guard let 쓰면 에러 뜸. "Initializer for conditional binding must have Optional type, not 'RMO_Habit'"
         
-        if habits.count == 0 {
+        guard let theHabits = hbs else {return}
+        if theHabits.count == 0 {
             return
         }
         
@@ -281,16 +290,11 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
             habit = sectionedData[indexPath.row]
         }
         
-        
         //이것을 guard let으로
-        guard let gHabit = habit else {
-            print("error")
-            return
-        }
+        guard let gHabit = habit else {return}
         
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: gHabit)
-        habitDetailVC.delegate = self
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)
     }
@@ -303,12 +307,13 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: cell에 넣을 정보를 어디서 뽑아 오는가?
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell,
+              let theHabits = self.hbs
         else {
             return UITableViewCell()
         }
         
-        if habits.count == 0 {
+        if theHabits.count == 0 {
             return cell
         }
         
@@ -325,22 +330,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: Realm Notification function
         func realmNoti() {
             
-            let today = Date()
-            
-            guard let beginningOfToday = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: today),
-                month: Calendar.current.component(.month, from: today),
-                day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
-                  
-                let endOfToday = Calendar.current.date(from: DateComponents(
-                year: Calendar.current.component(.year, from: today),
-                month: Calendar.current.component(.month, from: today),
-                day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
-           
-            else { return }
-            
-            
-            hbs = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+            createSection() // Section을 다시 reload해서 만약 날짜가 edit 되었으면 section도 update시킴
+
+            hbs = self.localRealm.objects(RMO_Habit.self)
             
             //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
             guard let theHabits = self.hbs else {return}
@@ -359,9 +351,9 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
                         
                         // Always apply updates in the following order: deletions, insertions, then modifications.
                         // Handling insertions before deletions may result in unexpected behavior.
-                        tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                        tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                        tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
+                        tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: $0)}), with: .automatic)
+                        tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: $0)}), with: .automatic)
+                        tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: $0) }), with: .automatic)
                         
                         
                     }, completion: { finished in
@@ -381,7 +373,8 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         return .delete
     }
     
-    //MARK: searched vs unsearched 상황에서 delete 하기
+
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             
