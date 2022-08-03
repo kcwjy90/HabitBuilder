@@ -1,29 +1,10 @@
-//
-//  searchVC.swift
-//  HabitBuilder
-//
-//  Created by ppc90 on 7/27/22.
-//  Copyright © 2022 CW. All rights reserved.
-//
-
 import UIKit
-import RealmSwift
 
 class searchVC: UIViewController, UISearchBarDelegate {
-    
+
     
     let localRealm = DBManager.SI.realm!
-    
-    //realm Noti 에서 쓰는거
-    deinit {
-        print("deinit - NewHabitVC")
-        notificationToken?.invalidate()
-    }
-    
-    //realm Noti 에서 쓰는거
-    var status: NewHabitVCStatus = .initialize
-    var notificationToken: NotificationToken? = nil
-    
+
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -53,12 +34,13 @@ class searchVC: UIViewController, UISearchBarDelegate {
     var searchedT: String = ""
     
     // RMO_Habit에서 온 data를 넣을 empty한 array들
-    var habits: Results<RMO_Habit>? = nil
+    var habits: [RMO_Habit] = []
+    var searchedHabits: [RMO_Habit] = []
     
     
     override func loadView() {
         super.loadView()
-        
+
         setNaviBar()
         
         searchBar.delegate = self
@@ -85,9 +67,15 @@ class searchVC: UIViewController, UISearchBarDelegate {
             make.left.right.bottom.equalTo(backView)
         }
         
-        realmNoti()
+        reloadData()
+
+        
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadData()
+    }
     
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
@@ -95,26 +83,51 @@ class searchVC: UIViewController, UISearchBarDelegate {
         title = "Search Habits"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
-        
+    
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
         // Swipe to dismiss tableView
         searchedTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
+    
+    //MARK: tableView reload 시킴
+    func reloadData() {
+        // Get all habits in the realm
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
+        searchedHabits = habits
+        searchedTableView.reloadData()
+    }
+    
+
 }
 
 
+extension searchVC: habitDetailVCDelegate {
+    func editComp() {
+        
+    }
+}
 
 //Adding tableview and content
 extension searchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
+        
+        var habit: RMO_Habit
         
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        guard let habit = habits?[indexPath.row] else { return }
+        if habitSearched {
+            habit = searchedHabits[indexPath.row]
+        } else {
+            habit = habits[indexPath.row]
+        }
+        
+        print("지금 tap 헀음. 현제 IndexPath.row는 \(indexPath.row)")
         
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
+        habitDetailVC.delegate = self
         
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)
@@ -124,19 +137,17 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if habitSearched {
-            habits = self.localRealm.objects(RMO_Habit.self).where {
-                ($0.title.contains(searchedT, options: .caseInsensitive))
-            }
-            
+            print("search 됨 - searchedHabtits.count =  \(searchedHabits.count)")
+
+// 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
+
+            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+
         } else {
-            habits = self.localRealm.objects(RMO_Habit.self)
+            print("search 안됨 - habits.count =  \(habits.count)")
+            return habits.count
         }
-        
-        guard let theHabits = habits else {return 0}
-        return theHabits.count
-        
     }
-    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
@@ -151,13 +162,7 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
         
         if habitSearched {
             
-            habits = self.localRealm.objects(RMO_Habit.self).where {
-                ($0.title.contains(searchedT, options: .caseInsensitive))
-            }
-            
-            guard let theHabits = habits else {return UITableViewCell()
-}
-            let newHabit = theHabits[indexPath.row]
+            let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
             
@@ -166,10 +171,7 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
             
         } else {
             
-            habits = self.localRealm.objects(RMO_Habit.self)
-            guard let theHabits = habits else {return UITableViewCell()}
-            
-            let newHabit = theHabits[indexPath.row]
+            let newHabit = habits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
             let title = newHabit.title
             let desc = newHabit.desc
             
@@ -182,86 +184,20 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: SearchBar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-                
+        
+        searchedHabits = []
+        
         if searchText != "" {
             habitSearched = true
             searchedT = searchText //search한 text를 저장.
             
-            habits = self.localRealm.objects(RMO_Habit.self).where {
-                ($0.title.contains(searchedT, options: .caseInsensitive))
+            searchedHabits = habits.filter { habit in
+                return habit.title.lowercased().contains(searchText.lowercased())
             }
-            
-            (habits) = habitsUpdatedAfterFilter()
-            print("habits after searched \(habits)")
             
         } else {
             habitSearched = false
-            habits = self.localRealm.objects(RMO_Habit.self)
-            print("habits not searched \(habits)")
-
         }
-        
-        self.searchedTableView.reloadData() // search 했고 안했고를 반영해주는 reload. 이건 아마 realm noti랑은 상관없는듯..왜냐 이건 realm 에 바뀐게 아니라, 지금 화면에 뜨는 tableView에 바뀌는것을 반영해주는 거니까
+        self.searchedTableView.reloadData() // search 했고 안했고를 반영해주는 reload
     }
-    
-    
-    
-    //MARK: Realm Notification function
-    func realmNoti() {
-        
-        print("여기는 뭘까요 \(habits)")
-
-        habits = self.localRealm.objects(RMO_Habit.self)
-        
-        //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
-        guard let theHabits = self.habits else {return}
-        notificationToken = theHabits.observe { [weak self] (changes: RealmCollectionChange) in
-            guard let tableView = self?.searchedTableView else { return }
-            
-            print("여기는 뭘까요 \(self?.habits)")
-
-            
-            switch changes {
-            case .initial:
-                // Results are now populated and can be accessed without blocking the UI
-                tableView.reloadData()
-            case .update(_, let deletions, let insertions, let modifications):
-                
-                
-                // Query results have changed, so apply them to the UITableView
-                tableView.performBatchUpdates({
-                    
-                    // Always apply updates in the following order: deletions, insertions, then modifications.
-                    // Handling insertions before deletions may result in unexpected behavior.
-                    tableView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    tableView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                    tableView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
-                    
-                    
-                }, completion: { finished in
-                })
-                
-            case .error(let error):
-                // An error occurred while opening the Realm file on the background worker thread
-                fatalError("\(error)")
-            }
-        }
-    }
-    
-    func habitsUpdatedAfterFilter () -> (RealmSwift.Results<HabitBuilder.RMO_Habit>){
-        
-        if habitSearched == true {
-            habits = self.localRealm.objects(RMO_Habit.self).where {
-                ($0.title.contains(searchedT, options: .caseInsensitive))
-            }
-        }
-    
-            //FIXME: 고쳐야함
-        return(habits!)
-        
-    }
-    
 }
-
-
-
