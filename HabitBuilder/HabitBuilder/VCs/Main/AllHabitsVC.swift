@@ -165,63 +165,6 @@ class AllHabitsVC: UIViewController, UISearchBarDelegate {
     
 }
 
-//MARK: NewHabitVC에서 새로 생성된 habit들. RMO_Habit에 넣을 예정
-extension AllHabitsVC: NewHabitVCDelegate {
-    func didCreateNewHabit () {
-        //        //        print("HabitVC - title : \(title), detail: \(desc)")
-        //
-        //        // Get new habit from RMO_Habit
-        //        let newHabit = RMO_Habit()
-        //        newHabit.title = title
-        //        newHabit.desc = desc
-        //        newHabit.date = date
-        //
-        //        let dateFormatter = DateFormatter()
-        //        dateFormatter.dateFormat = "MM/dd/yyyy"
-        //        let habitDate = dateFormatter.string(from: date) // habitDate = 방금받은 habit의 date
-        //        let countRealm = localRealm.objects(RMO_Count.self)
-        //
-        //        //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
-        //        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
-        //        if !countRealm.contains(where: { $0.date == habitDate} )
-        //        {
-        //            let newCount = RMO_Count()
-        //            newCount.date = habitDate
-        //
-        //            try! localRealm.write {
-        //                localRealm.add(newCount)
-        //                print("생성")
-        //                print(newCount)
-        //            }
-        //        }
-        //
-        //        try! localRealm.write {
-        //            localRealm.add(newHabit)
-        //        }
-        //
-        //        //만약 RMO_Count에 지금 add하는 날짜의 object가 있을경우 그 total 을 +1 한다
-        //        guard let indexNumb = countRealm.firstIndex(where: { $0.date == habitDate}) else
-        //        {return}
-        //        let existCount = countRealm[indexNumb]
-        //
-        //        try! localRealm.write {
-        //            existCount.total += 1
-        //            print("+1")
-        //            print(existCount)
-        //        }
-        //
-        //        createSection()
-        //        reloadData()
-    }
-}
-
-//MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
-extension AllHabitsVC: habitDetailVCDelegate {
-    func editComp() {
-        self.reloadData()
-    }
-}
-
 
 //Adding tableview and content
 extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
