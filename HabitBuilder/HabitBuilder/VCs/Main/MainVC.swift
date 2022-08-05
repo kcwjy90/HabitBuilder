@@ -136,18 +136,10 @@ class MainVC: UIViewController {
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
-        //FIXME: 지원야한다
-        v.delegate = self
         v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
-}
-
-//FIXME: 지워야한다
-extension MainVC: NewHabitVCDelegate {
-    func didCreateNewHabit () {
-    }
 }
 
 //Adding tableview and content
@@ -186,10 +178,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
-        let desc = newHabit.desc
+        let date = newHabit.date
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let newHabitDate = dateFormatter.string(from: date)
         
         cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
+        cell.newHabitDesc.text = newHabitDate
         
         return cell
     }

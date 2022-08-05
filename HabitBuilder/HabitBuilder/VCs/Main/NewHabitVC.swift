@@ -9,19 +9,10 @@
 import UIKit
 import RealmSwift
 
-//MARK: Protocol to send newly created Habit to MainVC/AllHabitVC
-protocol NewHabitVCDelegate: AnyObject {
-    func didCreateNewHabit()
-}
-
-
 class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     //realm Noti 에서 쓰는거
     let localRealm = DBManager.SI.realm!
-    
-    // Delegate property var 생성
-    weak var delegate: NewHabitVCDelegate?
     
     // backview 생성
     lazy var backView: UIView = {
@@ -321,14 +312,10 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         try! localRealm.write {
             localRealm.add(habit)
-//            print("habit added to localrealm")
         }
         
         //MARK: adding notification to Scheduler
         NotificationManger.SI.addScheduleNoti(habit: habit)
-        
-        delegate?.didCreateNewHabit()         //to MainVC/AllHabitsVC
-//        print(localRealm.objects(RMO_Habit.self))
         dismiss(animated: true, completion: nil)
         
     }
