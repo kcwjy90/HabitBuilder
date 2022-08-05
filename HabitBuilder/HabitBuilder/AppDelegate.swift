@@ -32,15 +32,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          
          let mainVC = MainVC()
          let defaultNavi = UINavigationController(rootViewController: mainVC)
-         mainVC.title = "Habits"
+         mainVC.title = "Today's Habits"
          mainVC.tabBarItem.image = UIImage(named: "goals")
          
          
-         let allHabitsVC = AllHabitsVC()
-         let allHabitsNavi = UINavigationController(rootViewController: allHabitsVC)
-         allHabitsVC.title = "All Habits"
-         allHabitsVC.tabBarItem.image = UIImage(named: "all")
-         
+//         let allHabitsVC = AllHabitsVC()
+//         let allHabitsNavi = UINavigationController(rootViewController: allHabitsVC)
+//         allHabitsVC.title = "All Habits"
+//         allHabitsVC.tabBarItem.image = UIImage(named: "all")
+//
          let progressVC = ProgressVC()
          let progressNavi = UINavigationController(rootViewController: progressVC)
          progressVC.title = "Progress"
@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          
          let allHabitSearchVC = AllHabitSearchVC()
          let allHabitSearchNavi = UINavigationController(rootViewController: allHabitSearchVC)
-         allHabitSearchVC.title = "All Search"
+         allHabitSearchVC.title = "Search All Habits"
          allHabitSearchVC.tabBarItem.image = UIImage(named: "search")
 
          
@@ -61,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
                 
          self.window!.rootViewController = tabBarController
          
-         tabBarController.setViewControllers([defaultNavi, allHabitsNavi, allHabitSearchNavi, progressNavi], animated: false)
+         tabBarController.setViewControllers([defaultNavi, allHabitSearchNavi, progressNavi], animated: false)
          
                   
          self.window!.makeKeyAndVisible()

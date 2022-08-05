@@ -190,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				C0B2E8E527A11DC500BC03EB /* MainVC.swift */,
+				4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */,
 				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				485EA4C62834C99400C38387 /* ProgressVC.swift */,
 				480567F827FBD7E50066FF9A /* SettingsVC.swift */,
@@ -199,7 +200,6 @@
 				488CA3A228409D0B002F1E6B /* RepeatVC.swift */,
 				488CA3A428409DB4002F1E6B /* RepeatTableCell.swift */,
 				4839B56F28924E1B0073F6E1 /* searchVC.swift */,
-				4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";

@@ -116,7 +116,6 @@ class MainVC: UIViewController {
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
-        title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
@@ -178,14 +177,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
-        let date = newHabit.date
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let newHabitDate = dateFormatter.string(from: date)
-        
+        let desc = newHabit.desc
+
         cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = newHabitDate
+        cell.newHabitDesc.text = desc
         
         return cell
     }

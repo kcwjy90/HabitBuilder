@@ -30,8 +30,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         return v
     }()
     
-    // todaysHabitTablewView 생성
-    lazy var todaysHabitTableView: UITableView = {
+    // allHabitsTableView 생성
+    lazy var allHabitsTableView: UITableView = {
         let v = UITableView()
         v.register(HabitTableCell.self,
                    forCellReuseIdentifier:"MyCell")
@@ -59,7 +59,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         view.addSubview(backView)
         view.backgroundColor = .white
         backView.addSubview(searchBar)
-        backView.addSubview(todaysHabitTableView)
+        backView.addSubview(allHabitsTableView)
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
@@ -72,13 +72,15 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
             make.height.equalTo(44)
         }
         
-        // todaysHabitTableView grid
-        todaysHabitTableView.snp.makeConstraints { (make) in
+        // allHabitsTableView grid
+        allHabitsTableView.snp.makeConstraints { (make) in
             make.top.equalTo(searchBar.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
         
         reloadData()
+        
+        print(habits)
         
     }
     
@@ -88,36 +90,27 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         reloadData()
     }
     
-    func dateFormatting() {
-        
-    }
-    
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
-        title = "Habit Builder"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
       
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
         // Swip to dismiss tableView
-        todaysHabitTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
+        allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
-
-    //MARK: Filter to only display Habits with Today's Habit
-    func filterTodaysHabit() {
-        habits = localRealm.objects(RMO_Habit.self).filter {
-            habit in
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
-            let habitDate = dateFormatter.string(from: habit.date)
-            let today = Date()
-            let todaysDate = dateFormatter.string(from: today)
-            return habitDate == todaysDate
-        }
+    func reloadData() {
+        // Get all habits in the realm
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
         
-        searchedHabits = habits //search 된 habits을 searchedHabits[] 안으로
+        //
+        habits = habits.sorted(by: {
+            $0.date.compare($1.date) == .orderedAscending
+        })
+        searchedHabits = habits
+        allHabitsTableView.reloadData()
     }
     
 }
@@ -127,21 +120,19 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
 extension AllHabitSearchVC: habitDetailVCDelegate {
     func editComp() {
+        
+        self.reloadData() //this code prevents app from crashing when realm noti already deletes the habit. but AllHabitSearchVC doesn't have realm noti, so it has to RELOAD first. THEN show searched vs unsearched
+
         if habitSearched {
             searchedHabits = habits.filter { habit in
                 //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
                 return habit.title.lowercased().contains(searchedT.lowercased())
             }
-            self.todaysHabitTableView.reloadData()
+            self.allHabitsTableView.reloadData()
             
         }  else {
             self.reloadData()
         }
-    }
-    
-    func reloadData() {
-        filterTodaysHabit() //새로추가된 habit을 오늘 날짜에 따라 filter, 그리고 다시 searchedHabits [] 안으로
-        todaysHabitTableView.reloadData() //reload
     }
 }
 
@@ -149,7 +140,6 @@ extension AllHabitSearchVC: habitDetailVCDelegate {
 extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //        print("Row: \(indexPath.row)")  print(habits[indexPath.row].date)
         
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         let habit = searchedHabits[indexPath.row]
@@ -186,11 +176,31 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
-        let desc = newHabit.desc
         let date = newHabit.date
-
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let newHabitDate = dateFormatter.string(from: date)
+        let todayDate = dateFormatter.string(from: today)
+        
+        cell.newHabitTitle.text = title
+        cell.newHabitDate.text = newHabitDate
+        
+        
+        //repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
+        if newHabitDate == todayDate {
+            cell.newHabitDate.textColor = .red
+        } else {
+            cell.newHabitDate.textColor = .black
+        }
+        
+        if newHabit.privateRepeatType == 0 {
+            cell.newHabitTitle.textColor = .red
+        } else {
+            cell.newHabitTitle.textColor = .black
+        }
+    
         
         return cell
     }
@@ -211,7 +221,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             self.searchedHabits = self.habits
             habitSearched = false
         }
-        self.todaysHabitTableView.reloadData()
+        self.allHabitsTableView.reloadData()
     }
     
     
@@ -258,7 +268,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
             actionPerformed(true)
-            self.filterTodaysHabit() //이거를 넣으니까 search 한상태에서 habit을 없애도 에러가 안남
         }
         success.backgroundColor = .systemBlue
         
@@ -293,8 +302,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
             actionPerformed(true)
-            actionPerformed(true)
-            self.filterTodaysHabit()
         }
         remove.backgroundColor = .systemOrange
         
@@ -330,7 +337,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .fade)
             tableView.endUpdates()
             actionPerformed(true)
-            self.filterTodaysHabit()
         }
         fail.backgroundColor = .systemRed
         
@@ -349,6 +355,3 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
 
 //아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
 //저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
-
-//let today = Date()
-//let todaysDate = dateFormatter.string(from: today)
