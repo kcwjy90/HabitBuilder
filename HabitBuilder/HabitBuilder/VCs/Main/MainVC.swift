@@ -37,14 +37,14 @@ class MainVC: UIViewController {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = .baseBrown
         return v
     }()
     
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
-        v.backgroundColor = .starWhite
+        v.backgroundColor = .restGreen
         return v
     }()
     
@@ -67,6 +67,7 @@ class MainVC: UIViewController {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
+        v.backgroundColor = .baseBrown
         return v
     }()
     
@@ -80,7 +81,7 @@ class MainVC: UIViewController {
         setNaviBar()
         
         view.addSubview(backView)
-        view.backgroundColor = .white
+        view.backgroundColor = .baseBrown
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -117,7 +118,7 @@ class MainVC: UIViewController {
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .white
+        navigationController?.navigationBar.backgroundColor = .baseBrown
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Add",
             style: .done,
@@ -177,10 +178,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
-        let desc = newHabit.desc
-
-        cell.newHabitTitle.text = title + " - "
-        cell.newHabitDesc.text = desc
+        
+        switch newHabit.privateRepeatType {
+        case 1 : cell.newHabitRepeat.text = "(D)"
+        case 2 : cell.newHabitRepeat.text = "(W)"
+        case 3 : cell.newHabitRepeat.text = "(M)"
+        case 4 : cell.newHabitRepeat.text = "(Y)"
+        default: cell.newHabitRepeat.text = ""
+        }
+        
+        cell.backgroundColor = .baseBrown
+        
+        cell.newHabitTitle.text = title
         
         return cell
     }

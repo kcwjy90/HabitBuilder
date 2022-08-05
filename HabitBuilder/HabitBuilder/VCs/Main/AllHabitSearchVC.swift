@@ -19,7 +19,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = .baseBrown
         return v
     }()
     
@@ -37,9 +37,10 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
+        v.backgroundColor = .baseBrown
         return v
     }()
-    
+        
     // habit이 검색됨에 따라 tableView에 보여지는걸 다르게 하기 위해서
     var habitSearched: Bool = false
     var searchedT: String = ""
@@ -57,7 +58,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         
         view.addSubview(backView)
-        view.backgroundColor = .white
+        view.backgroundColor = .baseBrown
         backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
@@ -93,7 +94,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .white
+        navigationController?.navigationBar.backgroundColor = .baseBrown
+
       
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
@@ -168,6 +170,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         return 44.0 //Choose your custom row
     }
     
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
         else {
@@ -181,6 +184,8 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
+        let sevenDays = today.addingTimeInterval(604800)
+    
         let newHabitDate = dateFormatter.string(from: date)
         let todayDate = dateFormatter.string(from: today)
         
@@ -190,17 +195,23 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         //repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
         if newHabitDate == todayDate {
-            cell.newHabitDate.textColor = .red
+            cell.backgroundColor = .todayGreen
+            
+        } else if date > today && date < sevenDays  {
+            print(date)
+            print(sevenDays)
+            cell.backgroundColor = .weekGreen
         } else {
-            cell.newHabitDate.textColor = .black
+            cell.backgroundColor = .restGreen
         }
         
-        if newHabit.privateRepeatType == 0 {
-            cell.newHabitTitle.textColor = .red
-        } else {
-            cell.newHabitTitle.textColor = .black
+        switch newHabit.privateRepeatType {
+        case 1 : cell.newHabitRepeat.text = "(D)"
+        case 2 : cell.newHabitRepeat.text = "(W)"
+        case 3 : cell.newHabitRepeat.text = "(M)"
+        case 4 : cell.newHabitRepeat.text = "(Y)"
+        default: cell.newHabitRepeat.text = ""
         }
-    
         
         return cell
     }
@@ -348,6 +359,28 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     }
     
 }
+
+// v.backgroundColor = UIColor(hexString: cellColors[0])
+// hexString으로 할때 썼던거. 아마 이제 필요 없음
+//extension UIColor {
+//    convenience init(hexString: String) {
+//        let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+//        var int = UInt64()
+//        Scanner(string: hex).scanHexInt64(&int)
+//        let a, r, g, b: UInt64
+//        switch hex.count {
+//        case 3: // RGB (12-bit)
+//            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+//        case 6: // RGB (24-bit)
+//            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+//        case 8: // ARGB (32-bit)
+//            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+//        default:
+//            (a, r, g, b) = (255, 0, 0, 0)
+//        }
+//        self.init(red: CGFloat(r) / 255, green: CGFloat(g) / 255, blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
+//    }
+//}
 
 
 

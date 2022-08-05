@@ -26,6 +26,11 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
+    lazy var newHabitRepeat: UILabel = {
+        let v = UILabel()
+        return v
+    }()
+    
     lazy var newHabitDate: UILabel = {
         let v = UILabel()
         return v
@@ -39,6 +44,7 @@ class HabitTableCell: UITableViewCell {
         addSubview(backView)
         backView.addSubview(newHabitTitle)
         backView.addSubview(newHabitDesc)
+        backView.addSubview(newHabitRepeat)
         backView.addSubview(newHabitDate)
 
         
@@ -56,10 +62,17 @@ class HabitTableCell: UITableViewCell {
             make.left.equalTo(newHabitTitle.snp.right)
         }
         
+        newHabitRepeat.snp.makeConstraints{ (make) in
+            make.top.equalTo(newHabitTitle)
+            make.right.equalTo(newHabitDate.snp.left).offset(-10)
+        }
+        
         newHabitDate.snp.makeConstraints{ (make) in
             make.top.equalTo(newHabitTitle)
             make.right.equalTo(backView).offset(-10)
         }
+        
+       
     }
     
     required init?(coder: NSCoder) {
