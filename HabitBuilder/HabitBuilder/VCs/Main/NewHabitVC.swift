@@ -17,7 +17,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = .baseBrown
         return v
     }()
     
@@ -53,7 +53,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // newHabitTitle TextField 생성
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         v.placeholder = "Title of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -63,7 +63,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // newHabitDesc UITextView (Multi line) 생성
     lazy var newHabitDesc: UITextView = {
         let v = UITextView()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         v.text = "Description of your New Habit"
         v.textColor = UIColor.lightGray
         v.layer.masksToBounds = true
@@ -76,7 +76,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var newHabitDateTimeBackview: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         return v
     }()
     
@@ -100,7 +100,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var repeatBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         return v
     }()
     
@@ -206,7 +206,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         newHabitDesc.addPadding()
         newHabitDesc.addPadding()
         
-        
         // newHabitDateTimeBackview size grid
         newHabitDateTimeBackview.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
@@ -228,6 +227,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
             make.height.equalTo(60)
         }
+//        newHabitDateTime.tintColor = .weekGreen
         
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in

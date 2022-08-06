@@ -14,6 +14,9 @@ extension UIColor {
     @nonobjc class var todayGreen: UIColor { return UIColor(red:204/255, green:214/255, blue: 166/255, alpha: 1.00) }
     @nonobjc class var weekGreen: UIColor { return UIColor(red:218/255, green:226/255, blue: 182/255, alpha: 1.00) }
     @nonobjc class var restGreen: UIColor { return UIColor(red:223/255, green:232/255, blue: 204/255, alpha: 1.00) }
+    @nonobjc class var pureRed: UIColor { return UIColor(red:255/255, green:147/255, blue: 147/255, alpha: 1.00) }
+    @nonobjc class var pureBlue: UIColor { return UIColor(red:171/255, green:205/255, blue: 255/255, alpha: 1.00) }
+    @nonobjc class var pureBlack: UIColor { return UIColor(red:114/255, green:114/255, blue: 110/255, alpha: 1.00) }
 
 }
 

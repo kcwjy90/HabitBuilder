@@ -27,7 +27,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = .baseBrown
         return v
     }()
     
@@ -54,7 +54,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // habitTitle TextField 생성
     lazy var habitTitle: UITextField = {
         let v = UITextField()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         v.placeholder = "Title of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -66,7 +66,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //  habitDesc UITextView 생성
     lazy var habitDesc: UITextView = {
         let v = UITextView()
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         v.text = "Description of your New Habit"
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 15
@@ -78,7 +78,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var habitDateTimeBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         return v
     }()
     
@@ -86,7 +86,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var habitDateTimeLabel: UILabel = {
         let v = UILabel()
         v.text = "Date and Time"
-        v.textColor = .black
+        v.textColor = .pureBlack
         return v
     }()
     
@@ -102,7 +102,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var repeatBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
-        v.backgroundColor = .systemGray5
+        v.backgroundColor = .white
         return v
     }()
     
@@ -136,7 +136,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let v = UIButton()
         v.setTitle("Success", for: .normal)
         v.setTitleColor(.white, for: .normal)
-        v.backgroundColor = .blue
+        v.backgroundColor = .pureBlue
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
@@ -147,7 +147,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let v = UIButton()
         v.setTitle("Fail", for: .normal)
         v.setTitleColor(.white, for: .normal)
-        v.backgroundColor = .red
+        v.backgroundColor = .pureRed
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
@@ -158,7 +158,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let v = UIButton()
         v.setTitle("Delete", for: .normal)
         v.setTitleColor(.white, for: .normal)
-        v.backgroundColor = .black
+        v.backgroundColor = .pureBlack
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
