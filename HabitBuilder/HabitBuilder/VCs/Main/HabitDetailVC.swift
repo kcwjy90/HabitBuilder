@@ -299,26 +299,26 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(backView).offset(-30)
         }
         
-        // failButton size grid
-        failButton.snp.makeConstraints { (make) in
-            make.bottom.equalTo(deleteButton.snp.top).offset(-50)
-            make.height.equalTo(50)
-            make.width.equalTo(100)
-            make.left.equalTo(backView).offset(50)
-        }
-        
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.bottom.equalTo(deleteButton.snp.top).offset(-50)
+            make.bottom.equalTo(failButton.snp.top).offset(-20)
             make.height.equalTo(50)
-            make.width.equalTo(100)
-            make.right.equalTo(backView).offset(-50)
+            make.width.equalTo(300)
+            make.centerX.equalTo(backView)
+        }
+        
+        // failButton size grid
+        failButton.snp.makeConstraints { (make) in
+            make.bottom.equalTo(deleteButton.snp.top).offset(-40)
+            make.height.equalTo(50)
+            make.width.equalTo(300)
+            make.centerX.equalTo(backView)
         }
         
         // deleteButton size grid
         deleteButton.snp.makeConstraints { (make) in
             make.bottom.equalTo(backView.snp.bottom).offset(-30)
-            make.height.equalTo(40)
+            make.height.equalTo(50)
             make.width.equalTo(150)
             make.centerX.equalTo(backView)
         }

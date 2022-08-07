@@ -167,7 +167,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
-        return 44.0 //Choose your custom row
+        return 66.0 //Choose your custom row
     }
     
     
