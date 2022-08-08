@@ -179,6 +179,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
+        let desc = newHabit.desc
         let date = newHabit.date
         
         let dateFormatter = DateFormatter()
@@ -190,6 +191,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let todayDate = dateFormatter.string(from: today)
         
         cell.newHabitTitle.text = title
+        cell.newHabitDesc.text = desc
         cell.newHabitDate.text = newHabitDate
         
         
