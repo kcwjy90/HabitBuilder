@@ -358,6 +358,32 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     //FIXME: failButtonPressed, successButtonPressed, deleteButtonPressed all being worked on after fixing how to work realm noti.
     @objc func failButtonPressed(sender: UIButton){
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        let realm = self.localRealm.objects(RMO_Habit.self)
+        
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return} //
+        let taskToUpdate = countRealm[indexNumb]
+        
+        try! self.localRealm.write {
+            taskToUpdate.fail += 1
+        }
+        
+        let thisId = habit.id
+                try! self.localRealm.write {
+        
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    self.localRealm.delete(deleteHabit)
+                }
+        
+        delegate?.editComp()
+        
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -410,6 +436,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
             super.dismiss(animated: true, completion: nil)
+            
         }))
         
         present(alert, animated: true, completion: nil)
