@@ -63,7 +63,7 @@ class HabitTableCell: UITableViewCell {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.vertical
         v.backgroundColor = .green
-        v.distribution = .fillEqually
+        v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         return v
     }()
@@ -116,14 +116,15 @@ class HabitTableCell: UITableViewCell {
         newHabitRepeat.snp.makeConstraints{ (make) in
             make.top.equalTo(dateStackView).offset(3)
             make.height.equalTo(40)
-            make.width.equalTo(40)
-            //왜 이게 밑에꺼랑 같이 움직이는...????
-            make.left.equalTo(dateStackView).offset(50)
+            //왜 right.equalTo하면 안되지?
+            //그리고 왜 여기 left.equalto 가 newHabitDate의 equalto에도 영향을 주지???
+            make.left.equalTo(dateStackView).offset(70)
         }
         
         newHabitDate.snp.makeConstraints{ (make) in
             make.height.equalTo(20)
-            make.right.equalTo(dateStackView)
+            make.right.equalTo(dateStackView).offset(5)
+            make.left.equalTo(dateStackView)
         }
         
        

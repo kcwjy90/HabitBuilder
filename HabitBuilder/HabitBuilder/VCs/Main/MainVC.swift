@@ -178,7 +178,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
+        let desc = newHabit.desc
+        let date = newHabit.date
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "h:mm a"
+        let newHabitDate = dateFormatter.string(from: date)
+
         switch newHabit.privateRepeatType {
         case 1 : cell.newHabitRepeat.text = "(D)"
         case 2 : cell.newHabitRepeat.text = "(W)"
@@ -190,6 +196,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         cell.backgroundColor = .baseBrown
         
         cell.newHabitTitle.text = title
+        cell.newHabitDesc.text = desc
+        cell.newHabitDate.text = newHabitDate
         
         return cell
     }

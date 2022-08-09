@@ -183,7 +183,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let date = newHabit.date
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "MM-dd-yyyy"
         let today = Date()
         let sevenDays = today.addingTimeInterval(604800)
     
