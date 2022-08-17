@@ -37,7 +37,7 @@ class MainVC: UIViewController {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
@@ -67,7 +67,7 @@ class MainVC: UIViewController {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
@@ -81,7 +81,7 @@ class MainVC: UIViewController {
         setNaviBar()
         
         view.addSubview(backView)
-        view.backgroundColor = .baseBrown
+        view.backgroundColor = .white
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
@@ -118,7 +118,7 @@ class MainVC: UIViewController {
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .baseBrown
+        navigationController?.navigationBar.backgroundColor = .white
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Add",
             style: .done,
@@ -193,7 +193,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         default: cell.newHabitRepeat.text = ""
         }
         
-        cell.backgroundColor = .baseBrown
+        cell.backgroundColor = .white
         
         cell.newHabitTitle.text = title
         cell.newHabitDesc.text = desc

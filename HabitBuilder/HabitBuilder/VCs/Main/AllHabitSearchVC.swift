@@ -19,7 +19,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
@@ -37,7 +37,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
         
@@ -58,7 +58,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         searchBar.delegate = self
         
         view.addSubview(backView)
-        view.backgroundColor = .baseBrown
+        view.backgroundColor = .white
         backView.addSubview(searchBar)
         backView.addSubview(allHabitsTableView)
         
@@ -94,7 +94,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .baseBrown
+        navigationController?.navigationBar.backgroundColor = .white
 
       
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색

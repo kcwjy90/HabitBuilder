@@ -27,7 +27,7 @@ class RepeatVC: UIViewController {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
@@ -57,7 +57,7 @@ class RepeatVC: UIViewController {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     

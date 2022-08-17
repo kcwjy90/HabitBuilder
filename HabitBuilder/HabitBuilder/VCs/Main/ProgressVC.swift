@@ -20,7 +20,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
@@ -54,7 +54,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         view.addSubview(backView)
         view.addSubview(todayPiChart)
         
-        view.backgroundColor = .baseBrown
+        view.backgroundColor = .white
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
@@ -117,7 +117,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     //MARK: Navi Bar
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
-        navigationController?.navigationBar.backgroundColor = .baseBrown
+        navigationController?.navigationBar.backgroundColor = .white
     }
 }
 

@@ -27,7 +27,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     // backview 생성
     lazy var backView: UIView = {
         let v = UIView()
-        v.backgroundColor = .baseBrown
+        v.backgroundColor = .white
         return v
     }()
     
