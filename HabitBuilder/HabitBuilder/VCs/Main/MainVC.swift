@@ -108,7 +108,7 @@ class MainVC: UIViewController {
             make.top.equalTo(dateLabelBackView.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
-        
+       
         realmNoti()
         
     }
@@ -166,7 +166,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
-        return 66.0 //Choose your custom row
+        return 80 //Choose your custom row
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -41,6 +41,15 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
+    lazy var boxCell: UIStackView = {
+        let v = UIStackView()
+        v.axis = NSLayoutConstraint.Axis.horizontal
+        v.backgroundColor = .purple
+        v.distribution = .equalSpacing
+        v.alignment = UIStackView.Alignment.leading
+        return v
+    }()
+    
     lazy var cellStackView: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
@@ -54,6 +63,15 @@ class HabitTableCell: UITableViewCell {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.vertical
         v.backgroundColor = .blue
+        v.distribution = .equalSpacing
+        v.alignment = UIStackView.Alignment.leading
+        return v
+    }()
+    
+    lazy var middleLine: UIStackView = {
+        let v = UIStackView()
+        v.axis = NSLayoutConstraint.Axis.vertical
+        v.backgroundColor = .black
         v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         return v
@@ -73,8 +91,10 @@ class HabitTableCell: UITableViewCell {
         
         //Cell은 왜 굳이 addSubView가 필요할까 했는데, 이게 없으면 tableview에서 안 보임
         addSubview(backView)
-        backView.addSubview(cellStackView)
+        backView.addSubview(boxCell)
+        boxCell.addSubview(cellStackView)
         cellStackView.addArrangedSubview(titleStackView)
+        cellStackView.addArrangedSubview(middleLine)
         cellStackView.addArrangedSubview(dateStackView)
         titleStackView.addArrangedSubview(newHabitTitle)
         titleStackView.addArrangedSubview(newHabitDesc)
@@ -85,44 +105,61 @@ class HabitTableCell: UITableViewCell {
         backView.snp.makeConstraints{ (make) in
             make.edges.equalTo(self)
         }
+//        backView.layer.borderWidth = 0.5
+//        backView.layer.shadowOpacity = 0.8
+//        backView.layer.shadowRadius = 5.0
+//        backView.layer.masksToBounds = false;
+
         
-        cellStackView.snp.makeConstraints{ (make) in
+        boxCell.snp.makeConstraints{ (make) in
             make.edges.equalTo(backView)
         }
         
+        cellStackView.snp.makeConstraints{ (make) in
+            make.top.equalTo(boxCell).offset(5)
+            make.bottom.equalTo(boxCell).offset(-5)
+            make.right.equalTo(boxCell).offset(-5)
+            make.left.equalTo(boxCell).offset(5)
+        }
+        
         titleStackView.snp.makeConstraints{ (make) in
-            //FIXME: width 수정
-            make.width.equalTo(300)
-            make.height.equalTo(66)
+            make.left.equalTo(cellStackView)
+            make.right.equalTo(middleLine.snp.left)
+            make.height.equalTo(70)
+        }
+        
+        middleLine.snp.makeConstraints{ (make) in
+            make.left.equalTo(cellStackView).offset(300)
+            make.width.equalTo(5)
+            make.height.equalTo(70)
         }
         
         dateStackView.snp.makeConstraints{ (make) in
-            //FIXME: width 수정
-            make.width.equalTo(105)
-            make.height.equalTo(66)
+            make.left.equalTo(middleLine.snp.right)
+            make.right.equalTo(cellStackView)
+            make.height.equalTo(70)
         }
         
         newHabitTitle.snp.makeConstraints{ (make) in
-            make.top.equalTo(titleStackView).offset(3)
-            make.height.equalTo(40)
-            make.left.equalTo(titleStackView).offset(10)
+            make.top.equalTo(titleStackView)
+            make.height.equalTo(50)
+            make.left.equalTo(titleStackView).offset(5)
         }
         
         newHabitDesc.snp.makeConstraints{ (make) in
             make.height.equalTo(20)
-            make.left.equalTo(titleStackView).offset(10)
+            make.left.equalTo(titleStackView).offset(5)
         }
         
         newHabitRepeat.snp.makeConstraints{ (make) in
-            make.top.equalTo(dateStackView).offset(3)
-            make.height.equalTo(40)
+            make.height.equalTo(35)
             //왜 right.equalTo하면 안되지?
             //그리고 왜 여기 left.equalto 가 newHabitDate의 equalto에도 영향을 주지???
             make.left.equalTo(dateStackView).offset(70)
         }
         
         newHabitDate.snp.makeConstraints{ (make) in
-            make.height.equalTo(20)
+            make.height.equalTo(35)
             make.right.equalTo(dateStackView).offset(5)
             make.left.equalTo(dateStackView)
         }
