@@ -31,7 +31,7 @@ class HabitTableCell: UITableViewCell {
     
     lazy var newHabitRepeat: UILabel = {
         let v = UILabel()
-        v.backgroundColor = .purple
+        v.backgroundColor = .gray
         return v
     }()
     
@@ -44,7 +44,7 @@ class HabitTableCell: UITableViewCell {
     lazy var boxCell: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
-        v.backgroundColor = .purple
+        v.backgroundColor = .white
         v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         return v
@@ -105,11 +105,6 @@ class HabitTableCell: UITableViewCell {
         backView.snp.makeConstraints{ (make) in
             make.edges.equalTo(self)
         }
-//        backView.layer.borderWidth = 0.5
-//        backView.layer.shadowOpacity = 0.8
-//        backView.layer.shadowRadius = 5.0
-//        backView.layer.masksToBounds = false;
-
         
         boxCell.snp.makeConstraints{ (make) in
             make.edges.equalTo(backView)
@@ -121,6 +116,10 @@ class HabitTableCell: UITableViewCell {
             make.right.equalTo(boxCell).offset(-5)
             make.left.equalTo(boxCell).offset(5)
         }
+        cellStackView.layer.borderWidth = 0.5
+        cellStackView.layer.shadowOpacity = 0.3
+        cellStackView.layer.shadowRadius = 1.0
+        cellStackView.layer.masksToBounds = false;
         
         titleStackView.snp.makeConstraints{ (make) in
             make.left.equalTo(cellStackView)
@@ -160,7 +159,7 @@ class HabitTableCell: UITableViewCell {
         
         newHabitDate.snp.makeConstraints{ (make) in
             make.height.equalTo(35)
-            make.right.equalTo(dateStackView).offset(5)
+            make.right.equalTo(dateStackView).offset(-5)
             make.left.equalTo(dateStackView)
         }
         

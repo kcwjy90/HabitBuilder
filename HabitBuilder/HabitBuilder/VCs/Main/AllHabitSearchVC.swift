@@ -78,6 +78,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
             make.top.equalTo(searchBar.snp.bottom)
             make.left.right.bottom.equalTo(backView)
         }
+        allHabitsTableView.separatorStyle = .none //removes lines btwn tableView cells
+
         
         reloadData()
         
@@ -167,7 +169,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
-        return 66.0 //Choose your custom row
+        return 80.0 //Choose your custom row
     }
     
     
