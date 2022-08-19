@@ -44,7 +44,7 @@ class MainVC: UIViewController {
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
-        v.backgroundColor = .restGreen
+        v.backgroundColor = .white
         return v
     }()
     
@@ -184,15 +184,16 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let date = newHabit.date
         
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
         dateFormatter.dateFormat = "h:mm a"
         let newHabitDate = dateFormatter.string(from: date)
 
         switch newHabit.privateRepeatType {
-        case 1 : cell.newHabitRepeat.text = "(D)"
-        case 2 : cell.newHabitRepeat.text = "(W)"
-        case 3 : cell.newHabitRepeat.text = "(M)"
-        case 4 : cell.newHabitRepeat.text = "(Y)"
-        default: cell.newHabitRepeat.text = ""
+        case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
+        case 2 : cell.newHabitRepeat.text = "(W)"; cell.repeatBackground.backgroundColor = .pureOrange
+        case 3 : cell.newHabitRepeat.text = "(M)"; cell.repeatBackground.backgroundColor = .pureBlue
+        case 4 : cell.newHabitRepeat.text = "(Y)"; cell.repeatBackground.backgroundColor = .purePurple
+        default: cell.newHabitRepeat.text = ""; cell.repeatBackground.backgroundColor = .white
         }
         
         cell.backgroundColor = .white

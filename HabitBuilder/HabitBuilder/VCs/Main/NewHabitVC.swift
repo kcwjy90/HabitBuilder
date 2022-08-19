@@ -198,7 +198,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.top.equalTo(newHabitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(160)
+            make.height.equalTo(350)
         }
         newHabitDesc.delegate = self //placeholder가 UITextView에는 없어서 비슷한것을 생성하기위한 function.
         textViewDidBeginEditing(newHabitDesc) //을 넣기 위해서 delegate을 해야함.

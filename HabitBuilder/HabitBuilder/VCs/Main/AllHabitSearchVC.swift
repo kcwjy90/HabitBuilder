@@ -185,7 +185,8 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let date = newHabit.date
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM-dd-yyyy"
+        dateFormatter.locale = Locale(identifier: "en_US")
+        dateFormatter.dateFormat = "MMM d, yyyy"
         let today = Date()
         let sevenDays = today.addingTimeInterval(604800)
     
@@ -199,22 +200,20 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         //repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
         if newHabitDate == todayDate {
-            cell.backgroundColor = .todayGreen
-            
+            cell.titleBackground.backgroundColor = .darkGreen
         } else if date > today && date < sevenDays  {
-            print(date)
-            print(sevenDays)
-            cell.backgroundColor = .weekGreen
+            cell.titleBackground.backgroundColor = .todayGreen
         } else {
-            cell.backgroundColor = .restGreen
+            cell.titleBackground.backgroundColor = .restGreen
         }
         
+        
         switch newHabit.privateRepeatType {
-        case 1 : cell.newHabitRepeat.text = "(D)"
-        case 2 : cell.newHabitRepeat.text = "(W)"
-        case 3 : cell.newHabitRepeat.text = "(M)"
-        case 4 : cell.newHabitRepeat.text = "(Y)"
-        default: cell.newHabitRepeat.text = ""
+        case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
+        case 2 : cell.newHabitRepeat.text = "(W)"; cell.repeatBackground.backgroundColor = .pureOrange
+        case 3 : cell.newHabitRepeat.text = "(M)"; cell.repeatBackground.backgroundColor = .pureBlue
+        case 4 : cell.newHabitRepeat.text = "(Y)"; cell.repeatBackground.backgroundColor = .purePurple
+        default: cell.newHabitRepeat.text = ""; cell.repeatBackground.backgroundColor = .white
         }
         
         return cell

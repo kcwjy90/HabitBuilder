@@ -237,7 +237,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.top.equalTo(habitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(160)
+            make.height.equalTo(300)
         }
         //MARK: UITextView는 placeholder가 없어서 따로 placeholder처럼 보이게 만든것. Function is at the bottom
         habitDesc.delegate = self
