@@ -110,7 +110,7 @@ class MainVC: UIViewController {
         }
         todaysHabitTableView.separatorStyle = .none //removes lines btwn tableView cells
 
-       
+        deletePrev()
         realmNoti()
         
     }
@@ -205,6 +205,25 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+//MARK: auto-deleting habits that are 2 days old
+    func deletePrev() {
+        let realm = self.localRealm.objects(RMO_Habit.self)
+        
+        let today = Date()
+        let calendar = Calendar.current
+        let midnight = calendar.startOfDay(for: today)
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: midnight)
+        
+        guard let ystday = yesterday else {return}
+   
+        try! self.localRealm.write {
+            
+            let deleteHabit = realm.where {
+                $0.date < ystday
+            }
+            self.localRealm.delete(deleteHabit)
+        }
+    }
     
 //MARK: Realm Notification function
     func realmNoti() {

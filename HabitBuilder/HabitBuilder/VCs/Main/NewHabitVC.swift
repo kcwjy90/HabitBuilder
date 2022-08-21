@@ -92,6 +92,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var newHabitDateTime: UIDatePicker = {
         let v = UIDatePicker()
         v.datePickerMode = .dateAndTime
+        let today = Date()
+        v.minimumDate = today
         v.layer.cornerRadius = 15
         return v
     }()

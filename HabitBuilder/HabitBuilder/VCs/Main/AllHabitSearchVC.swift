@@ -210,6 +210,12 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             cell.titleBackground.backgroundColor = .restGreen
         }
         
+        //오래된 habit의 색을 까맣게 바꿈
+        if newHabitDate < todayDate {
+            cell.cellStackView.backgroundColor = .pureBlack
+        } else {
+            cell.cellStackView.backgroundColor = .white
+        }
         
         switch newHabit.privateRepeatType {
         case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
