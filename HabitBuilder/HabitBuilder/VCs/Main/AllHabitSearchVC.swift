@@ -27,6 +27,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     lazy var searchBar : UISearchBar = {
         let v = UISearchBar()
         v.searchBarStyle = .minimal
+        v.backgroundColor = .dateGreen
+        v.searchTextField.backgroundColor = .customWhite
         return v
     }()
     
@@ -37,7 +39,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .white
+        v.backgroundColor = .dateGreen
         return v
     }()
         
@@ -70,12 +72,13 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         // searchBar grid
         searchBar.snp.makeConstraints { (make) in
             make.top.left.right.equalTo(backView)
-            make.height.equalTo(44)
+            make.height.equalTo(52)
+            make.centerY.equalTo(searchBar)
         }
         
         // allHabitsTableView grid
         allHabitsTableView.snp.makeConstraints { (make) in
-            make.top.equalTo(searchBar.snp.bottom)
+            make.top.equalTo(searchBar.snp.bottom).offset(-5)
             make.left.right.bottom.equalTo(backView)
         }
         allHabitsTableView.separatorStyle = .none //removes lines btwn tableView cells

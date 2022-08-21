@@ -15,6 +15,7 @@ extension UIColor {
     @nonobjc class var restGreen: UIColor { return UIColor(red:217/255, green:255/255, blue: 248/255, alpha: 1.00) }
     @nonobjc class var darkGreen: UIColor { return UIColor(red:9/255, green:133/255, blue: 110/255, alpha: 1.00) }
     @nonobjc class var todayGreen: UIColor { return UIColor(red:27/255, green:238/255, blue: 202/255, alpha: 1.00) }
+    @nonobjc class var customWhite: UIColor { return UIColor(red:250/255, green:255/255, blue: 254/255, alpha: 1.00) }
     @nonobjc class var pureRed: UIColor { return UIColor(red:255/255, green:147/255, blue: 147/255, alpha: 1.00) }
     @nonobjc class var pureBlue: UIColor { return UIColor(red:171/255, green:205/255, blue: 255/255, alpha: 1.00) }
     @nonobjc class var pureOrange: UIColor { return UIColor(red:255/255, green:228/255, blue: 179/255, alpha: 1.00) }

@@ -44,7 +44,7 @@ class MainVC: UIViewController {
     // dateLabelBackView 생성
     lazy var dateLabelBackView: UIView = {
         let v = UIView()
-        v.backgroundColor = .white
+        v.backgroundColor = .dateGreen
         return v
     }()
     
@@ -67,7 +67,7 @@ class MainVC: UIViewController {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .white
+        v.backgroundColor = .dateGreen
         return v
     }()
     

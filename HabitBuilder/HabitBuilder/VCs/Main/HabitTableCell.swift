@@ -57,7 +57,7 @@ class HabitTableCell: UITableViewCell {
     lazy var boxCell: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
-        v.backgroundColor = .white
+        v.backgroundColor = .dateGreen
         v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         return v
@@ -128,11 +128,11 @@ class HabitTableCell: UITableViewCell {
             make.right.equalTo(boxCell).offset(-10)
             make.left.equalTo(boxCell).offset(10)
         }
-        cellStackView.layer.borderWidth = 3.0
+//        cellStackView.layer.borderWidth = 3.0
 //        cellStackView.layer.shadowOpacity = 0.2
 //        cellStackView.layer.shadowRadius = 0.2
         cellStackView.layer.masksToBounds = false;
-        cellStackView.layer.borderColor = UIColor.dateGreen.cgColor
+//        cellStackView.layer.borderColor = UIColor.white.cgColor
         
         titleStackView.snp.makeConstraints{ (make) in
             make.left.equalTo(cellStackView)
