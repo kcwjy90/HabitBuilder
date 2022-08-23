@@ -177,7 +177,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else {
             return UITableViewCell()
         }
-        
+
+
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
@@ -243,7 +244,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else { return }
         
         
-        habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday)
+        habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).sorted(byKeyPath: "date", ascending: true)
+        
+        //.sorted뒤에 나오는게 시간에 맞춰서 순서를 바꿔주는 핵심
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
         guard let theHabits = self.habits else {return}

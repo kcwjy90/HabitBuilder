@@ -48,7 +48,7 @@ class NotificationManger: NSObject {
         guard let repeatType = habit.repeatType else { return }
         
         execTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
-        
+
     }
     
     

@@ -131,7 +131,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }()
     
     //default Repeat Type when user creates Habit
-    var repTyp: RepeatType = .none
+    var prevRep: RepeatType?
+    var repTyp: RepeatType?
     
     // successButton 생성
     lazy var successButton: UIButton = {
@@ -330,6 +331,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
         habitDateTime.date = habit.date
+        prevRep = habit.repeatType
         
         guard let rt = habit.repeatType else { return }
         let repeatTypeString = String(describing: rt)
@@ -527,8 +529,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
             taskToUpdate.date = habitDateTime.date
-            taskToUpdate.repeatType = repTyp
-//            print(realm)
+            
+            if repTyp == nil {
+                taskToUpdate.repeatType = prevRep
+            } else {
+                taskToUpdate.repeatType = repTyp
+            }
         }
         
         //MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
