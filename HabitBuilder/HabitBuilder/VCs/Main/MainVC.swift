@@ -421,7 +421,20 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 
-//아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
-//저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
+//아직 해야 할것 -
+//1)앱 상에 빨간 숫자 사라지게 하는거.지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
+//2)repeat에 따라 cell이 자동 생성되게 하는거? 코드는 어디에 적어야 하나?
+//3)repeat이 지정된 것을 영구 지우면 noti가 안오게 하는법
+// 예> 책읽기는 daily habit인데, 오늘 성공했으면 'Success' button 을 누른다. 이러면 tableview에서 사라지지만 daily habit이기 때문에 내일이 되면 다시 떠야함. 현재 noti는 오고 있음. 근데 habit 생성은 안됨
+// 그러다가 책읽기 habit을 영구적으로 지우면 다시 뜨지도 않아야 하고 noti 도 안와야 함.
 
-
+/* 이렇게 하면 되나?
+1. RMO_Habit 에 var onGoing: Bool 을 생성
+2. tableview 에는 onGoing == True 인 애들만 불러옴
+3. habit 이 success나 fail을 하면 onGoing 을 false로 바꿔 tableView에 안 뜨게함. RMO_Habit자체에서 habit을 지우는 것은 아님.
+4. 그리고 다음날이 되면 모든 habit에 onGoing을 true 로 다시 바꿈. 이러면 매일마다 repeat되는 habit들이 다시 뜸
+5. 영구적으로 habit을 지우고 싶을때는 delete button을 눌러 아예 지워버림
+ 
+ 그럼 noti를 update하는거 어떻게 하는거지?
+ 
+ */

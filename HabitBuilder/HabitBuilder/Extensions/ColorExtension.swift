@@ -23,7 +23,7 @@ extension UIColor {
     @nonobjc class var pureBlack: UIColor { return UIColor(red:114/255, green:114/255, blue: 110/255, alpha: 1.00) }
     @nonobjc class var baseGreen: UIColor { return UIColor(red:122/255, green:245/255, blue: 224/255, alpha: 1.00) }
     @nonobjc class var dateGreen: UIColor { return UIColor(red:213/255, green:235/255, blue: 231/255, alpha: 1.00) }
-    
+    @nonobjc class var pastGray: UIColor { return UIColor(red:217/255, green:217/255, blue: 217/255, alpha: 1.00) }
 }
 
 // Spuit 설치

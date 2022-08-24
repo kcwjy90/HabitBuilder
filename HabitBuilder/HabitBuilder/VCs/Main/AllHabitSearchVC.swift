@@ -212,7 +212,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         //오래된 habit의 색을 까맣게 바꿈
         if newHabitDate < todayDate {
-            cell.cellStackView.backgroundColor = .pureBlack
+            cell.cellStackView.backgroundColor = .pastGray
         } else {
             cell.cellStackView.backgroundColor = .white
         }
