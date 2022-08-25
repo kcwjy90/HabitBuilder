@@ -200,7 +200,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.top.equalTo(newHabitTitle.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(350)
+            make.height.equalTo(210)
         }
         newHabitDesc.delegate = self //placeholder가 UITextView에는 없어서 비슷한것을 생성하기위한 function.
         textViewDidBeginEditing(newHabitDesc) //을 넣기 위해서 delegate을 해야함.
@@ -233,7 +233,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(10)
+            make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(5)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(60)
@@ -241,7 +241,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // repeatLabel size grid
         repeatLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(10)
+            make.top.equalTo(repeatBackView)
             make.left.equalTo(backView).offset(39)
             make.height.equalTo(60)
         }
