@@ -110,8 +110,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     
     func reloadData() {
         // Get all habits in the realm
-        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        
+        habits = localRealm.objects(RMO_Habit.self).filter("onGoing == True").toArray() //updating habits []
+        print(habits)
         //
         habits = habits.sorted(by: {
             $0.date.compare($1.date) == .orderedAscending

@@ -109,7 +109,8 @@ class MainVC: UIViewController {
             make.left.right.bottom.equalTo(backView)
         }
         todaysHabitTableView.separatorStyle = .none //removes lines btwn tableView cells
-
+        
+        updateOngoing()
         deletePrev()
         realmNoti()
         
@@ -150,11 +151,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         guard let habit = habits?[indexPath.row] else { return }
-                
+        
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
-  
+        
         habitDetailVC.modalPresentationStyle = .pageSheet
         present(habitDetailVC, animated:true)
     }
@@ -177,8 +178,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else {
             return UITableViewCell()
         }
-
-
+        
+        
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
         let desc = newHabit.desc
@@ -188,7 +189,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         dateFormatter.locale = Locale(identifier: "en_US")
         dateFormatter.dateFormat = "h:mm a"
         let newHabitDate = dateFormatter.string(from: date)
-
+        
         switch newHabit.privateRepeatType {
         case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
         case 2 : cell.newHabitRepeat.text = "(W)"; cell.repeatBackground.backgroundColor = .pureOrange
@@ -206,7 +207,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-//MARK: auto-deleting habits that are 2 days old
+    //MARK: auto-deleting habits that are 2 days old
     func deletePrev() {
         let realm = self.localRealm.objects(RMO_Habit.self)
         
@@ -216,7 +217,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let yesterday = calendar.date(byAdding: .day, value: -1, to: midnight)
         
         guard let ystday = yesterday else {return}
-   
+        
         try! self.localRealm.write {
             
             let deleteHabit = realm.where {
@@ -226,7 +227,31 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-//MARK: Realm Notification function
+    
+    //step 4 =====================
+// MARK: Updating on going
+    func updateOngoing() {
+        let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
+        
+//        let today = Date()
+//        let midnight = Calendar.current.startOfDay(for: today)
+//        let nextMidnight = Calendar.current.date(byAdding: .day, value: 1, to: midnight)
+
+        print("===========")
+        print(realm)
+        print("===========")
+        
+        try! self.localRealm.write {
+            realm.setValue(true, forKey: "onGoing")
+        }
+        
+        print(localRealm.objects(RMO_Habit.self))
+        
+    }
+    //step 4 =====================
+
+    
+    //MARK: Realm Notification function
     func realmNoti() {
         
         let today = Date()
@@ -236,15 +261,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             month: Calendar.current.component(.month, from: today),
             day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
               
-            let endOfToday = Calendar.current.date(from: DateComponents(
-            year: Calendar.current.component(.year, from: today),
-            month: Calendar.current.component(.month, from: today),
-            day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
-       
+                let endOfToday = Calendar.current.date(from: DateComponents(
+                    year: Calendar.current.component(.year, from: today),
+                    month: Calendar.current.component(.month, from: today),
+                    day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+                
         else { return }
         
         
-        habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).sorted(byKeyPath: "date", ascending: true)
+        habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).filter("onGoing == True").sorted(byKeyPath: "date", ascending: true)
         
         //.sorted뒤에 나오는게 시간에 맞춰서 순서를 바꿔주는 핵심
         
@@ -427,14 +452,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 //3)repeat이 지정된 것을 영구 지우면 noti가 안오게 하는법
 // 예> 책읽기는 daily habit인데, 오늘 성공했으면 'Success' button 을 누른다. 이러면 tableview에서 사라지지만 daily habit이기 때문에 내일이 되면 다시 떠야함. 현재 noti는 오고 있음. 근데 habit 생성은 안됨
 // 그러다가 책읽기 habit을 영구적으로 지우면 다시 뜨지도 않아야 하고 noti 도 안와야 함.
+//4) 다음날 자정에 onGoing == false로 바꿔 다시 뜨게 해주는 코드는 아직 개발중
+//5. 해야할거 - habit을 habitDetailVC에서 지웠을 경우 allHabitsearchVC를 update해줘야함
 
-/* 이렇게 하면 되나?
-1. RMO_Habit 에 var onGoing: Bool 을 생성
-2. tableview 에는 onGoing == True 인 애들만 불러옴
-3. habit 이 success나 fail을 하면 onGoing 을 false로 바꿔 tableView에 안 뜨게함. RMO_Habit자체에서 habit을 지우는 것은 아님.
-4. 그리고 다음날이 되면 모든 habit에 onGoing을 true 로 다시 바꿈. 이러면 매일마다 repeat되는 habit들이 다시 뜸
-5. 영구적으로 habit을 지우고 싶을때는 delete button을 눌러 아예 지워버림
+
+
  
- 그럼 noti를 update하는거 어떻게 하는거지?
+/* 이렇게 하면 되나? 일단 지금 까지 한거
+ 1. RMO_Habit 에 var onGoing: Bool 을 생성
+ 2. tableview 에는 onGoing == True 인 애들만 불러옴
+ 3. habit 이 success나 fail을 하면 onGoing 을 false로 바꿔 tableView에 안 뜨게함. RMO_Habit자체에서 habit을 지우는 것은 아님.
+ 4. 그리고 다음날이 되면 모든 habit에 onGoing을 true 로 다시 바꿈. 이러면 매일마다 repeat되는 habit들이 다시 뜸
+    a) 만약 repeate = .none 일경우는 영구 지워지고, repeat != .none이 아닌경우는 onGoing 이 false 가 됨
+ 5. 영구적으로 habit을 지우고 싶을때는 delete button을 눌러 아예 지워버림
  
  */
+
+
+//Q: AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?

@@ -377,15 +377,33 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             taskToUpdate.fail += 1
         }
         
-        let thisId = habit.id
-                try! self.localRealm.write {
         
-                    let deleteHabit = realm.where {
-                        $0.id == thisId
+        // ========================================= step 3
+
+        // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
+        guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+        {return}
+        let updateHabit = realm[indexNumb]
+        
+        if updateHabit.privateRepeatType == 0 {
+            
+            let thisId = habit.id
+                    try! self.localRealm.write {
+
+                        let deleteHabit = realm.where {
+                            $0.id == thisId
+                        }
+                        self.localRealm.delete(deleteHabit)
                     }
-                    self.localRealm.delete(deleteHabit)
-                }
-        
+        } else {
+            
+            try! self.localRealm.write {
+                updateHabit.onGoing = false
+            }
+        }
+            
+        // ========================================= step 3
+
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
@@ -411,17 +429,32 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //        print(self.localRealm.objects(RMO_Count.self))
         
         
-        let thisId = habit.id
-//        print(realm)
-                try! self.localRealm.write {
+        // ========================================= step 3
+
+        // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
+        guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+        {return}
+        let updateHabit = realm[indexNumb]
         
-                    let deleteHabit = realm.where {
-                        $0.id == thisId
+        if updateHabit.privateRepeatType == 0 {
+            
+            let thisId = habit.id
+                    try! self.localRealm.write {
+
+                        let deleteHabit = realm.where {
+                            $0.id == thisId
+                        }
+                        self.localRealm.delete(deleteHabit)
                     }
-                    self.localRealm.delete(deleteHabit)
-                }
-//        print(realm)
+        } else {
+            
+            try! self.localRealm.write {
+                updateHabit.onGoing = false
+            }
+        }
         
+        // ========================================= step 3
+
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
@@ -439,10 +472,28 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
-            super.dismiss(animated: true, completion: nil)
-            
+            super.dismiss(animated: true, completion: deleteD)
+            self.delegate?.editComp() // 왜 이걸 했는데도 reload가 안되지??
+
         }))
         
+        
+        //delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
+        func deleteD() {
+        
+        let realm = self.localRealm.objects(RMO_Habit.self)
+                let thisId = habit.id
+                        try! self.localRealm.write {
+                            let deleteHabit = realm.where {
+                                $0.id == thisId
+                            }
+                            self.localRealm.delete(deleteHabit)
+                        }
+        }
+        
+        //delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
+
+
         present(alert, animated: true, completion: nil)
         
     }
@@ -473,9 +524,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                 try! localRealm.write {
                     localRealm.add(newCount)
                 }
-//                print("새로만듬")
-//                print(newCount)
-                
+
             }
             
             //예전 habit의 count 수를 -1
@@ -485,11 +534,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             let minusCount = countRealm[indexNumb]
             
             try! localRealm.write {
-//                print("리무브되기전")
-//                print(minusCount)
                 minusCount.total -= 1
-//                print("리무브된후")
-//                print(minusCount)
+
             }
             
             //새로운 habit의 count수를 +1
@@ -497,12 +543,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             {return}
             let plusCount = countRealm[indexNumb]
             try! localRealm.write {
-//                print("플러스되기전")
-//                print(plusCount)
                 plusCount.total += 1
-//                print("플러스된후")
-//                print(plusCount)
-                
             }
             
         }

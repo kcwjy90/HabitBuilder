@@ -24,7 +24,7 @@ class RMO_Habit: Object {
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
     @Persisted var date: Date = Date()
-//    @Persisted var isRepeat: Bool = false
+    @Persisted var onGoing: Bool = true
     
     
     @Persisted var privateRepeatType: Int = 0
