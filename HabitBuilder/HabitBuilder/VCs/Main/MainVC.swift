@@ -447,14 +447,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 //아직 해야 할것 -
-//1)앱 상에 빨간 숫자 사라지게 하는거.지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
+//1)앱 상에 빨간 숫자 사라지게 하는거.지금은 noti뜨는걸 눌러야만 사라짐. 
 //2)repeat에 따라 cell이 자동 생성되게 하는거? 코드는 어디에 적어야 하나?
 //3)repeat이 지정된 것을 영구 지우면 noti가 안오게 하는법
 // 예> 책읽기는 daily habit인데, 오늘 성공했으면 'Success' button 을 누른다. 이러면 tableview에서 사라지지만 daily habit이기 때문에 내일이 되면 다시 떠야함. 현재 noti는 오고 있음. 근데 habit 생성은 안됨
 // 그러다가 책읽기 habit을 영구적으로 지우면 다시 뜨지도 않아야 하고 noti 도 안와야 함.
 //4) 다음날 자정에 onGoing == false로 바꿔 다시 뜨게 해주는 코드는 아직 개발중
 //5. 해야할거 - habit을 habitDetailVC에서 지웠을 경우 allHabitsearchVC를 update해줘야함
-
+//6. noti 는 또 왜 안되고 지랄이야 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
 
 
  

@@ -262,7 +262,7 @@ extension AllHabitsVC: UITableViewDelegate, UITableViewDataSource {
         
         
         if let itemsForDate = sectionedHabit[itemDates[indexPath.section]] {
-            var habit = itemsForDate[indexPath.row]
+            let habit = itemsForDate[indexPath.row]
             cell.newHabitTitle.text = habit.title + " - "
             cell.newHabitDesc.text = habit.desc
         }
