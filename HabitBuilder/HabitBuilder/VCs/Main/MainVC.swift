@@ -469,4 +469,24 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
  */
 
 
+/*PLAN B
+1. RMO_habit 말고 RMO_repeat object를 하나 더 만들경우
+새로 add 할때
+    a) non-repeat인 경우 -> adds habit to RMO_Habit
+    b) repeat인 경우 -> adds habit to RMO_repeat
+2. App을 실행시킬때 RMO_repeat에 있는 것들을 RMO_Habit으로 가지고 온다. (Q: 하지만 앱을 매번 실행시킬때마다 이걸 하는게 아니라 하루에 한번만 해야하는데..)
+3. success/fail 을 할경우 RMO_Habit에서만 지우고, delete을 할 경우 만약 이게 repeated habit이면 RMO_Habit, RMO_Repeat이 둘다 에서 지운다.
+ 
+edit 할때
+scenario 1 : old RepeatType & new repeatType == .none
+    -> RMO_Habit에서만 edit
+scenario 2 : old RepeatType == .none & new repeatType = .repeat
+    -> RMO_Habit에서 edit, RMO_repeat 에 새로추가
+scenario 3 : old repeatType == .repeat & new repeatType = .none
+    -> RMO_Habit에서 edit, RMO_repeat 에서 지우기
+scenario 4 : old RepeatType & new repeatType == .repeat (different interval ex> daily -> monthly)
+    -> RMO_Habit, RMO_Repeat 둘다 edit
+    */
+
+
 //Q: AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?
