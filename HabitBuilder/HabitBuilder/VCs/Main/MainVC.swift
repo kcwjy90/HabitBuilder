@@ -231,12 +231,26 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //step 4 =====================
 // MARK: Updating on going
     func updateOngoing() {
+        
+//        //MARK: RMO_Count에 오늘 날짜가 없을경우 오늘 날짜를 넣는다.
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "MM/dd/yyyy"
+//        let habitDate = dateFormatter.string(from: Date())
+//
+//        let countRealm = localRealm.objects(RMO_Count.self)
+//
+//        if !countRealm.contains(where: { $0.date == habitDate} )
+//        {
+//            let newCount = RMO_Count()
+//            newCount.date = habitDate
+//
+//            try! localRealm.write {
+//                localRealm.add(newCount)
+//            }
+//        }
+//
         let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
         
-//        let today = Date()
-//        let midnight = Calendar.current.startOfDay(for: today)
-//        let nextMidnight = Calendar.current.date(byAdding: .day, value: 1, to: midnight)
-
         print("===========")
         print(realm)
         print("===========")
@@ -488,5 +502,11 @@ scenario 4 : old RepeatType & new repeatType == .repeat (different interval ex> 
     -> RMO_Habit, RMO_Repeat 둘다 edit
     */
 
+/*새로운 시나리오
+ 1. updateOngoing 안에 countRealm을 넣는다.
+ 2. RMO_Count에 yestDate var 을 넣는다. 여기에는 app을 실행한 날짜의 어제 날짜를 적는다.
+ 3. app을 처음 실행 하면 그 전 날에 해당하는 object의 yestDate var을 체크. 만약 어제에 해당하는 object가 없으면 아무일도 생기지 않는다. 체크를 했는데 있으면 onGoing이 false인 애들을 전부 true로 바뀐다.
+
+ */
 
 //Q: AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?
