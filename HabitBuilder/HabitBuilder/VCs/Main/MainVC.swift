@@ -503,10 +503,46 @@ scenario 4 : old RepeatType & new repeatType == .repeat (different interval ex> 
     */
 
 /*새로운 시나리오
- 1. updateOngoing 안에 countRealm을 넣는다.
- 2. RMO_Count에 yestDate var 을 넣는다. 여기에는 app을 실행한 날짜의 어제 날짜를 적는다.
- 3. app을 처음 실행 하면 그 전 날에 해당하는 object의 yestDate var을 체크. 만약 어제에 해당하는 object가 없으면 아무일도 생기지 않는다. 체크를 했는데 있으면 onGoing이 false인 애들을 전부 true로 바뀐다.
 
+ ==RMO_Habit에 있는 onGoing var을 업데이트 하는 방법==
+ 
+ 1. App을 실행 하면 func updateOnGoing 이 바로 실행된다.
+
+    a) 만약 app이 오늘 처음 실행되는 거라면..
+        1) RMO_Count에 오늘에 해당하는 날짜가 있는지 없는지 체크한다.
+            a) 없으면 date var에 오늘 날짜가 저장된다.
+            b) 있으면 그냥 2)로 넘어간다 (있는 경우는 NewHabitVC를 통해서 미래에 있을 habit을 이미 만들어 놓은경우)
+        2) 오늘 날짜에 해당하는 object의 habitUpdated를 체크한다. false일 것이다.
+        3) RMO_Count에 있는 habitUpdated (Bool) var이 false에서 true로 바뀐다.
+        4) RMO_Habit에 있는 모든 onGoing이 true로 바뀐다.
+ 
+ 2. tableView에는 onGoing == true 인 모든 habit들이 찍힌다.
+ 3. 그러고 나서 오늘 repeat되는 애들중에 몇개를 success/fail 했다고 치자. 그러면 걔네들은 onGoing = false 가 되고 tableview에 더 이상 나타나지 않는다.
+ 
+    b) 오늘중 app을 다시 실행 시키면
+        1) RMO_Count의 오늘에 해당하는 object의 habitUpdated를 체크한다.
+            a) true일 경우 이미 app을 오늘 실행했다는 의미이기 때문에 아무일도 일어나지 않는다.
+            b) 오늘 하루중 이미 app을 실행 시켰다면 false일 경우는 없다.(왜냐하면 app이 실행되면 제일 먼저 hapitUpdated가 true로 바뀌기 때문에)
+ 
+그리고 그 다음날 app을 실행하면
+ 
+4.역시나 func updateOnGoing이 실행되고, RMO_Count는 그 다음날에 해당하는 날짜의 habitUpdate를 true로 바꿔주고 RMO_Habit에 있는 onGoing도 true로 만들어 준다. 이렇게 함으로 RMO_Habit에 남아있는 모든 habit들이 새로 tableView에 뜨게 된다.
+ 
+ 
+ ==tableView에서 habit을 delete/success/fail하게 되면 생기는 변화==
+ 1. tableView에서 delete을 한 경우
+    a) repeatType에 상관없이 무조건 RMO_Habit에서 지워진다.
+ 
+ 2. tableView에서 success/fail 한 경우
+    a) habit이 repeatType == .none 이면 RMO_Habit에서 지워진다.
+    b) habit이 repeatType != .none 이면 onGoing = false가 되고 tableView에서만 지워진다.
+
+ 
+ 
+ 
+
+ 
+ 
  */
 
 //Q: AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?
