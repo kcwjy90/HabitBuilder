@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		480567F927FBD7E50066FF9A /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567F827FBD7E50066FF9A /* SettingsVC.swift */; };
 		480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567FC280E6E050066FF9A /* AllHabitsVC.swift */; };
 		480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480568022817A5DA0066FF9A /* NotiTestVC.swift */; };
 		4839B57028924E1B0073F6E1 /* searchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4839B56F28924E1B0073F6E1 /* searchVC.swift */; };
@@ -37,7 +36,6 @@
 
 /* Begin PBXFileReference section */
 		389F6030B377C8AD6055D89E /* Pods_HabitBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HabitBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		480567F827FBD7E50066FF9A /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		480567FC280E6E050066FF9A /* AllHabitsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllHabitsVC.swift; sourceTree = "<group>"; };
 		480568022817A5DA0066FF9A /* NotiTestVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTestVC.swift; sourceTree = "<group>"; };
 		4839B56F28924E1B0073F6E1 /* searchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchVC.swift; sourceTree = "<group>"; };
@@ -193,7 +191,6 @@
 				4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */,
 				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				485EA4C62834C99400C38387 /* ProgressVC.swift */,
-				480567F827FBD7E50066FF9A /* SettingsVC.swift */,
 				C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */,
 				48990398281DB99E009ED152 /* HabitDetailVC.swift */,
 				C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */,
@@ -332,7 +329,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				480567F927FBD7E50066FF9A /* SettingsVC.swift in Sources */,
 				488CA3A528409DB4002F1E6B /* RepeatTableCell.swift in Sources */,
 				48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */,
 				48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */,
