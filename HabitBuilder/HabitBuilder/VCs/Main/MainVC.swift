@@ -114,6 +114,9 @@ class MainVC: UIViewController {
         deletePrev()
         realmNoti()
         
+        //FIX: 일단은 app을 run 할때마다 지워지기는 하는데...문제는 app을 완전히 close하지 않은상태에서 noti가 왔고, 그걸 못 보고 app을 켰을경우 밑의 code가 run 되지는 않으니 noti가 지워지지 않는다.
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
     }
     
     
@@ -461,14 +464,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 //아직 해야 할것 -
-//1)앱 상에 빨간 숫자 사라지게 하는거.지금은 noti뜨는걸 눌러야만 사라짐. 
+//1)앱 상에 빨간 숫자 사라지게 하는거.지금은 noti뜨는걸 눌러야만 사라짐.
+//      -> MainVC 117줄을 보시오
 //2)repeat에 따라 cell이 자동 생성되게 하는거? 코드는 어디에 적어야 하나?
 //3)repeat이 지정된 것을 영구 지우면 noti가 안오게 하는법
 // 예> 책읽기는 daily habit인데, 오늘 성공했으면 'Success' button 을 누른다. 이러면 tableview에서 사라지지만 daily habit이기 때문에 내일이 되면 다시 떠야함. 현재 noti는 오고 있음. 근데 habit 생성은 안됨
 // 그러다가 책읽기 habit을 영구적으로 지우면 다시 뜨지도 않아야 하고 noti 도 안와야 함.
 //4) 다음날 자정에 onGoing == false로 바꿔 다시 뜨게 해주는 코드는 아직 개발중
+//      -> 토요일날 형이랑 시나리오 점검 하고나면 아마 만들수 있지 않을까
 //5. 해야할거 - habit을 habitDetailVC에서 지웠을 경우 allHabitsearchVC를 update해줘야함
+//      -> 아 이거 꼭 물어봐야 함
 //6. noti 는 또 왜 안되고 지랄이야 ㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜㅜ
+//      -> 시뮬레이터에서 돌리면 되기는 됨 ㅜㅜ
 
 
  
