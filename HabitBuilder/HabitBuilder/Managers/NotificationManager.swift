@@ -8,6 +8,7 @@
 
 import Foundation
 import RealmSwift
+import UserNotifications
 
 class NotificationManger: NSObject {
     
@@ -49,6 +50,11 @@ class NotificationManger: NSObject {
         
         execTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
 
+    }
+    
+    //MARK: removes notification of deleted Habits
+    func removeNoti(id:String) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [id])
     }
     
     
