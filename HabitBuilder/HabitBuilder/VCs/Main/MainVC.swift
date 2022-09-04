@@ -319,6 +319,31 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
+    // FIXME: Added 9/4. Still needs to execute this.
+    func checkTheDay() -> Bool {
+        
+        let executedToday = UserDefaults.standard.object(forKey: "exeToday")
+        if let exeToday: Date = executedToday as? Date {
+            
+            let today = Date()
+            if today > exeToday {
+                // 다음날 실행
+                UserDefaults.standard.set(today, forKey: "exeToday")
+                return true
+            }
+                
+                else {
+                // 오늘 첫 실행
+                return false
+            }
+        } else {
+            //앱 처음 실행
+            let today = Date()
+            UserDefaults.standard.set(today, forKey: "exeToday")
+            return false
+            
+        }
+    }
     
     
     
