@@ -229,37 +229,26 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     //step 4 =====================
-// MARK: Updating on going
+// FIXME: Updating on going. 왜 아직 계속 나타나지? 내일 다시 해보자
     func updateOngoing() {
         
-//        //MARK: RMO_Count에 오늘 날짜가 없을경우 오늘 날짜를 넣는다.
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let habitDate = dateFormatter.string(from: Date())
-//
-//        let countRealm = localRealm.objects(RMO_Count.self)
-//
-//        if !countRealm.contains(where: { $0.date == habitDate} )
-//        {
-//            let newCount = RMO_Count()
-//            newCount.date = habitDate
-//
-//            try! localRealm.write {
-//                localRealm.add(newCount)
-//            }
-//        }
-//
-        let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
-        
-        print("===========")
-        print(realm)
-        print("===========")
-        
-        try! self.localRealm.write {
-            realm.setValue(true, forKey: "onGoing")
+        if checkTheDay() == true {
+            let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
+            
+            print("===========")
+            print(realm)
+            print("===========")
+            
+            try! self.localRealm.write {
+                realm.setValue(true, forKey: "onGoing")
+            }
+            
+            print(localRealm.objects(RMO_Habit.self))
+        } else {
+            print("아직 내일 아님")
+            return
         }
         
-        print(localRealm.objects(RMO_Habit.self))
         
     }
     //step 4 =====================
