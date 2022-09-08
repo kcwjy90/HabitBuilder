@@ -282,8 +282,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).filter("onGoing == True").sorted(byKeyPath: "date", ascending: true)
         
-        print("line284=============== habits")
-        print(habits)
         
         //.sorted뒤에 나오는게 시간에 맞춰서 순서를 바꿔주는 핵심
         
@@ -319,7 +317,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    // FIXME: Added 9/4. Still needs to execute this.
+    
+    
+    // MARK: userDefault에 오늘 날짜 저장/체크하기
     func checkTheDay() -> Bool {
         
         let executedToday = UserDefaults.standard.object(forKey: "exeToday")
@@ -339,6 +339,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 // 오늘 첫 실행
                 return false
             }
+            
         } else {
             //앱 처음 실행
             let today = Date()
@@ -490,12 +491,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 //아직 해야 할것 -
 
-//4) 다음날 자정에 onGoing == false로 바꿔 다시 뜨게 해주는 코드는 아직 개발중
-//      -> 토요일날 형이랑 시나리오 점검 하고나면 아마 만들수 있지 않을까
+
 //5. 해야할거 - habit을 habitDetailVC에서 지웠을 경우 allHabitsearchVC를 update해줘야함
 //      -> 아 이거 꼭 물어봐야 함
-// HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함
-
+//6. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함
+//7. repeat되어 있는 habit들중, 오늘 무시하고 지나가버린 habit들은 '과거의 habit'으로 존재하고, 새롭게 오늘도 그 하빗들이 뜨게 만들어야 함
 
  
 /* 이렇게 하면 되나? 일단 지금 까지 한거
