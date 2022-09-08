@@ -397,8 +397,20 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                     }
         } else {
             
+            
+            //근데 만약 만약 success/fail 하지 않고 하루가 지나면 어떡하지??
+            
+            //MARK: habit을 지우면 RMO_habit에 있는 habit의 날짜를 그 다음날로 변경
+            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: updateHabit.date)
+            print("============================today\(updateHabit.title)" )
+            print("============================today\(updateHabit.date)" )
+            print("=============================\(tomorrow)")
+            
+            guard let tmr = tomorrow else {return}
+            
             try! self.localRealm.write {
                 updateHabit.onGoing = false
+                updateHabit.date = tmr
             }
         }
             

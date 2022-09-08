@@ -236,22 +236,24 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print(checkTheDay())
             let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
             
-            print("내일인 경우===========")
+            print("line 239 CheckTheDay == true onGoing false ===========")
             print(realm)
             print("===========")
-            
+
+                        
             //FIXME: 여기서 onGoing만 할게 아니라 날짜도 같이 업데이트 해줘야지 todaysTableView에 보이게 되는구나!! 아하
             try! self.localRealm.write {
                 realm.setValue(true, forKey: "onGoing")
             }
             
+            print("line 249 CheckTheDay == true onGoing changed to TRUE ===========")
             print(localRealm.objects(RMO_Habit.self))
             print("======================")
 
         } else {
             
             print(checkTheDay())
-            print("아직 내일 아님")
+            print("line 256. checktheday == false 아직 내일 아님")
             return
         }
         
@@ -279,6 +281,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).filter("onGoing == True").sorted(byKeyPath: "date", ascending: true)
+        
+        print("line284=============== habits")
+        print(habits)
         
         //.sorted뒤에 나오는게 시간에 맞춰서 순서를 바꿔주는 핵심
         
