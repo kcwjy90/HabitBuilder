@@ -233,18 +233,24 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func updateOngoing() {
         
         if checkTheDay() == true {
+            print(checkTheDay())
             let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
             
-            print("===========")
+            print("내일인 경우===========")
             print(realm)
             print("===========")
             
+            //FIXME: 여기서 onGoing만 할게 아니라 날짜도 같이 업데이트 해줘야지 todaysTableView에 보이게 되는구나!! 아하
             try! self.localRealm.write {
                 realm.setValue(true, forKey: "onGoing")
             }
             
             print(localRealm.objects(RMO_Habit.self))
+            print("======================")
+
         } else {
+            
+            print(checkTheDay())
             print("아직 내일 아님")
             return
         }
@@ -318,6 +324,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             if today > exeToday {
                 // 다음날 실행
                 UserDefaults.standard.set(today, forKey: "exeToday")
+                print("today는 \(today)")
+                print("exeToday는 \(exeToday)")
+
                 return true
             }
                 
