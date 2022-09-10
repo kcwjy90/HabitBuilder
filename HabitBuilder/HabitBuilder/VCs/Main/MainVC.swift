@@ -208,8 +208,30 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
+//FIXME: 만약에 오늘보다 오래된 habit이 repeat이고 지금 현재 보다 '과거'의 habit이라면 오늘 날짜로 업데이트 해서 여기에 display
+    
+    
+    
+// MARK: CheckTheDay bool에 따라서 RMO_Habit의 onGoing을 업데이트
+    func updateOngoing() {
+        
+        if checkTheDay() == true {
+            //onGoing 이 false인 애들을 true로 바꿔줌
+            let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
+            
+            try! self.localRealm.write {
+                realm.setValue(true, forKey: "onGoing")
+            }
+
+        } else {
+            //아직 다음날이 아니라서 아무것도 안함
+            return
+        }
+        
+    }
+
+    
     //MARK: Auto-deleting habits that are 2 days old
-    //FIXME: 여기서 해야 하는구나. 만약에 오늘보다 오래된 habit이 repeat이고 지금 현재 보다 '과거'의 habit이라면 오늘 날짜로 업데이트 해서 여기에 display
     func deletePrev() {
         let realm = self.localRealm.objects(RMO_Habit.self)
         
@@ -220,7 +242,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         guard let ystday = yesterday else {return}
         
-        // MARK: repeatType none이 애들만 delete
+        // MARK: repeatType none이 애들은 이틀 이상 되면 delete
         try! self.localRealm.write {
             
             let deleteHabit = realm.where {
@@ -228,42 +250,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             self.localRealm.delete(deleteHabit)
         }
-        
-        
     }
     
-    
-// MARK: CheckTheDay bool에 따라서 RMO_Habit의 onGoing을 업데이트
-    func updateOngoing() {
-        
-        if checkTheDay() == true {
-            print(checkTheDay())
-            let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
-            
-            print("line 239 CheckTheDay == true onGoing false ===========")
-            print(realm)
-            print("===========")
-
-                        
-            //FIXME: 여기서 onGoing만 할게 아니라 날짜도 같이 업데이트 해줘야지 todaysTableView에 보이게 되는구나!! 아하
-            try! self.localRealm.write {
-                realm.setValue(true, forKey: "onGoing")
-            }
-            
-            print("line 249 CheckTheDay == true onGoing changed to TRUE ===========")
-            print(localRealm.objects(RMO_Habit.self))
-            print("======================")
-
-        } else {
-            
-            print(checkTheDay())
-            print("line 256. checktheday == false 아직 내일 아님")
-            return
-        }
-        
-        
-    }
-
     
     
     

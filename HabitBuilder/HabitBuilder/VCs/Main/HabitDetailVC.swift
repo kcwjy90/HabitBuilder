@@ -378,7 +378,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         
-        // ========================================= step 3
 
         // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
@@ -428,8 +427,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             }
         }
             
-        // ========================================= step 3
-
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
