@@ -207,7 +207,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
-    //MARK: auto-deleting habits that are 2 days old
+    
+    //MARK: Auto-deleting habits that are 2 days old
+    //FIXME: 여기서 해야 하는구나. 만약에 오늘보다 오래된 habit이 repeat이고 지금 현재 보다 '과거'의 habit이라면 오늘 날짜로 업데이트 해서 여기에 display
     func deletePrev() {
         let realm = self.localRealm.objects(RMO_Habit.self)
         
@@ -218,18 +220,20 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         guard let ystday = yesterday else {return}
         
+        // MARK: repeatType none이 애들만 delete
         try! self.localRealm.write {
             
             let deleteHabit = realm.where {
-                $0.date < ystday
+                $0.date < ystday && $0.privateRepeatType == 0
             }
             self.localRealm.delete(deleteHabit)
         }
+        
+        
     }
     
     
-    //step 4 =====================
-// FIXME: Updating on going. 왜 아직 계속 나타나지? 내일 다시 해보자
+// MARK: CheckTheDay bool에 따라서 RMO_Habit의 onGoing을 업데이트
     func updateOngoing() {
         
         if checkTheDay() == true {
@@ -259,8 +263,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         
     }
-    //step 4 =====================
 
+    
+    
     
     //MARK: Realm Notification function
     func realmNoti() {
@@ -345,9 +350,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let today = Date()
             UserDefaults.standard.set(today, forKey: "exeToday")
             return false
-            
         }
     }
+    
+    
     
     
     
@@ -491,84 +497,47 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 //아직 해야 할것 -
 
+//-형하고 아마 해결해야 하는것-
 
-//5. 해야할거 - habit을 habitDetailVC에서 지웠을 경우 allHabitsearchVC를 update해줘야함
-//      -> 아 이거 꼭 물어봐야 함
-//6. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함
-//7. repeat되어 있는 habit들중, 오늘 무시하고 지나가버린 habit들은 '과거의 habit'으로 존재하고, 새롭게 오늘도 그 하빗들이 뜨게 만들어야 함
+
+//1.오늘 완료 하지 않고 지나가버린 habit들은
+    // repeat 일경우 : 자동적으로 그 다음날에 해당하는 날짜를 달고 todaysTableview에 나타나야 한다!!!!! allHabitTalbeview에는 '완료되지 않은 과거의 habit' 는 빼고 그냥 '오늘 예정인' habit만 나타난다.
+    // repeat이 아닐경우 : '완료되지 않은 과거의 habit'은 회색으로 display. 그리고 만약 더 지나면 과거의 habit들의 noti를 업데이트 해야함 (더 이상 오지 않도록)
 
  
-/* 이렇게 하면 되나? 일단 지금 까지 한거
- 1. RMO_Habit 에 var onGoing: Bool 을 생성
- 2. tableview 에는 onGoing == True 인 애들만 불러옴
- 3. habit 이 success나 fail을 하면 onGoing 을 false로 바꿔 tableView에 안 뜨게함. RMO_Habit자체에서 habit을 지우는 것은 아님.
- 4. 그리고 다음날이 되면 모든 habit에 onGoing을 true 로 다시 바꿈. 이러면 매일마다 repeat되는 habit들이 다시 뜸
-    a) 만약 repeate = .none 일경우는 영구 지워지고, repeat != .none이 아닌경우는 onGoing 이 false 가 됨
- 5. 영구적으로 habit을 지우고 싶을때는 delete button을 눌러 아예 지워버림
+
+
+/* 아니면 완전 다른 시나리오
+
+전체적으로 갈아엎고 다시 해보자.
+ 1. RMO_Repeat 이라는 object를 만든다. 여기에는 habit이 repeat일 경우만 저장된다.
+    a) haibtDetailVC에서 repeatType을 Daily에서 NONE으로 바꿀경우 RMO_repeat에서는 이 하빗을 지우고, RMO_Habit에 이하빗을 저장한다. Noti도 업데이트 한다.
+ 
+ 2. app을 처음 실행 시킬때
+    a) daily의 경우: RMO_Habit에 똑같은 id가 있는 하빗이 있는가를 먼저 확인 후 RMO_Repeat에 있는 하빗의 날짜들을 오늘 날짜로 바꿔주고 이 하빗들을  해당하는 habit을 RMO_Habit에다가 넣어준다. 날짜를 바꿔주는 이유는 그래야지 todaysTableView에 띄워진다.
+    b) weekly, monthly, yearly의 경우: 저장되어 있는 날짜가 오늘기준 1주/1달/1년 전인지를 확인 후, 맞다면 날짜를 오늘 날짜로 바꿔 주고 RMO_Habit에 넣어준다.
+ 
+ 3. app을 오늘 처음 실행 시킨것이 아닐떄: UserDefaults 때문에 아무일도 생기지 않는다.
+ 4. app을 그 다음날 실행시키면: UserDefaults에 아무것도 없기 떄문에 step 2가 실행된다.
+ 
+ 5. 하빗을 완료하는 경우
+    a) success/fail 한 경우 RMO_Habit에서만 지워짐. 그렇기 떄문에 RMO_Repeat에는 repeat되어진 habit들이 계속 존재. 그리고 '그 다음 날'의 habit으로서 날짜가 바뀌고 AllHabitSearchVC에서 '내일'의 habit으로 띄워진다.
+    b) delete 한 경우. RMO_Habit + RMO_repeat두개에서 다 지워짐. noti도 같이 업데이트 된다.
+ 
+ 6. 그날 하빗을 완료하지 않은경우
+    a) repeat이 아닐경우: allHabitSearchVC에서 '어제'의 habit으로서 이 하빗들을 확인할수 있으며. 여기서도 success & fail & delete은 동일하게 적용 가능하다.
+    b) repeat일 경우: '어제'의 habit은 사라지고 오늘 repeat되는 새로운 habit으로 생성된다.
+    
+ 3. AllHabitsSearchVC에는 repeat되는 모든 하빗을 제일 위(밑)에 항상 display하고 있음.
  
  */
 
 
-/*PLAN B
-1. RMO_habit 말고 RMO_repeat object를 하나 더 만들경우
-새로 add 할때
-    a) non-repeat인 경우 -> adds habit to RMO_Habit
-    b) repeat인 경우 -> adds habit to RMO_repeat
-2. App을 실행시킬때 RMO_repeat에 있는 것들을 RMO_Habit으로 가지고 온다. (Q: 하지만 앱을 매번 실행시킬때마다 이걸 하는게 아니라 하루에 한번만 해야하는데..)
-3. success/fail 을 할경우 RMO_Habit에서만 지우고, delete을 할 경우 만약 이게 repeated habit이면 RMO_Habit, RMO_Repeat이 둘다 에서 지운다.
- 
-edit 할때
-scenario 1 : old RepeatType & new repeatType == .none
-    -> RMO_Habit에서만 edit
-scenario 2 : old RepeatType == .none & new repeatType = .repeat
-    -> RMO_Habit에서 edit, RMO_repeat 에 새로추가
-scenario 3 : old repeatType == .repeat & new repeatType = .none
-    -> RMO_Habit에서 edit, RMO_repeat 에서 지우기
-scenario 4 : old RepeatType & new repeatType == .repeat (different interval ex> daily -> monthly)
-    -> RMO_Habit, RMO_Repeat 둘다 edit
-    */
 
-/*새로운 시나리오
 
- ==RMO_Habit에 있는 onGoing var을 업데이트 하는 방법==
- 
- 1. App을 실행 하면 func updateOnGoing 이 바로 실행된다.
+//-내가 혼자 해결할수 있지 않을까...하는것-
+//1. AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?
+//2. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함. 예) 시간을 바꾼다 -> 바꾼 시간으로 노티가 와야함
+//3. past는 success/fail이 안되고, 오직 save나 delete밖에 못해야 된다.
 
-    a) 만약 app이 오늘 처음 실행되는 거라면..
-        1) RMO_Count에 오늘에 해당하는 날짜가 있는지 없는지 체크한다.
-            a) 없으면 date var에 오늘 날짜가 저장된다.
-            b) 있으면 그냥 2)로 넘어간다 (있는 경우는 NewHabitVC를 통해서 미래에 있을 habit을 이미 만들어 놓은경우)
-        2) 오늘 날짜에 해당하는 object의 habitUpdated를 체크한다. false일 것이다.
-        3) RMO_Count에 있는 habitUpdated (Bool) var이 false에서 true로 바뀐다.
-        4) RMO_Habit에 있는 모든 onGoing이 true로 바뀐다.
- 
- 2. tableView에는 onGoing == true 인 모든 habit들이 찍힌다.
- 3. 그러고 나서 오늘 repeat되는 애들중에 몇개를 success/fail 했다고 치자. 그러면 걔네들은 onGoing = false 가 되고 tableview에 더 이상 나타나지 않는다.
- 
-    b) 오늘중 app을 다시 실행 시키면
-        1) RMO_Count의 오늘에 해당하는 object의 habitUpdated를 체크한다.
-            a) true일 경우 이미 app을 오늘 실행했다는 의미이기 때문에 아무일도 일어나지 않는다.
-            b) 오늘 하루중 이미 app을 실행 시켰다면 false일 경우는 없다.(왜냐하면 app이 실행되면 제일 먼저 hapitUpdated가 true로 바뀌기 때문에)
- 
-그리고 그 다음날 app을 실행하면
- 
-4.역시나 func updateOnGoing이 실행되고, RMO_Count는 그 다음날에 해당하는 날짜의 habitUpdate를 true로 바꿔주고 RMO_Habit에 있는 onGoing도 true로 만들어 준다. 이렇게 함으로 RMO_Habit에 남아있는 모든 habit들이 새로 tableView에 뜨게 된다.
- 
- 
- ==tableView에서 habit을 delete/success/fail하게 되면 생기는 변화==
- 1. tableView에서 delete을 한 경우
-    a) repeatType에 상관없이 무조건 RMO_Habit에서 지워진다.
- 
- 2. tableView에서 success/fail 한 경우
-    a) habit이 repeatType == .none 이면 RMO_Habit에서 지워진다.
-    b) habit이 repeatType != .none 이면 onGoing = false가 되고 tableView에서만 지워진다.
 
- 
- 
- 
-
- 
- 
- */
-
-//Q: AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?

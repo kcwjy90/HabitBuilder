@@ -201,7 +201,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitDate.text = newHabitDate
         
         
-        //repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
+        //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
         if newHabitDate == todayDate {
             cell.titleBackground.backgroundColor = .darkGreen
         } else if date > today && date < sevenDays  {
@@ -210,12 +210,16 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             cell.titleBackground.backgroundColor = .restGreen
         }
         
-        //오래된 habit의 색을 까맣게 바꿈
+        //MARK: 오래된 habit의 색을 까맣게 바꿈.
+        //FIXME: 오래된 habit의 색을 까맣게 바꾸고 날짜가 더 오래 됨에 따라 자동적으로 지워지면서 noti도 같이 지워져야함.
+        //아 혹은 repeat된 애들은 만약 하루보다 더 오래 되면 자동적으로 날짜가 바뀌면 되는구나!
+        
         if newHabitDate < todayDate {
             cell.cellStackView.backgroundColor = .pastGray
         } else {
             cell.cellStackView.backgroundColor = .white
         }
+        
         
         switch newHabit.privateRepeatType {
         case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
@@ -395,8 +399,3 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
 //}
 
 
-
-
-
-//아직 해야 할것 - 1)앱 상에 빨간 숫자 사라지게 하는거. 지금은 noti뜨는걸 눌러야만 사라짐. TapGesture 가 있으니까 selectrowat이 안됨
-//저번주에 못한거 - 1) 타임존 지정. 2) NSCalendar 써서 바꾸는 거
