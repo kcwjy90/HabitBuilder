@@ -502,9 +502,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 //1.오늘 완료 하지 않고 지나가버린 habit들은
     // repeat 일경우 : 자동적으로 그 다음날에 해당하는 날짜를 달고 todaysTableview에 나타나야 한다!!!!! allHabitTalbeview에는 '완료되지 않은 과거의 habit' 는 빼고 그냥 '오늘 예정인' habit만 나타난다.
-    // repeat이 아닐경우 : '완료되지 않은 과거의 habit'은 회색으로 display. 그리고 만약 더 지나면 과거의 habit들의 noti를 업데이트 해야함 (더 이상 오지 않도록)
-
+  
+//2. AllHabit에서 habit을 지울경우 HabitDetailVC line 520이 allHabitSearchVC line 129번으로 가서 111번의 reloaddata로 가는데 왜 아직 tableView가 업데이트가 안되고 그대로일까?
  
+
+
 
 
 /* 아니면 완전 다른 시나리오
@@ -536,8 +538,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 //-내가 혼자 해결할수 있지 않을까...하는것-
-//1. AllHabit에서 habit을 지울경우 HabitDetailVC line 476이 allHabitSearchVC line 113을 call 하는데 왜 tableview가 reload될때 habit은 아직 그대로일까?
+
 //2. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함. 예) 시간을 바꾼다 -> 바꾼 시간으로 노티가 와야함
 //3. past는 success/fail이 안되고, 오직 save나 delete밖에 못해야 된다.
 
 
+// repeat이 아닐경우 : '완료되지 않은 과거의 habit'은 회색으로 display. 그리고 만약 더 지나면 과거의 habit들의 noti를 업데이트 해야함 (더 이상 오지 않도록)

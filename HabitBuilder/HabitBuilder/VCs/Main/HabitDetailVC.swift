@@ -457,7 +457,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // ========================================= step 3
 
-        // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
+        // MARK: 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
@@ -498,13 +498,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+            
             super.dismiss(animated: true, completion: deleteD)
-            self.delegate?.editComp() // 왜 이걸 했는데도 reload가 안되지??
-
+            
         }))
         
         
-        //delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
+        //MARK: delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
         func deleteD() {
         
         let realm = self.localRealm.objects(RMO_Habit.self)
@@ -517,8 +517,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                         }
         }
         
-        //delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
-
+        self.delegate?.editComp() // 왜 이걸 했는데도 reload가 안되지??
 
         present(alert, animated: true, completion: nil)
         
@@ -574,20 +573,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             
         }
         
-        //        option 1
-        //        print를 하면 하나가 뜨는게 아니라 habit object가 다~뜸. 왜지? 그리고 여기는 guard 를 붙힐수가 없네...왜지?
-        //        let habit2 = localRealm.objects(RMO_Habit.self).filter { habit in
-        //                return habit.id == self.habit.id
-        //            }
-        //        print(habit2)
-        
-        //        option2
-        //        밑에 코드는 build는 되는데 save button을 누르면 에러가 남. 왜지?
-        //        let query = "id == \(self.habit.id)"
-        //        guard let habit = localRealm.objects(RMO_Habit.self).filter(query).first else
-        //        { return }
-        
-        // 그래서 완성본 위에서는 filter 안쓰고 where 씀
         
         //MARK: updating Habit
         try! self.localRealm.write {
@@ -604,7 +589,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             }
         }
         
-        //MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
+        // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
+        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
         delegate?.editComp()
         dismiss(animated: true, completion: nil)
         

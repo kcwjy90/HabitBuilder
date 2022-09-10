@@ -86,7 +86,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         
         reloadData()
         
-        print(habits)
+        print("after app runs - after reloaddata()\(habits)")
         
     }
     
@@ -109,9 +109,9 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     }
     
     func reloadData() {
-        // Get all habits in the realm
+        // MARK: Get all habits with onGoing = true in the realm
         habits = localRealm.objects(RMO_Habit.self).filter("onGoing == True").toArray() //updating habits []
-        print(habits)
+        print("reloaddata-\(habits)")
         //
         habits = habits.sorted(by: {
             $0.date.compare($1.date) == .orderedAscending
@@ -275,7 +275,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             try! self.localRealm.write {
                 taskToUpdate.success += 1
             }
-            print(self.localRealm.objects(RMO_Count.self))
+            print("after success - \(self.localRealm.objects(RMO_Count.self))")
             
             let habit = self.searchedHabits[indexPath.row]
             let thisId = habit.id
