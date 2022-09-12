@@ -378,7 +378,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         
-
+        
         // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
@@ -387,31 +387,31 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         if updateHabit.privateRepeatType == 0 {
             
             let thisId = habit.id
-                    try! self.localRealm.write {
-
-                        let deleteHabit = realm.where {
-                            $0.id == thisId
-                        }
-                        self.localRealm.delete(deleteHabit)
-                    }
+            try! self.localRealm.write {
+                
+                let deleteHabit = realm.where {
+                    $0.id == thisId
+                }
+                self.localRealm.delete(deleteHabit)
+            }
         } else {
             
             
             //FIXME: 근데 만약 만약 success/fail 하지 않고 하루가 지나면 어떡하지??
-                    //solution: habit.date에 +1 을 하는게 아니라, 오늘 날짜 에서 +1 한 tomorrow에서 day 만 추출. 그거를 새로운 habit.date의 날짜로 만듬.
+            //solution: habit.date에 +1 을 하는게 아니라, 오늘 날짜 에서 +1 한 tomorrow에서 day 만 추출. 그거를 새로운 habit.date의 날짜로 만듬.
             
             //MARK: habit을 지우면 RMO_habit에 있는 habit의 날짜를 그 다음날로 변경
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())
             
             guard let tmr = tomorrow else {return}
-
+            
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd"
             let tmrDay = dateFormatter.string(from: tmr)
             let tmrInt = Int(tmrDay)
             
             guard let newDate = tmrInt else {return}
-                
+            
             print(tmrDay)
             
             let newHabitDate = Calendar.current.date(bySetting: .day, value: newDate, of: habit.date)
@@ -426,7 +426,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
                 updateHabit.date = newHDate
             }
         }
-            
+        
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
@@ -449,11 +449,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         try! self.localRealm.write {
             taskToUpdate.success += 1
         }
-//        print(self.localRealm.objects(RMO_Count.self))
+        //        print(self.localRealm.objects(RMO_Count.self))
         
         
         // ========================================= step 3
-
+        
         // MARK: 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
@@ -462,13 +462,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         if updateHabit.privateRepeatType == 0 {
             
             let thisId = habit.id
-                    try! self.localRealm.write {
-
-                        let deleteHabit = realm.where {
-                            $0.id == thisId
-                        }
-                        self.localRealm.delete(deleteHabit)
-                    }
+            try! self.localRealm.write {
+                
+                let deleteHabit = realm.where {
+                    $0.id == thisId
+                }
+                self.localRealm.delete(deleteHabit)
+            }
         } else {
             
             try! self.localRealm.write {
@@ -477,7 +477,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         // ========================================= step 3
-
+        
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
@@ -487,7 +487,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     @objc func deleteButtonPressed(sender: UIButton){
         
         //MARK: creating Alert with two buttons - Cancel: to cancel delete. Confirm: to Delete
-        //FIXME: Still need to add delete functionality
         let alert = UIAlertController(
             title: "Delete this Habit",
             message: "",
@@ -496,140 +495,136 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
             
-            super.dismiss(animated: true, completion: deleteD)
-            
+            self.dismiss(animated: true) {
+                let realm = self.localRealm.objects(RMO_Habit.self)
+                let thisId = self.habit.id
+                try! self.localRealm.write {
+                    let deleteHabit = realm.where {
+                        $0.id == thisId
+                    }
+                    self.localRealm.delete(deleteHabit)
+                    self.delegate?.editComp()
+
+                }
+            }
         }))
         
-        
-        //MARK: delete가 제대로 작동하지 않아서 급하게 넣은 코드. allhabitsearchVC가 바로 업데이트가 안되네?
-        func deleteD() {
-        
-        let realm = self.localRealm.objects(RMO_Habit.self)
-                let thisId = habit.id
-                        try! self.localRealm.write {
-                            let deleteHabit = realm.where {
-                                $0.id == thisId
-                            }
-                            self.localRealm.delete(deleteHabit)
-                        }
-        }
-        
-        self.delegate?.editComp() // 왜 이걸 했는데도 reload가 안되지??
-
         present(alert, animated: true, completion: nil)
-        
     }
-    
-    
-    @objc func saveButtonPressed(sender: UIButton) {
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let countRealm = localRealm.objects(RMO_Count.self)
-        let realm = localRealm.objects(RMO_Habit.self)
         
-        //Filtering the habit where ID matches
-        guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
-        {return}
-        let taskToUpdate = realm[indexNumb]
         
-        // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
-        if taskToUpdate.date != habitDateTime.date {
+        
+        
+        @objc func saveButtonPressed(sender: UIButton) {
             
-            //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
-            let countDate = dateFormatter.string(from: habitDateTime.date)
-            if !countRealm.contains(where: { $0.date == countDate} )
-            {
-                let newCount = RMO_Count()
-                newCount.date = countDate
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let countRealm = localRealm.objects(RMO_Count.self)
+            let realm = localRealm.objects(RMO_Habit.self)
+            
+            //Filtering the habit where ID matches
+            guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+            {return}
+            let taskToUpdate = realm[indexNumb]
+            
+            // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
+            if taskToUpdate.date != habitDateTime.date {
+                
+                //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
+                let countDate = dateFormatter.string(from: habitDateTime.date)
+                if !countRealm.contains(where: { $0.date == countDate} )
+                {
+                    let newCount = RMO_Count()
+                    newCount.date = countDate
+                    
+                    try! localRealm.write {
+                        localRealm.add(newCount)
+                    }
+                    
+                }
+                
+                //예전 habit의 count 수를 -1
+                let removeDate = dateFormatter.string(from: taskToUpdate.date)
+                guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
+                {return}
+                let minusCount = countRealm[indexNumb]
                 
                 try! localRealm.write {
-                    localRealm.add(newCount)
+                    minusCount.total -= 1
+                    
                 }
-
+                
+                //새로운 habit의 count수를 +1
+                guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
+                {return}
+                let plusCount = countRealm[indexNumb]
+                try! localRealm.write {
+                    plusCount.total += 1
+                }
+                
             }
             
-            //예전 habit의 count 수를 -1
-            let removeDate = dateFormatter.string(from: taskToUpdate.date)
-            guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
-            {return}
-            let minusCount = countRealm[indexNumb]
             
-            try! localRealm.write {
-                minusCount.total -= 1
-
+            //MARK: updating Habit
+            try! self.localRealm.write {
+                guard let titleText = habitTitle.text, let descText = habitDesc.text
+                else { return }
+                taskToUpdate.title = titleText
+                taskToUpdate.desc = descText
+                taskToUpdate.date = habitDateTime.date
+                
+                if repTyp == nil {
+                    taskToUpdate.repeatType = prevRep
+                } else {
+                    taskToUpdate.repeatType = repTyp
+                }
             }
             
-            //새로운 habit의 count수를 +1
-            guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
-            {return}
-            let plusCount = countRealm[indexNumb]
-            try! localRealm.write {
-                plusCount.total += 1
-            }
+            // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
+            NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
+            delegate?.editComp()
+            dismiss(animated: true, completion: nil)
             
         }
         
-        
-        //MARK: updating Habit
-        try! self.localRealm.write {
-            guard let titleText = habitTitle.text, let descText = habitDesc.text
-            else { return }
-            taskToUpdate.title = titleText
-            taskToUpdate.desc = descText
-            taskToUpdate.date = habitDateTime.date
-            
-            if repTyp == nil {
-                taskToUpdate.repeatType = prevRep
-            } else {
-                taskToUpdate.repeatType = repTyp
+        //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
+        func textViewDidBeginEditing(_ textView: UITextView) {
+            if textView.textColor == UIColor.lightGray {
+                textView.text = nil
+                textView.textColor = UIColor.black
             }
         }
         
-        // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
-        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
-        delegate?.editComp()
-        dismiss(animated: true, completion: nil)
-        
-    }
-    
-    //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == UIColor.lightGray {
-            textView.text = nil
-            textView.textColor = UIColor.black
+        //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
+        func textViewDidEndEditing(_ textView: UITextView) {
+            if textView.text.isEmpty {
+                textView.text = "Description of your New Habit"
+                textView.textColor = UIColor.lightGray
+            }
         }
-    }
-    
-    //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            textView.text = "Description of your New Habit"
-            textView.textColor = UIColor.lightGray
-        }
-    }
-    
-    //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
-    func changeTextColor(_ textView: UITextView) {
         
-        if textView.text == "Description of your New Habit" {
-            textView.textColor = UIColor.lightGray
+        //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
+        func changeTextColor(_ textView: UITextView) {
             
-            textViewDidBeginEditing(habitDesc)
-            textViewDidEndEditing(habitDesc)
+            if textView.text == "Description of your New Habit" {
+                textView.textColor = UIColor.lightGray
+                
+                textViewDidBeginEditing(habitDesc)
+                textViewDidEndEditing(habitDesc)
+            }
+        }
+        
+    }
+    
+    
+    //MARK: Receiving Updated Repeat Type from RepeatVC
+    extension HabitDetailVC: RepeatVCDelegate {
+        
+        func didChangeRepeatType(repeatType: RepeatType) {
+            repTyp = repeatType
+            let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
+            repeatTypeLabel.text = repeatTypeString.capitalized + " >"
         }
     }
     
-}
-
-
-//MARK: Receiving Updated Repeat Type from RepeatVC
-extension HabitDetailVC: RepeatVCDelegate {
-    
-    func didChangeRepeatType(repeatType: RepeatType) {
-        repTyp = repeatType
-        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
-        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
-    }
-}
-
