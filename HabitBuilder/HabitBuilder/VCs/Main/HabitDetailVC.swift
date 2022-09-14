@@ -396,34 +396,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             }
         } else {
             
-            
-            //FIXME: 근데 만약 만약 success/fail 하지 않고 하루가 지나면 어떡하지??
-            //solution: habit.date에 +1 을 하는게 아니라, 오늘 날짜 에서 +1 한 tomorrow에서 day 만 추출. 그거를 새로운 habit.date의 날짜로 만듬.
-            
-            //MARK: habit을 지우면 RMO_habit에 있는 habit의 날짜를 그 다음날로 변경
-            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())
-            
-            guard let tmr = tomorrow else {return}
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd"
-            let tmrDay = dateFormatter.string(from: tmr)
-            let tmrInt = Int(tmrDay)
-            
-            guard let newDate = tmrInt else {return}
-            
-            print(tmrDay)
-            
-            let newHabitDate = Calendar.current.date(bySetting: .day, value: newDate, of: habit.date)
-            print("============================today\(updateHabit.title)" )
-            print("============================today\(updateHabit.date)" )
-            print("=============================\(newHabitDate)")
-            
-            guard let newHDate = newHabitDate else {return}
-            
             try! self.localRealm.write {
                 updateHabit.onGoing = false
-                updateHabit.date = newHDate
             }
         }
         

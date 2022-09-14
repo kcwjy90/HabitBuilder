@@ -112,7 +112,7 @@ class MainVC: UIViewController {
         
         updateOngoing()
         deletePrev()
-        realmNoti()
+        initHabits()
     
     }
     
@@ -255,8 +255,23 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     
-    //MARK: Realm Notification function
-    func realmNoti() {
+    //MARK: Initialize Habits + Realm Notification function
+    func initHabits() {
+        
+        let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
+        for dailyHabit in dailyHabits {
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd"
+            let day = dateFormatter.string(from: Date())
+            let intDay = Int(day) ?? 0
+            
+            if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                try! self.localRealm.write {
+                    dailyHabit.date = newHabitDate
+                }
+            }
+        }
         
         let today = Date()
         
