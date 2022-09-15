@@ -24,15 +24,16 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
-    //realm Noti 에서 쓰는거
+    //MARK: ====realm Noti 에서 쓰는거===
     deinit {
         print("deinit - NewHabitVC")
         notificationToken?.invalidate()
     }
     
-    //realm Noti 에서 쓰는거
     var status: NewHabitVCStatus = .initialize
     var notificationToken: NotificationToken? = nil
+    //===components needed for realm Noti===
+
     
     // backView 생성
     lazy var backView: UIView = {
@@ -111,8 +112,7 @@ class MainVC: UIViewController {
         todaysHabitTableView.separatorStyle = .none //removes lines btwn tableView cells
         
         updateOngoing()
-        deletePrev()
-        initHabits()
+        setRealmNoti()
     
     }
     
@@ -144,6 +144,8 @@ class MainVC: UIViewController {
     }
     
 }
+
+
 
 //Adding tableview and content
 extension MainVC: UITableViewDelegate, UITableViewDataSource {
@@ -208,7 +210,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
-//FIXME: 만약에 오늘보다 오래된 habit이 repeat이고 지금 현재 보다 '과거'의 habit이라면 오늘 날짜로 업데이트 해서 여기에 display
     
     
     
@@ -216,12 +217,16 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func updateOngoing() {
         
         if checkTheDay() == true {
+            //만약 이게 오늘 처음 run 하는 거면
             //onGoing 이 false인 애들을 true로 바꿔줌
             let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
             
             try! self.localRealm.write {
                 realm.setValue(true, forKey: "onGoing")
             }
+            
+            deletePrev()
+            initHabits()
 
         } else {
             //아직 다음날이 아니라서 아무것도 안함
@@ -253,11 +258,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
+    //MARK: Intializing Habits. Updates day of the repeated habits to todays
     
-    
-    //MARK: Initialize Habits + Realm Notification function
     func initHabits() {
-        
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
             
@@ -272,6 +275,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+    }
+    
+    
+    
+    
+    //MARK: setting Realm Notification function
+    func setRealmNoti() {
+       
         
         let today = Date()
         
@@ -499,40 +510,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 //아직 해야 할것 -
-
-//-형하고 아마 해결해야 하는것-
-
-
-//1.오늘 완료 하지 않고 지나가버린 habit들은
-    // repeat 일경우 : 자동적으로 그 다음날에 해당하는 날짜를 달고 todaysTableview에 나타나야 한다!!!!! allHabitTalbeview에는 '완료되지 않은 과거의 habit' 는 빼고 그냥 '오늘 예정인' habit만 나타난다.
-
-
-
-/* 아니면 완전 다른 시나리오
-
-전체적으로 갈아엎고 다시 해보자.
- 1. RMO_Repeat 이라는 object를 만든다. 여기에는 habit이 repeat일 경우만 저장된다.
-    a) haibtDetailVC에서 repeatType을 Daily에서 NONE으로 바꿀경우 RMO_repeat에서는 이 하빗을 지우고, RMO_Habit에 이하빗을 저장한다. Noti도 업데이트 한다.
- 
- 2. app을 처음 실행 시킬때
-    a) daily의 경우: RMO_Habit에 똑같은 id가 있는 하빗이 있는가를 먼저 확인 후 RMO_Repeat에 있는 하빗의 날짜들을 오늘 날짜로 바꿔주고 이 하빗들을  해당하는 habit을 RMO_Habit에다가 넣어준다. 날짜를 바꿔주는 이유는 그래야지 todaysTableView에 띄워진다.
-    b) weekly, monthly, yearly의 경우: 저장되어 있는 날짜가 오늘기준 1주/1달/1년 전인지를 확인 후, 맞다면 날짜를 오늘 날짜로 바꿔 주고 RMO_Habit에 넣어준다.
- 
- 3. app을 오늘 처음 실행 시킨것이 아닐떄: UserDefaults 때문에 아무일도 생기지 않는다.
- 4. app을 그 다음날 실행시키면: UserDefaults에 아무것도 없기 떄문에 step 2가 실행된다.
- 
- 5. 하빗을 완료하는 경우
-    a) success/fail 한 경우 RMO_Habit에서만 지워짐. 그렇기 떄문에 RMO_Repeat에는 repeat되어진 habit들이 계속 존재. 그리고 '그 다음 날'의 habit으로서 날짜가 바뀌고 AllHabitSearchVC에서 '내일'의 habit으로 띄워진다.
-    b) delete 한 경우. RMO_Habit + RMO_repeat두개에서 다 지워짐. noti도 같이 업데이트 된다.
- 
- 6. 그날 하빗을 완료하지 않은경우
-    a) repeat이 아닐경우: allHabitSearchVC에서 '어제'의 habit으로서 이 하빗들을 확인할수 있으며. 여기서도 success & fail & delete은 동일하게 적용 가능하다.
-    b) repeat일 경우: '어제'의 habit은 사라지고 오늘 repeat되는 새로운 habit으로 생성된다.
-    
- 3. AllHabitsSearchVC에는 repeat되는 모든 하빗을 제일 위(밑)에 항상 display하고 있음.
- 
- */
-
 
 
 
