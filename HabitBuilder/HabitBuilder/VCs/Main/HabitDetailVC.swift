@@ -406,6 +406,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         self.dismiss(animated: true, completion: nil)
     }
     
+    
+    
     @objc func successButtonPressed(sender: UIButton){
         
         //FIXME: 이거를 밖으로 빼고 싶은데..function 안에 있는 constants를 어떻게 refer 하지?
@@ -456,6 +458,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         self.dismiss(animated: true, completion: nil)
     }
+    
     
     
     @objc func deleteButtonPressed(sender: UIButton){

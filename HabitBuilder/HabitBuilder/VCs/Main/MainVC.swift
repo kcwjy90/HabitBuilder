@@ -113,6 +113,7 @@ class MainVC: UIViewController {
         
         updateOngoing()
         setRealmNoti()
+        
     
     }
     
@@ -217,19 +218,23 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func updateOngoing() {
         
         if checkTheDay() == true {
-            //만약 이게 오늘 처음 run 하는 거면
+            //만약 이게 그 다음날이 처음 실행 하는거면 오늘 처음 run 하는 거면
             //onGoing 이 false인 애들을 true로 바꿔줌
             let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
             
             try! self.localRealm.write {
                 realm.setValue(true, forKey: "onGoing")
             }
-            
+          
             deletePrev()
             initHabits()
+            
+            print("===========================true=============")
 
         } else {
             //아직 다음날이 아니라서 아무것도 안함
+            print("===========================false=============")
+
             return
         }
         
@@ -248,6 +253,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         guard let ystday = yesterday else {return}
         
         // MARK: repeatType none이 애들은 이틀 이상 되면 delete
+        // FIXME: perhaps all the repeated habits should just respawn
         try! self.localRealm.write {
             
             let deleteHabit = realm.where {
@@ -259,6 +265,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     //MARK: Intializing Habits. Updates day of the repeated habits to todays
+    //FIXME: only targeting habits with repeattype 1. need to incorporate all other types
     
     func initHabits() {
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
@@ -345,7 +352,16 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         if let exeToday: Date = executedToday as? Date {
             
             let today = Date()
-            if today > exeToday {
+            
+            //FIXME: Need to somehow compare the dates (only days), not strings
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let todayString = dateFormatter.string(from: today)
+            let exeString = dateFormatter.string(from: exeToday)
+            
+            if todayString != exeString {
+//          if today > exeToday {
+
                 // 다음날 실행
                 UserDefaults.standard.set(today, forKey: "exeToday")
                 print("today는 \(today)")
@@ -355,7 +371,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
                 
                 else {
-                // 오늘 첫 실행
+                // 오늘 첫 실행이 아님
                 return false
             }
             
