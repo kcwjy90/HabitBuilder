@@ -95,12 +95,12 @@ class MainVC: UIViewController {
         // dateLabelBackView backveiw grid
         dateLabelBackView.snp.makeConstraints{ (make) in
             make.top.left.right.equalTo(backView)
-            make.height.equalTo(52)
+            make.height.equalTo(47)
         }
         
         // dateLabel grid
         dateLabel.snp.makeConstraints{ (make) in
-            make.centerY.equalTo(dateLabelBackView)
+            make.centerY.equalTo(dateLabelBackView).offset(3)
             make.right.equalTo(dateLabelBackView).offset(-10)
         }
         
@@ -193,11 +193,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let newHabitDate = dateFormatter.string(from: date)
         
         switch newHabit.privateRepeatType {
-        case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
-        case 2 : cell.newHabitRepeat.text = "(W)"; cell.repeatBackground.backgroundColor = .pureOrange
-        case 3 : cell.newHabitRepeat.text = "(M)"; cell.repeatBackground.backgroundColor = .pureBlue
-        case 4 : cell.newHabitRepeat.text = "(Y)"; cell.repeatBackground.backgroundColor = .purePurple
-        default: cell.newHabitRepeat.text = ""; cell.repeatBackground.backgroundColor = .white
+        case 1 : cell.cellStackView.layer.borderColor = UIColor.pureRed.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
+        case 2 : cell.cellStackView.layer.borderColor = UIColor.pureOrange.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
+        case 3 : cell.cellStackView.layer.borderColor = UIColor.pureBlue.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
+        case 4 : cell.cellStackView.layer.borderColor = UIColor.purePurple.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
+        default: cell.cellStackView.layer.borderColor = UIColor.white.cgColor
         }
         
         cell.backgroundColor = .white
@@ -510,7 +510,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 //아직 해야 할것 -
-
+// HMM..maybe we need something to update the date of the renewed habits when the app gets deleted, b/c what if someone needs a notification at 6 am, but doesn't run the app til 8 am? 아! 노티는 상관없이 매일 fire되지 참. 그냥 tableview에 보여주는게 중요하지. 근데 역시 다 디스플레이하는게 필요할까? allHabits에서 미래것도 보고 싶을수도?
 
 
 //-내가 혼자 해결할수 있지 않을까...하는것-

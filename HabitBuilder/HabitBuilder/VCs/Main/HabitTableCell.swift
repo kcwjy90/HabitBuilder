@@ -35,16 +35,10 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
+    // No longer needed but to take space for stackView
     lazy var newHabitRepeat: UILabel = {
         let v = UILabel()
         v.textAlignment = .center
-        return v
-    }()
-    
-    lazy var repeatBackground: UIButton = {
-        let v = UIButton()
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 5
         return v
     }()
     
@@ -109,10 +103,8 @@ class HabitTableCell: UITableViewCell {
         dateStackView.addSubview(titleBackground)
         titleStackView.addArrangedSubview(newHabitDesc)
         dateStackView.addArrangedSubview(newHabitRepeat)
-        dateStackView.addSubview(repeatBackground)
         dateStackView.addArrangedSubview(newHabitDate)
         
-
         
         backView.snp.makeConstraints{ (make) in
             make.edges.equalTo(self)
@@ -153,20 +145,20 @@ class HabitTableCell: UITableViewCell {
         }
         
         newHabitTitle.snp.makeConstraints{ (make) in
-            make.top.equalTo(titleStackView)
-            make.height.equalTo(45)
+            make.top.equalTo(titleStackView).offset(10)
+            make.height.equalTo(40)
             make.left.equalTo(titleBackground).offset(35)
         }
         
         titleBackground.snp.makeConstraints{ (make) in
             make.height.equalTo(25)
-            make.bottom.equalTo(newHabitTitle.snp.bottom).offset(-10)
+            make.centerY.equalTo(newHabitTitle)
             make.width.equalTo(25)
-            make.left.equalTo(titleStackView.snp.left).offset(10)
+            make.left.equalTo(titleStackView.snp.left).offset(15)
         }
         
         newHabitDesc.snp.makeConstraints{ (make) in
-            make.height.equalTo(25)
+            make.height.equalTo(30)
             make.left.equalTo(titleStackView).offset(15)
         }
         
@@ -175,15 +167,9 @@ class HabitTableCell: UITableViewCell {
             make.left.equalTo(dateStackView)
         }
         
-        repeatBackground.snp.makeConstraints{ (make) in
-            make.height.equalTo(10)
-            make.bottom.equalTo(newHabitRepeat.snp.bottom)
-            make.left.equalTo(newHabitRepeat).offset(35)
-            make.right.equalTo(newHabitRepeat).offset(-35)
-        }
         
         newHabitDate.snp.makeConstraints{ (make) in
-            make.height.equalTo(35)
+            make.height.equalTo(30)
             make.left.equalTo(dateStackView)
         }
         

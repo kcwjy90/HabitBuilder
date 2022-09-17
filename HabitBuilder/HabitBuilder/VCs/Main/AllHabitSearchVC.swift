@@ -222,11 +222,11 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         
         switch newHabit.privateRepeatType {
-        case 1 : cell.newHabitRepeat.text = "(D)"; cell.repeatBackground.backgroundColor = .pureRed
-        case 2 : cell.newHabitRepeat.text = "(W)"; cell.repeatBackground.backgroundColor = .pureOrange
-        case 3 : cell.newHabitRepeat.text = "(M)"; cell.repeatBackground.backgroundColor = .pureBlue
-        case 4 : cell.newHabitRepeat.text = "(Y)"; cell.repeatBackground.backgroundColor = .purePurple
-        default: cell.newHabitRepeat.text = ""; cell.repeatBackground.backgroundColor = .white
+        case 1 : cell.middleLine.backgroundColor = .pureRed
+        case 2 : cell.middleLine.backgroundColor = .pureOrange
+        case 3 : cell.middleLine.backgroundColor = .pureBlue
+        case 4 : cell.middleLine.backgroundColor = .purePurple
+        default: cell.middleLine.backgroundColor = .white
         }
         
         return cell
