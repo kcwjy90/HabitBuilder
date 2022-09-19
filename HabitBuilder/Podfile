@@ -6,7 +6,7 @@ target 'HabitBuilder' do
   use_frameworks!
 
   # Pods for HabitBuilder
-   pod 'SnapKit', '~> 5.0.0'
+   pod 'SnapKit', '~> 5.6.0'
    pod 'RealmSwift', '~>10'
    pod 'Charts'
    

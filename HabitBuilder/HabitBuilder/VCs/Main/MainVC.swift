@@ -268,8 +268,58 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //FIXME: only targeting habits with repeattype 1. need to incorporate all other types
     
     func initHabits() {
+        
+        //daily repeat
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd"
+            let day = dateFormatter.string(from: Date())
+            let intDay = Int(day) ?? 0
+            
+            if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                try! self.localRealm.write {
+                    dailyHabit.date = newHabitDate
+                }
+            }
+        }
+        
+        //weekly repeat
+        let weeklyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 2")
+        for dailyHabit in weeklyHabits {
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd"
+            let day = dateFormatter.string(from: Date())
+            let intDay = Int(day) ?? 0
+            
+            if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                try! self.localRealm.write {
+                    dailyHabit.date = newHabitDate
+                }
+            }
+        }
+        
+        //monthly repeat
+        let monthlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 3")
+        for dailyHabit in monthlyHabits {
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd"
+            let day = dateFormatter.string(from: Date())
+            let intDay = Int(day) ?? 0
+            
+            if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                try! self.localRealm.write {
+                    dailyHabit.date = newHabitDate
+                }
+            }
+        }
+        
+        //yearly repeat
+        let yearlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 4")
+        for dailyHabit in yearlyHabits {
             
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd"
