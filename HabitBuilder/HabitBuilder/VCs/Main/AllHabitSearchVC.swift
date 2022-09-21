@@ -191,7 +191,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         dateFormatter.locale = Locale(identifier: "en_US")
         dateFormatter.dateFormat = "MMM d, yyyy"
         let today = Date()
-        let sevenDays = today.addingTimeInterval(604800)
     
         let newHabitDate = dateFormatter.string(from: date)
         let todayDate = dateFormatter.string(from: today)
@@ -199,16 +198,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitTitle.text = title
         cell.newHabitDesc.text = desc
         cell.newHabitDate.text = newHabitDate
-        
-        
-        //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
-        if newHabitDate == todayDate {
-            cell.titleBackground.backgroundColor = .darkGreen
-        } else if date > today && date < sevenDays  {
-            cell.titleBackground.backgroundColor = .todayGreen
-        } else {
-            cell.titleBackground.backgroundColor = .restGreen
-        }
         
         //MARK: 오래된 habit의 색을 까맣게 바꿈.
         //FIXME: 오래된 habit의 색을 까맣게 바꾸고 날짜가 더 오래 됨에 따라 자동적으로 지워지면서 noti도 같이 지워져야함.
@@ -221,12 +210,21 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         
+        //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
+        if newHabitDate == todayDate {
+            cell.middleLine.backgroundColor = .darkGreen
+        } else {
+            cell.middleLine.backgroundColor = cell.cellStackView.backgroundColor
+        }
+        
+       
+        
         switch newHabit.privateRepeatType {
-        case 1 : cell.middleLine.backgroundColor = .pureRed
-        case 2 : cell.middleLine.backgroundColor = .pureOrange
-        case 3 : cell.middleLine.backgroundColor = .pureBlue
-        case 4 : cell.middleLine.backgroundColor = .purePurple
-        default: cell.middleLine.backgroundColor = .white
+        case 1 : cell.titleBackground.backgroundColor = .pureRed
+        case 2 : cell.titleBackground.backgroundColor = .pureOrange
+        case 3 : cell.titleBackground.backgroundColor = .pureBlue
+        case 4 : cell.titleBackground.backgroundColor = .purePurple
+        default: cell.titleBackground.backgroundColor = .dateGreen
         }
         
         return cell

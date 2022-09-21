@@ -26,7 +26,7 @@ class HabitTableCell: UITableViewCell {
         let v = UIButton()
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 5
-        v.backgroundColor = .darkGreen
+        v.backgroundColor = .dateGreen
         return v
     }()
     

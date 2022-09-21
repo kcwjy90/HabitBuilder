@@ -193,11 +193,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let newHabitDate = dateFormatter.string(from: date)
         
         switch newHabit.privateRepeatType {
-        case 1 : cell.cellStackView.layer.borderColor = UIColor.pureRed.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
-        case 2 : cell.cellStackView.layer.borderColor = UIColor.pureOrange.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
-        case 3 : cell.cellStackView.layer.borderColor = UIColor.pureBlue.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
-        case 4 : cell.cellStackView.layer.borderColor = UIColor.purePurple.cgColor;  cell.cellStackView.layer.borderWidth = 2.5
-        default: cell.cellStackView.layer.borderColor = UIColor.white.cgColor
+        case 1 : cell.titleBackground.backgroundColor = .pureRed
+        case 2 : cell.titleBackground.backgroundColor = .pureOrange
+        case 3 : cell.titleBackground.backgroundColor = .pureBlue
+        case 4 : cell.titleBackground.backgroundColor = .purePurple
+        default: cell.titleBackground.backgroundColor = .dateGreen
         }
         
         cell.backgroundColor = .white
