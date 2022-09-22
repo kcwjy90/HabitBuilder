@@ -7,8 +7,10 @@
 //
 
 import UIKit
+import SnapKit
 import RealmSwift
 import SwiftUI
+import Charts
 
 
 //MARK: update 된 Habit이 담긴 protocol. MainVC나 AllHabitsVC로 간다
@@ -17,7 +19,7 @@ protocol habitDetailVCDelegate: AnyObject {
 }
 
 
-class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
+class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, ChartViewDelegate{
     
     let localRealm = DBManager.SI.realm!
     
@@ -166,6 +168,19 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.layer.cornerRadius = 20
         return v
     }()
+
+    
+    // FIXME: needs to be scrollable
+    //Graph Related======================================
+    // for pieChart
+    var todayPiChart = PieChartView()
+    // 3 Labels for the pieChart
+    let results = ["Succeeded", "Failed", "Working"]
+    var counts = [0,0,0]
+    var compCount: Int = 0
+    //Graph Related======================================
+
+    
     
     
     
@@ -180,6 +195,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
     
     
     override func loadView() {
@@ -205,6 +222,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         backView.addSubview(successButton)
         backView.addSubview(failButton)
         backView.addSubview(deleteButton)
+        
         
         // backView grid
         backView.snp.makeConstraints { (make) in
@@ -326,6 +344,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.centerX.equalTo(backView)
         }
         
+        //Graph Related======================================
+
+        todayPiChart.delegate = self
+        reloadChart()
+
+        //Graph Related======================================
+
+        
+        
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
@@ -347,6 +374,83 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         deleteButton.addTarget(self, action: #selector(deleteButtonPressed), for: .touchUpInside)
         
     }
+    
+    
+    //Graph Related======================================
+
+    //MARK: viewWillAppear -> reload graph
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadChart()  // 이게 있어야 그레프가 업데이트됨
+    }
+    
+    override func viewDidLayoutSubviews() { //이렇게 따로 viewDidLayoutSubview에 넣어야지만 그래프가 뜨는데 왜인지는 모름.
+        super.viewDidLayoutSubviews()
+        
+        backView.addSubview(todayPiChart)
+        
+        // todayPiChart grid
+        todayPiChart.snp.makeConstraints{ (make) in
+            make.top.equalTo(repeatBackView.snp.bottom)
+            make.left.equalTo(backView)
+            make.right.equalTo(backView)
+            make.height.equalTo(300)
+        }
+        todayPiChart.center = backView.center
+        
+    }
+    
+    //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
+    func reloadChart() {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
+
+        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
+        
+    }
+    
+    //MARK: Chart Customizing.
+    func customizeChart(dataPoints: [String], values: [Double]) {
+        
+        // 1. Set ChartDataEntry
+        var dataEntries: [ChartDataEntry] = []
+        for i in 0..<dataPoints.count {
+            let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
+            dataEntries.append(dataEntry)
+        }
+        // 2. Set ChartDataSet
+        let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
+        pieChartDataSet.colors = ChartColorTemplates.colorful()
+        
+        // 3. Set ChartData
+        let pieChartData = PieChartData(dataSet: pieChartDataSet)
+        let format = NumberFormatter()
+        format.numberStyle = .percent
+        let formatter = DefaultValueFormatter(formatter: format)
+        pieChartData.setValueFormatter(formatter)
+        
+        // 4. Assign it to the chart’s data
+        todayPiChart.data = pieChartData
+    }
+    
+    //Graph Related======================================
+
+    
+    
+    
+    
     
     // MARK: functions for above buttons
     @objc func backButtonPressed(sender: UIButton){
