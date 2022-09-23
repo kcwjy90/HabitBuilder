@@ -26,7 +26,7 @@ class HabitTableCell: UITableViewCell {
         let v = UIButton()
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 5
-        v.backgroundColor = .dateGreen
+        v.backgroundColor = .cellGray
         return v
     }()
     
@@ -51,7 +51,7 @@ class HabitTableCell: UITableViewCell {
     lazy var boxCell: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
-        v.backgroundColor = .dateGreen
+        v.backgroundColor = .white
         v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         return v
@@ -60,7 +60,7 @@ class HabitTableCell: UITableViewCell {
     lazy var cellStackView: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
-        v.backgroundColor = .white
+        v.backgroundColor = .cellGray
         v.distribution = .equalSpacing
         v.alignment = UIStackView.Alignment.leading
         v.layer.cornerRadius = 10
@@ -123,7 +123,7 @@ class HabitTableCell: UITableViewCell {
 //        cellStackView.layer.borderWidth = 3.0
 //        cellStackView.layer.shadowOpacity = 0.2
 //        cellStackView.layer.shadowRadius = 0.2
-        cellStackView.layer.masksToBounds = false;
+//        cellStackView.layer.masksToBounds = false;
 //        cellStackView.layer.borderColor = UIColor.white.cgColor
         
         titleStackView.snp.makeConstraints{ (make) in

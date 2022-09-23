@@ -37,7 +37,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     lazy var backButton: UIButton = {
         let v = UIButton()
         v.setTitle("Back", for: .normal)
-        v.setTitleColor(.red, for: .normal)
+        v.setTitleColor(.black, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
@@ -47,7 +47,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     lazy var saveHabitButton: UIButton = {
         let v = UIButton()
         v.setTitle("Save", for: .normal)
-        v.setTitleColor(.blue, for: .normal)
+        v.setTitleColor(.black, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v

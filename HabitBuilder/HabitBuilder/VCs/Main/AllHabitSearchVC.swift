@@ -27,7 +27,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     lazy var searchBar : UISearchBar = {
         let v = UISearchBar()
         v.searchBarStyle = .minimal
-        v.backgroundColor = .dateGreen
+        v.backgroundColor = .white
         v.searchTextField.backgroundColor = .customWhite
         return v
     }()
@@ -39,7 +39,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
                    forCellReuseIdentifier:"MyCell")
         v.delegate = self
         v.dataSource = self
-        v.backgroundColor = .dateGreen
+        v.backgroundColor = .white
         return v
     }()
         
@@ -206,7 +206,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         if newHabitDate < todayDate {
             cell.cellStackView.backgroundColor = .pastGray
         } else {
-            cell.cellStackView.backgroundColor = .white
+            cell.cellStackView.backgroundColor = .cellGray
         }
         
         
@@ -220,11 +220,11 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
        
         
         switch newHabit.privateRepeatType {
-        case 1 : cell.titleBackground.backgroundColor = .pureRed
+        case 1 : cell.titleBackground.backgroundColor = .pureGreen
         case 2 : cell.titleBackground.backgroundColor = .pureOrange
         case 3 : cell.titleBackground.backgroundColor = .pureBlue
         case 4 : cell.titleBackground.backgroundColor = .purePurple
-        default: cell.titleBackground.backgroundColor = .dateGreen
+        default: cell.titleBackground.backgroundColor = .pureGray
         }
         
         return cell

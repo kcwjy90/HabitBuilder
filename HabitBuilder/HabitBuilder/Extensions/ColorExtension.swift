@@ -21,9 +21,13 @@ extension UIColor {
     @nonobjc class var pureOrange: UIColor { return UIColor(red:255/255, green:228/255, blue: 179/255, alpha: 1.00) }
     @nonobjc class var purePurple: UIColor { return UIColor(red:219/255, green:179/255, blue: 255/255, alpha: 1.00) }
     @nonobjc class var pureBlack: UIColor { return UIColor(red:114/255, green:114/255, blue: 110/255, alpha: 1.00) }
+    @nonobjc class var pureGreen: UIColor { return UIColor(red:210/255, green:239/255, blue: 207/255, alpha: 1.00) }
+    @nonobjc class var pureGray: UIColor { return UIColor(red:217/255, green:217/255, blue: 217/255, alpha: 1.00) }
+    @nonobjc class var cellGray: UIColor { return UIColor(red:244/255, green:244/255, blue: 244/255, alpha: 1.00) }
     @nonobjc class var baseGreen: UIColor { return UIColor(red:122/255, green:245/255, blue: 224/255, alpha: 1.00) }
     @nonobjc class var dateGreen: UIColor { return UIColor(red:213/255, green:235/255, blue: 231/255, alpha: 1.00) }
     @nonobjc class var pastGray: UIColor { return UIColor(red:217/255, green:217/255, blue: 217/255, alpha: 1.00) }
+    @nonobjc class var tintBlue: UIColor { return UIColor(red:82/255, green:150/255, blue: 247/255, alpha: 1.00) }
 }
 
 // Spuit 설치

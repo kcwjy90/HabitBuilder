@@ -25,7 +25,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var backButton: UIButton = {
         let v = UIButton()
         v.setTitle("Back", for: .normal)
-        v.setTitleColor(.red, for: .normal)
+        v.setTitleColor(.black, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v
@@ -35,7 +35,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var pageLabel: UILabel = {
         let v = UILabel()
         v.text = "New Habit"
-        v.textColor = .black
+        v.textColor = .tintBlue
         v.font = UIFont.boldSystemFont(ofSize: 16.0)
         return v
     }()
@@ -44,7 +44,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     lazy var addHabitButton: UIButton = {
         let v = UIButton()
         v.setTitle("Add", for: .normal)
-        v.setTitleColor(.blue, for: .normal)
+        v.setTitleColor(.black, for: .normal)
         v.layer.masksToBounds = true
         v.layer.cornerRadius = 20
         return v

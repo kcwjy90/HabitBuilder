@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
          tabBarController.tabBar.isTranslucent = false // both lines needed
          tabBarController.tabBar.backgroundColor = .white // to change tabbar color
              
-         UITabBar.appearance().tintColor = .baseGreen
+         UITabBar.appearance().tintColor = .tintBlue
          
          NotificationManger.SI.requestNotiAuth()
          
