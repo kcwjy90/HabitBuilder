@@ -143,7 +143,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         v.setTitleColor(.white, for: .normal)
         v.backgroundColor = .pureBlue
         v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
+        v.layer.cornerRadius = 10
         return v
     }()
     
@@ -154,7 +154,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         v.setTitleColor(.white, for: .normal)
         v.backgroundColor = .pureRed
         v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
+        v.layer.cornerRadius = 10
         return v
     }()
     
@@ -165,7 +165,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         v.setTitleColor(.white, for: .normal)
         v.backgroundColor = .pureBlack
         v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
+        v.layer.cornerRadius = 10
         return v
     }()
 
@@ -219,6 +219,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         backView.addSubview(repeatLabel)
         backView.addSubview(repeatButton)
         backView.addSubview(repeatTypeLabel)
+        backView.addSubview(todayPiChart)
         backView.addSubview(successButton)
         backView.addSubview(failButton)
         backView.addSubview(deleteButton)
@@ -320,27 +321,38 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.right.equalTo(backView).offset(-30)
         }
         
+        todayPiChart.snp.makeConstraints{ (make) in
+            make.top.equalTo(repeatBackView.snp.bottom)
+            make.bottom.equalTo(successButton.snp.top)
+            make.left.equalTo(backView)
+            make.right.equalTo(backView)
+            make.height.equalTo(300)
+        }
+        
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.bottom.equalTo(failButton.snp.top).offset(-20)
+            make.top.equalTo(todayPiChart.snp.bottom)
             make.height.equalTo(50)
-            make.width.equalTo(300)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
             make.centerX.equalTo(backView)
         }
         
         // failButton size grid
         failButton.snp.makeConstraints { (make) in
-            make.bottom.equalTo(deleteButton.snp.top).offset(-40)
+            make.top.equalTo(successButton.snp.bottom).offset(10)
             make.height.equalTo(50)
-            make.width.equalTo(300)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
             make.centerX.equalTo(backView)
         }
         
         // deleteButton size grid
         deleteButton.snp.makeConstraints { (make) in
-            make.bottom.equalTo(backView.snp.bottom).offset(-30)
+            make.top.equalTo(failButton.snp.bottom).offset(20)
             make.height.equalTo(50)
-            make.width.equalTo(150)
+            make.left.equalTo(backView).offset(16)
+            make.right.equalTo(backView).offset(-16)
             make.centerX.equalTo(backView)
         }
         
@@ -383,32 +395,18 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         super.viewWillAppear(animated)
         reloadChart()  // 이게 있어야 그레프가 업데이트됨
     }
-    
-    override func viewDidLayoutSubviews() { //이렇게 따로 viewDidLayoutSubview에 넣어야지만 그래프가 뜨는데 왜인지는 모름.
-        super.viewDidLayoutSubviews()
-        
-        backView.addSubview(todayPiChart)
-        
-        // todayPiChart grid
-        todayPiChart.snp.makeConstraints{ (make) in
-            make.top.equalTo(repeatBackView.snp.bottom)
-            make.left.equalTo(backView)
-            make.right.equalTo(backView)
-            make.height.equalTo(300)
-        }
-        todayPiChart.center = backView.center
-        
-    }
-    
+
+
+
     //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
     func reloadChart() {
-        
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
-        
+
         //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
@@ -418,12 +416,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
 
         customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-        
+
     }
-    
+
     //MARK: Chart Customizing.
     func customizeChart(dataPoints: [String], values: [Double]) {
-        
+
         // 1. Set ChartDataEntry
         var dataEntries: [ChartDataEntry] = []
         for i in 0..<dataPoints.count {
@@ -433,14 +431,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // 2. Set ChartDataSet
         let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
         pieChartDataSet.colors = ChartColorTemplates.colorful()
-        
+
         // 3. Set ChartData
         let pieChartData = PieChartData(dataSet: pieChartDataSet)
         let format = NumberFormatter()
         format.numberStyle = .percent
         let formatter = DefaultValueFormatter(formatter: format)
         pieChartData.setValueFormatter(formatter)
-        
+
         // 4. Assign it to the chart’s data
         todayPiChart.data = pieChartData
     }
@@ -514,7 +512,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     @objc func successButtonPressed(sender: UIButton){
         
-        //FIXME: 이거를 밖으로 빼고 싶은데..function 안에 있는 constants를 어떻게 refer 하지?
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
@@ -575,6 +572,21 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+            
+            
+            let countRealm = self.localRealm.objects(RMO_Count.self)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let today = Date()
+            let todayDate = dateFormatter.string(from: today)
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+            {return} //
+            let taskToUpdate = countRealm[indexNumb]
+            
+            try! self.localRealm.write {
+                taskToUpdate.total -= 1
+            }
+            
             
             self.dismiss(animated: true) {
                 let realm = self.localRealm.objects(RMO_Habit.self)

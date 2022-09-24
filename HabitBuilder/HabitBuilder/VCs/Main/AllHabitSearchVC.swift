@@ -206,13 +206,13 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         if newHabitDate < todayDate {
             cell.cellStackView.backgroundColor = .pastGray
         } else {
-            cell.cellStackView.backgroundColor = .cellGray
+            cell.cellStackView.backgroundColor = .cellBlue
         }
         
         
         //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
         if newHabitDate == todayDate {
-            cell.middleLine.backgroundColor = .darkGreen
+            cell.middleLine.backgroundColor = .todayBlue
         } else {
             cell.middleLine.backgroundColor = cell.cellStackView.backgroundColor
         }

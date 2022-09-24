@@ -61,6 +61,31 @@ class MainVC: UIViewController {
         return v
     }()
     
+    // progressLabel 생성
+    lazy var progressLabel: UILabel = {
+        let v = UILabel()
+        v.textAlignment = .center
+        return v
+    }()
+    
+    // progressImage 생성
+    lazy var progressImage: UIImageView = {
+        let v = UIImageView()
+        return v
+    }()
+    
+    // progressBar 생성
+    lazy var todayProgressBar: UIProgressView = {
+        let v = UIProgressView(progressViewStyle: .bar)
+//        v.setProgress(0.5, animated: true)
+        v.trackTintColor = .cellGray
+        v.tintColor = .todayBlue
+        return v
+    }()
+    
+    // progressBar에 필요한 count
+    var counts = [0,0,0]
+    
     // todaysHabitTablewView 생성
     lazy var todaysHabitTableView: UITableView = {
         let v = UITableView()
@@ -71,6 +96,8 @@ class MainVC: UIViewController {
         v.backgroundColor = .white
         return v
     }()
+    
+    
     
     // RMO_Habit에서 온 data를 result로 가져온다?
     var habits: Results<RMO_Habit>? = nil
@@ -86,6 +113,10 @@ class MainVC: UIViewController {
         backView.addSubview(dateLabelBackView)
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
+        backView.addSubview(progressImage)
+        backView.addSubview(progressLabel)
+        backView.addSubview(todayProgressBar)
+
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
@@ -107,12 +138,39 @@ class MainVC: UIViewController {
         // todaysHabitTableView grid
         todaysHabitTableView.snp.makeConstraints { (make) in
             make.top.equalTo(dateLabelBackView.snp.bottom)
-            make.left.right.bottom.equalTo(backView)
+            make.left.right.equalTo(backView)
+            make.bottom.equalTo(progressImage.snp.top)
         }
         todaysHabitTableView.separatorStyle = .none //removes lines btwn tableView cells
         
+        progressImage.snp.makeConstraints{ (make) in
+            make.top.equalTo(todaysHabitTableView.snp.bottom)
+            make.height.equalTo(50)
+            make.width.equalTo(50)
+            make.left.equalTo(backView).offset(10)
+            make.bottom.equalTo(backView)
+        }
+        progressImage.image = UIImage(named: "PF")
+        
+        progressLabel.snp.makeConstraints{ (make) in
+            make.top.equalTo(todaysHabitTableView.snp.bottom)
+            make.height.equalTo(20)
+            make.left.equalTo(todayProgressBar)
+            make.right.equalTo(todayProgressBar)
+            make.bottom.equalTo(todayProgressBar.snp.top)
+        }
+        
+        todayProgressBar.snp.makeConstraints{ (make) in
+            make.height.equalTo(30)
+            make.left.equalTo(progressImage.snp.right).offset(10)
+            make.right.equalTo(backView).offset(-10)
+            make.bottom.equalTo(backView)
+        }
+                
+        
         updateOngoing()
         setRealmNoti()
+        updateProgressBar()
         
     }
     
@@ -431,7 +489,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
         else { return }
         
-        
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).filter("onGoing == True").sorted(byKeyPath: "date", ascending: true)
         
         
@@ -466,7 +523,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(error)")
             }
+            
+            //updating ProgressBar after making changes in RMO_Habit
+            self?.updateProgressBar()
         }
+        
     }
     
     
@@ -508,6 +569,34 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             return false
         }
     }
+    
+    
+    
+    
+    //MARK: updating todayProgressBar
+    
+    func updateProgressBar() {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total
+
+        var progress = Float(counts[0])/Float(counts[2])
+        progressLabel.text = "\(String(counts[0])) SUCCESS / \(String(counts[2])) TOTAL              \(String(format: "%.1f", progress*100))%"
+        todayProgressBar.progress = progress
+                
+    }
+    
     
     
     
@@ -658,4 +747,4 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 //-내가 혼자 해결할수 있지 않을까...하는것-
 
 //2. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함. 예) 시간을 바꾼다 -> 바꾼 시간으로 노티가 와야함
-//3. past는 success/fail이 안되고, 오직 save나 delete밖에 못해야 된다.
+//3. past는 success/fail이 안되고, 오직 save나 delete밖에 못해야 된다. -> 조금 더 생각해보자
