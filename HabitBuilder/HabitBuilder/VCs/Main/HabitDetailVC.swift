@@ -180,7 +180,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     var compCount: Int = 0
     //Graph Related======================================
 
-    
+    lazy var scrollView: UIScrollView = {
+        let v = UIScrollView()
+        v.backgroundColor = .white
+        return v
+    }()
     
     
     
@@ -202,12 +206,16 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     override func loadView() {
         super.loadView()
         
+
+    
+        
         //MARK: tapGesture - Dismisses Keyboard
         //Used Gesture instead of Swipe to prevent from dismissing the HabitDetailVC modal when dismising the keyboard by Swipe.
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
         
-        view.addSubview(backView)
+        view.addSubview(scrollView)
+        scrollView.addSubview(backView)
         backView.addSubview(backButton)
         backView.addSubview(saveHabitButton)
         backView.addSubview(habitTitle)
@@ -225,9 +233,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         backView.addSubview(deleteButton)
         
         
+        scrollView.snp.makeConstraints { (make) in
+            make.edges.equalTo(view)
+        }
+        
         // backView grid
         backView.snp.makeConstraints { (make) in
-            make.edges.equalTo(view)
+            make.top.bottom.equalTo(scrollView)
+            make.left.right.equalTo(view)
         }
         
         // backButton size grid
@@ -240,10 +253,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         // saveHabitButton size grid
         saveHabitButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
+            make.top.equalTo(backButton)
             make.right.equalTo(backView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
+            make.width.equalTo(backButton)
+            make.height.equalTo(backButton)
         }
         
         // habitTitle TextField size grid
@@ -257,8 +270,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // habitDesc TextView size grid
         habitDesc.snp.makeConstraints { (make) in
             make.top.equalTo(habitTitle.snp.bottom).offset(5)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
+            make.left.equalTo(habitTitle)
+            make.right.equalTo(habitTitle)
             make.height.equalTo(180)
         }
         //MARK: UITextView는 placeholder가 없어서 따로 placeholder처럼 보이게 만든것. Function is at the bottom
@@ -272,31 +285,31 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
+            make.left.equalTo(habitTitle)
+            make.right.equalTo(habitTitle)
             make.height.equalTo(60)
         }
         
         // habitDateTimeLabel size grid
         habitDateTimeLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDesc.snp.bottom).offset(10)
+            make.top.equalTo(habitDateTimeBackView)
             make.left.equalTo(backView).offset(39)
-            make.height.equalTo(60)
+            make.height.equalTo(habitDateTimeBackView)
         }
         
         // habitDateTime size grid
         habitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateTimeBackView)
             make.right.equalTo(backView).offset(-34)
-            make.height.equalTo(60)
+            make.height.equalTo(habitDateTimeBackView)
         }
         
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.height.equalTo(60)
+            make.left.equalTo(habitTitle)
+            make.right.equalTo(habitTitle)
+            make.height.equalTo(habitDateTimeBackView)
         }
         
         // repeatLabel size grid
@@ -341,19 +354,19 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // failButton size grid
         failButton.snp.makeConstraints { (make) in
             make.top.equalTo(successButton.snp.bottom).offset(10)
-            make.height.equalTo(50)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.centerX.equalTo(backView)
+            make.height.equalTo(successButton)
+            make.left.equalTo(successButton)
+            make.right.equalTo(successButton)
+            make.centerX.equalTo(successButton)
         }
         
         // deleteButton size grid
         deleteButton.snp.makeConstraints { (make) in
             make.top.equalTo(failButton.snp.bottom).offset(20)
-            make.height.equalTo(50)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.centerX.equalTo(backView)
+            make.height.equalTo(successButton)
+            make.left.equalTo(successButton)
+            make.right.equalTo(successButton)
+            make.centerX.equalTo(successButton)
         }
         
         //Graph Related======================================

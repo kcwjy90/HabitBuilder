@@ -170,6 +170,7 @@ class MainVC: UIViewController {
         
         updateOngoing()
         setRealmNoti()
+
         updateProgressBar()
         
     }
@@ -291,7 +292,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         } else {
             //아직 다음날이 아니라서 아무것도 안함
             print("===========================false=============")
-            
+            print(self.localRealm.objects(RMO_Count.self))
             return
         }
         
@@ -326,9 +327,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func initHabits() {
         
+        //To + today's habit's count
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
+        var counts = 0
+        
+        
         //daily repeat
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
+            
+           
             
             //Grabbing today's date - day only
             let dateFormatter = DateFormatter()
@@ -341,18 +355,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     dailyHabit.date = newHabitDate
                 }
             }
+            
+            counts += 1
+            print("daily repeat 357-----------------------------------------------------------")
+            print(counts)
         }
         
         //weekly repeat
         let weeklyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 2")
-        for dailyHabit in weeklyHabits {
+        for weeklyHabit in weeklyHabits {
             
             //If current Habit + 1 week == today's date...
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM/dd/yyyy"
             var dateComponent = DateComponents()
             dateComponent.day = 7
-            let futureWeek = Calendar.current.date(byAdding: dateComponent, to: dailyHabit.date)
+            let futureWeek = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date)
             
             guard let weeklyDate = futureWeek else { return }
             let habitWeekAwayString = dateFormatter.string(from: weeklyDate)
@@ -367,17 +385,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 let day = dateFormatter.string(from: Date())
                 let intDay = Int(day) ?? 0
                 
-                if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: weeklyHabit.date) {
                     try! self.localRealm.write {
-                        dailyHabit.date = newHabitDate
+                        weeklyHabit.date = newHabitDate
                     }
                 }
+                
+                counts += 1
+                print("week repeat 392-----------------------------------------------------------")
+                print(counts)
                 
             } else {
                 print("FAlse")
                 print(todayString)
                 print(habitWeekAwayString)
-                print(dailyHabit.date)
+                print(weeklyHabit.date)
                 print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
             }
@@ -386,7 +408,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //monthly repeat
         let monthlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 3")
-        for dailyHabit in monthlyHabits {
+        for monthlyHabit in monthlyHabits {
             
             
             //If current Habit + 1 month == today's date...
@@ -394,7 +416,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             dateFormatter.dateFormat = "MM/dd/yyyy"
             var dateComponent = DateComponents()
             dateComponent.month = 1
-            let futureMonth = Calendar.current.date(byAdding: dateComponent, to: dailyHabit.date)
+            let futureMonth = Calendar.current.date(byAdding: dateComponent, to: monthlyHabit.date)
             
             guard let monthlyDate = futureMonth else { return }
             let habitMonthAwayString = dateFormatter.string(from: monthlyDate)
@@ -405,21 +427,33 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             if todayString == habitMonthAwayString {
                 
                 //Grabbing today's date - day only
-                dateFormatter.dateFormat = "dd"
+                dateFormatter.dateFormat = "MM"
                 let day = dateFormatter.string(from: Date())
                 let intDay = Int(day) ?? 0
+                print("INTDAY=======================================================")
+                print(intDay)
                 
-                if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                //FIXME: 여기가 안되는구나
+                if let newHabitDate = Calendar.current.date(bySetting: .month, value: intDay, of: monthlyHabit.date) {
+                    
+                    print("NEWHABITDATE+=======================================")
+                    print(newHabitDate)
                     try! self.localRealm.write {
-                        dailyHabit.date = newHabitDate
+                        monthlyHabit.date = newHabitDate
                     }
                 }
+                
+                counts += 1
+                print("habitmonth --- \(habitMonthAwayString)")
+                print("monthAway --- \(habitMonthAwayString)")
+                print("mon repeat 438-----------------------------------------------------------")
+                print(counts)
                 
             } else {
                 print("FAlse")
                 print(todayString)
                 print(habitMonthAwayString)
-                print(dailyHabit.date)
+                print(monthlyHabit.date)
                 print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
             }
@@ -428,7 +462,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //yearly repeat
         let yearlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 4")
-        for dailyHabit in yearlyHabits {
+        for yearlyHabit in yearlyHabits {
             
             
             //If current Habit + 1 week == today's date...
@@ -436,7 +470,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             dateFormatter.dateFormat = "MM/dd/yyyy"
             var dateComponent = DateComponents()
             dateComponent.year = 1
-            let futureYear = Calendar.current.date(byAdding: dateComponent, to: dailyHabit.date)
+            let futureYear = Calendar.current.date(byAdding: dateComponent, to: yearlyHabit.date)
             
             guard let yearlyDate = futureYear else { return }
             let habitYearAwayString = dateFormatter.string(from: yearlyDate)
@@ -447,25 +481,53 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             if todayString == habitYearAwayString {
                 
                 //Grabbing today's date - day only
-                dateFormatter.dateFormat = "dd"
+                dateFormatter.dateFormat = "yyyy"
                 let day = dateFormatter.string(from: Date())
                 let intDay = Int(day) ?? 0
                 
-                if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+                if let newHabitDate = Calendar.current.date(bySetting: .year, value: intDay, of: yearlyHabit.date) {
                     try! self.localRealm.write {
-                        dailyHabit.date = newHabitDate
+                        yearlyHabit.date = newHabitDate
                     }
                 }
+                
+                counts += 1
+                print("yearly repeat 484-----------------------------------------------------------")
+                print(counts)
                 
             } else {
                 print("FAlse")
                 print(todayString)
                 print(habitYearAwayString)
-                print(dailyHabit.date)
+                print(yearlyHabit.date)
                 print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
             }
         }
+        
+        print("final counts-----------------------------------------------------------")
+        print(counts)
+        
+        if !countRealm.contains(where: { $0.date == todayDate} )
+        {
+            let newCount = RMO_Count()
+            newCount.date = todayDate
+            
+            try! localRealm.write {
+                localRealm.add(newCount)
+
+            }
+        }
+        
+        guard let inNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let existCount = countRealm[inNumb]
+        
+        try! localRealm.write {
+            existCount.total += counts
+
+        }
+        
     }
     
     
