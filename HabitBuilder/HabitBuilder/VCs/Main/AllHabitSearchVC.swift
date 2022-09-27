@@ -201,13 +201,13 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         
         //MARK: 오래된 habit의 색을 까맣게 바꿈.
         //FIXME: 오래된 habit의 색을 까맣게 바꾸고 날짜가 더 오래 됨에 따라 자동적으로 지워지면서 noti도 같이 지워져야함.
-        //아 혹은 repeat된 애들은 만약 하루보다 더 오래 되면 자동적으로 날짜가 바뀌면 되는구나!
+        //아 혹은 repeat된 애들은 만약 하루보다 더 오래 되면 자동적으로 날짜가 바뀌면 되는구나! 이거를 다른 vc로 그냥 옮기자
         
-        if newHabitDate < todayDate {
-            cell.cellStackView.backgroundColor = .pastGray
-        } else {
-            cell.cellStackView.backgroundColor = .cellBlue
-        }
+//        if newHabitDate < todayDate {
+//            cell.cellStackView.backgroundColor = .pastGray
+//        } else {
+//            cell.cellStackView.backgroundColor = .cellBlue
+//        }
         
         
         //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자

@@ -182,7 +182,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
 
     lazy var scrollView: UIScrollView = {
         let v = UIScrollView()
-        v.backgroundColor = .white
+        v.isUserInteractionEnabled = true
+        v.isScrollEnabled = true
+        v.backgroundColor = .red
         return v
     }()
     
@@ -406,6 +408,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     //MARK: viewWillAppear -> reload graph
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         reloadChart()  // 이게 있어야 그레프가 업데이트됨
     }
 

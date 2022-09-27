@@ -323,7 +323,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     
     //MARK: Intializing Habits. Updates day of the repeated habits to todays
-    //FIXME: only targeting habits with repeattype 1. need to incorporate all other types
     
     func initHabits() {
         
@@ -342,7 +341,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
             
-           
+           //FIXME: this bySetting actually changes the time too. gotta fix this so it ONLY changes day
             
             //Grabbing today's date - day only
             let dateFormatter = DateFormatter()
@@ -380,12 +379,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //Then execute
             if todayString == habitWeekAwayString {
                 
-                //Grabbing today's date - day only
-                dateFormatter.dateFormat = "dd"
-                let day = dateFormatter.string(from: Date())
-                let intDay = Int(day) ?? 0
-                
-                if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: weeklyHabit.date) {
+                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
                     try! self.localRealm.write {
                         weeklyHabit.date = newHabitDate
                     }
@@ -426,15 +420,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //Then execute
             if todayString == habitMonthAwayString {
                 
-                //Grabbing today's date - day only
-                dateFormatter.dateFormat = "MM"
-                let day = dateFormatter.string(from: Date())
-                let intDay = Int(day) ?? 0
-                print("INTDAY=======================================================")
-                print(intDay)
-                
-                //FIXME: 여기가 안되는구나
-                if let newHabitDate = Calendar.current.date(bySetting: .month, value: intDay, of: monthlyHabit.date) {
+               
+                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: monthlyHabit.date) {
                     
                     print("NEWHABITDATE+=======================================")
                     print(newHabitDate)
@@ -480,12 +467,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //Then execute
             if todayString == habitYearAwayString {
                 
-                //Grabbing today's date - day only
-                dateFormatter.dateFormat = "yyyy"
-                let day = dateFormatter.string(from: Date())
-                let intDay = Int(day) ?? 0
-                
-                if let newHabitDate = Calendar.current.date(bySetting: .year, value: intDay, of: yearlyHabit.date) {
+                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: yearlyHabit.date) {
                     try! self.localRealm.write {
                         yearlyHabit.date = newHabitDate
                     }
