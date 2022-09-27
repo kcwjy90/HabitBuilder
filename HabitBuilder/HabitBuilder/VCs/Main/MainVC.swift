@@ -217,7 +217,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         
-        habitDetailVC.modalPresentationStyle = .pageSheet
+        habitDetailVC.modalPresentationStyle = .fullScreen
         present(habitDetailVC, animated:true)
     }
     

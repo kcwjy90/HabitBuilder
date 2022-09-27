@@ -27,7 +27,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     weak var delegate: habitDetailVCDelegate?
     
     // backview 생성
-    lazy var backView: UIView = {
+    lazy var scrollContentView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
         return v
@@ -194,7 +194,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     var habit: RMO_Habit //RMO_Habit object를 mainVC, AllHabitsVC 에서 여기로
     init (habit: RMO_Habit) {
         self.habit = habit //initializing habit
-        super .init(nibName: nil, bundle: nil)
+        super.init(nibName: nil, bundle: nil)
+
     }
     
     //위의 코드랑 꼭 같이 가야함
@@ -217,38 +218,40 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         view.addGestureRecognizer(UITapGesture)
         
         view.addSubview(scrollView)
-        scrollView.addSubview(backView)
-        backView.addSubview(backButton)
-        backView.addSubview(saveHabitButton)
-        backView.addSubview(habitTitle)
-        backView.addSubview(habitDesc)
-        backView.addSubview(habitDateTimeBackView)
-        backView.addSubview(habitDateTimeLabel)
-        backView.addSubview(habitDateTime)
-        backView.addSubview(repeatBackView)
-        backView.addSubview(repeatLabel)
-        backView.addSubview(repeatButton)
-        backView.addSubview(repeatTypeLabel)
-        backView.addSubview(todayPiChart)
-        backView.addSubview(successButton)
-        backView.addSubview(failButton)
-        backView.addSubview(deleteButton)
+        scrollView.addSubview(scrollContentView)
+        scrollContentView.addSubview(backButton)
+        scrollContentView.addSubview(saveHabitButton)
+        scrollContentView.addSubview(habitTitle)
+        scrollContentView.addSubview(habitDesc)
+        scrollContentView.addSubview(habitDateTimeBackView)
+        scrollContentView.addSubview(habitDateTimeLabel)
+        scrollContentView.addSubview(habitDateTime)
+        scrollContentView.addSubview(repeatBackView)
+        scrollContentView.addSubview(repeatLabel)
+        scrollContentView.addSubview(repeatButton)
+        scrollContentView.addSubview(repeatTypeLabel)
+        scrollContentView.addSubview(todayPiChart)
+        scrollContentView.addSubview(successButton)
+        scrollContentView.addSubview(failButton)
+        scrollContentView.addSubview(deleteButton)
         
+        view.backgroundColor = .white
         
         scrollView.snp.makeConstraints { (make) in
-            make.edges.equalTo(view)
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         // backView grid
-        backView.snp.makeConstraints { (make) in
-            make.top.bottom.equalTo(scrollView)
+        scrollContentView.snp.makeConstraints { (make) in
+            make.top.equalTo(scrollView)
             make.left.right.equalTo(view)
+            make.bottom.equalTo(deleteButton.snp.bottom)
         }
         
         // backButton size grid
         backButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.left.equalTo(backView)
+            make.top.equalTo(scrollContentView).offset(10)
+            make.left.equalTo(scrollContentView)
             make.width.equalTo(60)
             make.height.equalTo(40)
         }
@@ -256,7 +259,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // saveHabitButton size grid
         saveHabitButton.snp.makeConstraints{ (make) in
             make.top.equalTo(backButton)
-            make.right.equalTo(backView)
+            make.right.equalTo(scrollContentView)
             make.width.equalTo(backButton)
             make.height.equalTo(backButton)
         }
@@ -264,8 +267,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // habitTitle TextField size grid
         habitTitle.snp.makeConstraints { (make) in
             make.top.equalTo(backButton.snp.bottom).offset(20)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
+            make.left.equalTo(scrollContentView).offset(16)
+            make.right.equalTo(scrollContentView).offset(-16)
             make.height.equalTo(50)
         }
         
@@ -295,14 +298,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // habitDateTimeLabel size grid
         habitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView)
-            make.left.equalTo(backView).offset(39)
+            make.left.equalTo(scrollContentView).offset(39)
             make.height.equalTo(habitDateTimeBackView)
         }
         
         // habitDateTime size grid
         habitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateTimeBackView)
-            make.right.equalTo(backView).offset(-34)
+            make.right.equalTo(scrollContentView).offset(-34)
             make.height.equalTo(habitDateTimeBackView)
         }
         
@@ -317,7 +320,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // repeatLabel size grid
         repeatLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(39)
+            make.left.equalTo(scrollContentView).offset(39)
             make.height.equalTo(60)
         }
         
@@ -326,21 +329,21 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.centerY.equalTo(repeatBackView)
             make.width.equalTo(repeatTypeLabel)
             make.height.equalTo(40)
-            make.right.equalTo(backView).offset(-30)
+            make.right.equalTo(scrollContentView).offset(-30)
         }
         
         // repeatTypeLabel size grid
         repeatTypeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
             make.height.equalTo(40)
-            make.right.equalTo(backView).offset(-30)
+            make.right.equalTo(scrollContentView).offset(-30)
         }
         
         todayPiChart.snp.makeConstraints{ (make) in
             make.top.equalTo(repeatBackView.snp.bottom)
             make.bottom.equalTo(successButton.snp.top)
-            make.left.equalTo(backView)
-            make.right.equalTo(backView)
+            make.left.equalTo(scrollContentView)
+            make.right.equalTo(scrollContentView)
             make.height.equalTo(300)
         }
         
@@ -348,9 +351,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         successButton.snp.makeConstraints { (make) in
             make.top.equalTo(todayPiChart.snp.bottom)
             make.height.equalTo(50)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
-            make.centerX.equalTo(backView)
+            make.left.equalTo(scrollContentView).offset(16)
+            make.right.equalTo(scrollContentView).offset(-16)
+            make.centerX.equalTo(scrollContentView)
         }
         
         // failButton size grid
@@ -412,7 +415,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         reloadChart()  // 이게 있어야 그레프가 업데이트됨
     }
 
-
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        scrollView.contentSize = CGSize(width: scrollContentView.frame.width,
+                                        height: scrollContentView.frame.height)
+    }
 
     //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
     func reloadChart() {
