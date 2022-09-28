@@ -16,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="HB Logo" translatesAutoresizingMaskIntoConstraints="NO" id="iZy-9o-gVf">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="HB logo" translatesAutoresizingMaskIntoConstraints="NO" id="h0r-LT-zcx">
                                 <rect key="frame" x="36.5" y="277.5" width="341" height="341"/>
                             </imageView>
                         </subviews>
@@ -24,8 +24,8 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="iZy-9o-gVf" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="kKs-sC-Z6i"/>
-                            <constraint firstItem="iZy-9o-gVf" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="uHa-OE-VU4"/>
+                            <constraint firstItem="h0r-LT-zcx" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="QlJ-LI-1P4"/>
+                            <constraint firstItem="h0r-LT-zcx" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="T2c-ly-NCE"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,6 +35,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="HB Logo" width="341" height="341"/>
+        <image name="HB logo" width="341" height="341"/>
     </resources>
 </document>

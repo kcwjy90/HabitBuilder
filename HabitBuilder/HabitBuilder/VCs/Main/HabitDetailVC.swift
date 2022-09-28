@@ -184,7 +184,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let v = UIScrollView()
         v.isUserInteractionEnabled = true
         v.isScrollEnabled = true
-        v.backgroundColor = .red
+        v.backgroundColor = .white
         return v
     }()
     
@@ -418,6 +418,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        //this Makes the screen scroallable
         scrollView.contentSize = CGSize(width: scrollContentView.frame.width,
                                         height: scrollContentView.frame.height)
     }

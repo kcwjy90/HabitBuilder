@@ -94,6 +94,8 @@ class MainVC: UIViewController {
         v.delegate = self
         v.dataSource = self
         v.backgroundColor = .white
+        v.separatorStyle = .none //removes lines btwn tableView cells
+        v.separatorColor = .clear
         return v
     }()
     
@@ -141,7 +143,7 @@ class MainVC: UIViewController {
             make.left.right.equalTo(backView)
             make.bottom.equalTo(progressImage.snp.top)
         }
-        todaysHabitTableView.separatorStyle = .none //removes lines btwn tableView cells
+        
         
         progressImage.snp.makeConstraints{ (make) in
             make.top.equalTo(todaysHabitTableView.snp.bottom)
@@ -217,7 +219,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
         
-        habitDetailVC.modalPresentationStyle = .fullScreen
+        habitDetailVC.modalPresentationStyle = .pageSheet //어? pagesheet해도 scroll 되는데?
         present(habitDetailVC, animated:true)
     }
     
