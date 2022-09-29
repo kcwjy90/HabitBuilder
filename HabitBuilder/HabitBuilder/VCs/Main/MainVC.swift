@@ -338,20 +338,27 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
         var counts = 0
         
+        //MARK: time function that returns timeInterval
+        func time(lsh: Date, rhs: Date) -> TimeInterval {
+            return lsh.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
+        }
         
+        //TEST 용
+//        let calendar = Calendar.current
+//        let tmr = calendar.date(byAdding: .day, value: 1, to: Date())
+
         //daily repeat
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
             
-           //FIXME: this bySetting actually changes the time too. gotta fix this so it ONLY changes day
-            
-            //Grabbing today's date - day only
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd"
-            let day = dateFormatter.string(from: Date())
-            let intDay = Int(day) ?? 0
-            
-            if let newHabitDate = Calendar.current.date(bySetting: .day, value: intDay, of: dailyHabit.date) {
+            let today = Date()
+            let currentHabitDate = dailyHabit.date
+
+            //calculating time difference btwn today's date - current habit's date
+            let timeDifference = time(lsh: today, rhs: currentHabitDate)
+            print(timeDifference)
+        
+            if let newHabitDate = Calendar.current.date(byAdding: .second,  value: Int(timeDifference), to: currentHabitDate) {
                 try! self.localRealm.write {
                     dailyHabit.date = newHabitDate
                 }
