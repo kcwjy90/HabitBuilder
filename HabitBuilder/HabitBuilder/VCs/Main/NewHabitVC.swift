@@ -20,36 +20,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.backgroundColor = .white
         return v
     }()
-    
-    // backButton 생성
-    lazy var backButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Back", for: .normal)
-        v.setTitleColor(.black, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
-    // pageLabel 생성
-    lazy var pageLabel: UILabel = {
-        let v = UILabel()
-        v.text = "New Habit"
-        v.textColor = .tintBlue
-        v.font = UIFont.boldSystemFont(ofSize: 16.0)
-        return v
-    }()
-    
-    // addHabitButton 생성
-    lazy var addHabitButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Add", for: .normal)
-        v.setTitleColor(.black, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
+  
     // newHabitTitle TextField 생성
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
@@ -135,14 +106,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     override func loadView() {
         super.loadView()
         
+        setNaviBar()
+        
         // tapGesture - Dismisses Keyboard
         let UITapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(UITapGesture)
         
         view.addSubview(backView)
-        backView.addSubview(backButton)
-        backView.addSubview(pageLabel)
-        backView.addSubview(addHabitButton)
         backView.addSubview(newHabitTitle)
         backView.addSubview(newHabitDesc)
         backView.addSubview(newHabitDateTimeBackview)
@@ -159,33 +129,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.edges.equalTo(view)
         }
         
-        // backButton size grid
-        backButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.left.equalTo(backView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
-        }
-        
-        // pageLabel size grid
-        pageLabel.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.centerX.equalTo(backView)
-            make.width.equalTo(80)
-            make.height.equalTo(40)
-        }
-        
-        // addHabitButton size grid
-        addHabitButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backView).offset(10)
-            make.right.equalTo(backView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
-        }
-        
         // newHabitTitle TextField size grid
         newHabitTitle.snp.makeConstraints { (make) in
-            make.top.equalTo(pageLabel.snp.bottom).offset(20)
+            make.top.equalTo(backView).offset(20)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
@@ -262,15 +208,13 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         }
         
         
-        //MARK: Button Actions - AddHabitButton & backButton & repeatButton
-        addHabitButton.addTarget(self, action: #selector(addButtonPressed), for: .touchUpInside)
-        backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
+        //MARK: Button Actions - repeatButton
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
         
     }
     
     //MARK: Button Funcs - Add, Back, Repeat Buttons
-    @objc func addButtonPressed(sender: UIButton) {
+    @objc func addButtonPressed() {
         
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         let habit = RMO_Habit()
@@ -278,6 +222,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.title = titleText
         habit.desc = descText
         habit.date = newHabitDateTime.date
+        habit.startDate = newHabitDateTime.date
         habit.repeatType = self.repTyp
         
         let dateFormatter = DateFormatter()
@@ -316,13 +261,17 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             localRealm.add(habit)
         }
         
+        print("========================")
+        print(self.localRealm.objects(RMO_Habit.self))
+        print("========================")
+
         //MARK: adding notification to Scheduler
         NotificationManger.SI.addScheduleNoti(habit: habit)
         dismiss(animated: true, completion: nil)
         
     }
     
-    @objc func backButtonPressed(sender: UIButton){
+    @objc func backButtonPressed(){
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -348,6 +297,31 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             textView.text = "Description of your New Habit"
             textView.textColor = UIColor.lightGray
         }
+    }
+    
+    //MARK: Navi Bar
+    func setNaviBar() {
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.navigationBar.backgroundColor = .white
+        
+        title = "New Habit"
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Back",
+            style: .done,
+            target: self,
+            action: #selector(backButtonPressed)
+        )
+        self.navigationItem.leftBarButtonItem?.tintColor = .black
+
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Save",
+            style: .done,
+            target: self,
+            action: #selector(addButtonPressed)
+        )
+        self.navigationItem.rightBarButtonItem?.tintColor = .black
     }
 }
 

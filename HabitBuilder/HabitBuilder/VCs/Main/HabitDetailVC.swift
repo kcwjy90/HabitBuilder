@@ -33,26 +33,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         return v
     }()
     
-    // backButton 생성
-    lazy var backButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Back", for: .normal)
-        v.setTitleColor(.black, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
-    // saveHabitButton 생성
-    lazy var saveHabitButton: UIButton = {
-        let v = UIButton()
-        v.setTitle("Save", for: .normal)
-        v.setTitleColor(.black, for: .normal)
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 20
-        return v
-    }()
-    
     // habitTitle TextField 생성
     lazy var habitTitle: UITextField = {
         let v = UITextField()
@@ -168,7 +148,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         v.layer.cornerRadius = 10
         return v
     }()
-
+    
     
     // FIXME: needs to be scrollable
     //Graph Related======================================
@@ -179,7 +159,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     var counts = [0,0,0]
     var compCount: Int = 0
     //Graph Related======================================
-
+    
     lazy var scrollView: UIScrollView = {
         let v = UIScrollView()
         v.isUserInteractionEnabled = true
@@ -195,7 +175,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     init (habit: RMO_Habit) {
         self.habit = habit //initializing habit
         super.init(nibName: nil, bundle: nil)
-
+        
     }
     
     //위의 코드랑 꼭 같이 가야함
@@ -209,8 +189,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     override func loadView() {
         super.loadView()
         
-
-    
+        
+        
+        setNaviBar()
         
         //MARK: tapGesture - Dismisses Keyboard
         //Used Gesture instead of Swipe to prevent from dismissing the HabitDetailVC modal when dismising the keyboard by Swipe.
@@ -219,8 +200,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         view.addSubview(scrollView)
         scrollView.addSubview(scrollContentView)
-        scrollContentView.addSubview(backButton)
-        scrollContentView.addSubview(saveHabitButton)
         scrollContentView.addSubview(habitTitle)
         scrollContentView.addSubview(habitDesc)
         scrollContentView.addSubview(habitDateTimeBackView)
@@ -248,25 +227,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.bottom.equalTo(deleteButton.snp.bottom)
         }
         
-        // backButton size grid
-        backButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(scrollContentView).offset(10)
-            make.left.equalTo(scrollContentView)
-            make.width.equalTo(60)
-            make.height.equalTo(40)
-        }
-        
-        // saveHabitButton size grid
-        saveHabitButton.snp.makeConstraints{ (make) in
-            make.top.equalTo(backButton)
-            make.right.equalTo(scrollContentView)
-            make.width.equalTo(backButton)
-            make.height.equalTo(backButton)
-        }
-        
         // habitTitle TextField size grid
         habitTitle.snp.makeConstraints { (make) in
-            make.top.equalTo(backButton.snp.bottom).offset(20)
+            make.top.equalTo(scrollContentView).offset(10)
             make.left.equalTo(scrollContentView).offset(16)
             make.right.equalTo(scrollContentView).offset(-16)
             make.height.equalTo(50)
@@ -375,12 +338,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         }
         
         //Graph Related======================================
-
+        
         todayPiChart.delegate = self
         reloadChart()
-
+        
         //Graph Related======================================
-
+        
         
         
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
@@ -395,9 +358,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
         
         
-        // Button Actions - backButton, saveHabitButton, repeatButton, failButton, successButton, deleteButton
-        backButton.addTarget(self, action: #selector(backButtonPressed), for: .touchUpInside)
-        saveHabitButton.addTarget(self, action: #selector(saveButtonPressed), for: .touchUpInside)
+        // Button Actions -  repeatButton, failButton, successButton, deleteButton
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
         failButton.addTarget(self, action: #selector(failButtonPressed), for: .touchUpInside)
         successButton.addTarget(self, action: #selector(successButtonPressed), for: .touchUpInside)
@@ -407,14 +368,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     
     //Graph Related======================================
-
+    
     //MARK: viewWillAppear -> reload graph
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         reloadChart()  // 이게 있어야 그레프가 업데이트됨
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -422,16 +383,16 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         scrollView.contentSize = CGSize(width: scrollContentView.frame.width,
                                         height: scrollContentView.frame.height)
     }
-
+    
     //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
     func reloadChart() {
-
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
-
+        
         //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
@@ -439,14 +400,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         counts[0] = todayCount.success
         counts[1] = todayCount.fail
         counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
-
+        
         customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-
+        
     }
-
+    
     //MARK: Chart Customizing.
     func customizeChart(dataPoints: [String], values: [Double]) {
-
+        
         // 1. Set ChartDataEntry
         var dataEntries: [ChartDataEntry] = []
         for i in 0..<dataPoints.count {
@@ -456,27 +417,27 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // 2. Set ChartDataSet
         let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
         pieChartDataSet.colors = ChartColorTemplates.colorful()
-
+        
         // 3. Set ChartData
         let pieChartData = PieChartData(dataSet: pieChartDataSet)
         let format = NumberFormatter()
         format.numberStyle = .percent
         let formatter = DefaultValueFormatter(formatter: format)
         pieChartData.setValueFormatter(formatter)
-
+        
         // 4. Assign it to the chart’s data
         todayPiChart.data = pieChartData
     }
     
     //Graph Related======================================
-
+    
     
     
     
     
     
     // MARK: functions for above buttons
-    @objc func backButtonPressed(sender: UIButton){
+    @objc func backButtonPressed(){
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -622,127 +583,157 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                     }
                     self.localRealm.delete(deleteHabit)
                     self.delegate?.editComp()
-
+                    
                 }
             }
         }))
         
         present(alert, animated: true, completion: nil)
     }
+    
+    
+    
+    
+    
+    @objc func saveButtonPressed() {
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let countRealm = localRealm.objects(RMO_Count.self)
+        let realm = localRealm.objects(RMO_Habit.self)
         
+        //Filtering the habit where ID matches
+        guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+        {return}
+        let taskToUpdate = realm[indexNumb]
         
-        
-        
-        @objc func saveButtonPressed(sender: UIButton) {
+        // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
+        if taskToUpdate.date != habitDateTime.date {
             
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
-            let countRealm = localRealm.objects(RMO_Count.self)
-            let realm = localRealm.objects(RMO_Habit.self)
+            //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
+            let countDate = dateFormatter.string(from: habitDateTime.date)
+            if !countRealm.contains(where: { $0.date == countDate} )
+            {
+                let newCount = RMO_Count()
+                newCount.date = countDate
+                
+                try! localRealm.write {
+                    localRealm.add(newCount)
+                }
+                
+            }
             
-            //Filtering the habit where ID matches
-            guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
+            //예전 habit의 count 수를 -1
+            let removeDate = dateFormatter.string(from: taskToUpdate.date)
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
             {return}
-            let taskToUpdate = realm[indexNumb]
+            let minusCount = countRealm[indexNumb]
             
-            // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
-            if taskToUpdate.date != habitDateTime.date {
-                
-                //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
-                let countDate = dateFormatter.string(from: habitDateTime.date)
-                if !countRealm.contains(where: { $0.date == countDate} )
-                {
-                    let newCount = RMO_Count()
-                    newCount.date = countDate
-                    
-                    try! localRealm.write {
-                        localRealm.add(newCount)
-                    }
-                    
-                }
-                
-                //예전 habit의 count 수를 -1
-                let removeDate = dateFormatter.string(from: taskToUpdate.date)
-                guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
-                {return}
-                let minusCount = countRealm[indexNumb]
-                
-                try! localRealm.write {
-                    minusCount.total -= 1
-                    
-                }
-                
-                //새로운 habit의 count수를 +1
-                guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
-                {return}
-                let plusCount = countRealm[indexNumb]
-                try! localRealm.write {
-                    plusCount.total += 1
-                }
+            try! localRealm.write {
+                minusCount.total -= 1
                 
             }
             
-            
-            //MARK: updating Habit
-            try! self.localRealm.write {
-                guard let titleText = habitTitle.text, let descText = habitDesc.text
-                else { return }
-                taskToUpdate.title = titleText
-                taskToUpdate.desc = descText
-                taskToUpdate.date = habitDateTime.date
-                
-                if repTyp == nil {
-                    taskToUpdate.repeatType = prevRep
-                } else {
-                    taskToUpdate.repeatType = repTyp
-                }
+            //새로운 habit의 count수를 +1
+            guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
+            {return}
+            let plusCount = countRealm[indexNumb]
+            try! localRealm.write {
+                plusCount.total += 1
             }
-            
-            // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
-            NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
-            delegate?.editComp()
-            dismiss(animated: true, completion: nil)
             
         }
         
-        //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
-        func textViewDidBeginEditing(_ textView: UITextView) {
-            if textView.textColor == UIColor.lightGray {
-                textView.text = nil
-                textView.textColor = UIColor.black
-            }
-        }
         
-        //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
-        func textViewDidEndEditing(_ textView: UITextView) {
-            if textView.text.isEmpty {
-                textView.text = "Description of your New Habit"
-                textView.textColor = UIColor.lightGray
-            }
-        }
-        
-        //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
-        func changeTextColor(_ textView: UITextView) {
+        //MARK: updating Habit
+        try! self.localRealm.write {
+            guard let titleText = habitTitle.text, let descText = habitDesc.text
+            else { return }
+            taskToUpdate.title = titleText
+            taskToUpdate.desc = descText
+            taskToUpdate.date = habitDateTime.date
+            taskToUpdate.startDate = habitDateTime.date
             
-            if textView.text == "Description of your New Habit" {
-                textView.textColor = UIColor.lightGray
-                
-                textViewDidBeginEditing(habitDesc)
-                textViewDidEndEditing(habitDesc)
+            if repTyp == nil {
+                taskToUpdate.repeatType = prevRep
+            } else {
+                taskToUpdate.repeatType = repTyp
             }
         }
+        
+        print("========================")
+        print(self.localRealm.objects(RMO_Habit.self))
+        print("========================")
+        
+        // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
+        NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
+        delegate?.editComp()
+        dismiss(animated: true, completion: nil)
         
     }
     
-    
-    //MARK: Receiving Updated Repeat Type from RepeatVC
-    extension HabitDetailVC: RepeatVCDelegate {
-        
-        func didChangeRepeatType(repeatType: RepeatType) {
-            repTyp = repeatType
-            let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
-            repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+    //MARK: UITextView "Placeholder" - 만약 edit 을 하려고 하는데 textColor가 gray 이다 (즉 가짜 placeholder이다) 그러면 text를 지우고 (마치 placeholder가 사라지듯이) textColor를 새롭게 black 으로 한다.
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            textView.textColor = UIColor.black
         }
     }
     
+    //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "Description of your New Habit"
+            textView.textColor = UIColor.lightGray
+        }
+    }
+    
+    //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
+    func changeTextColor(_ textView: UITextView) {
+        
+        if textView.text == "Description of your New Habit" {
+            textView.textColor = UIColor.lightGray
+            
+            textViewDidBeginEditing(habitDesc)
+            textViewDidEndEditing(habitDesc)
+        }
+    }
+    
+    //MARK: Navi Bar
+    func setNaviBar() {
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationController?.navigationBar.backgroundColor = .white
+        
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "Back",
+            style: .done,
+            target: self,
+            action: #selector(backButtonPressed)
+        )
+        self.navigationItem.leftBarButtonItem?.tintColor = .black
+        
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Save",
+            style: .done,
+            target: self,
+            action: #selector(saveButtonPressed)
+        )
+        self.navigationItem.rightBarButtonItem?.tintColor = .black
+    }
+    
+}
+
+
+
+
+//MARK: Receiving Updated Repeat Type from RepeatVC
+extension HabitDetailVC: RepeatVCDelegate {
+    
+    func didChangeRepeatType(repeatType: RepeatType) {
+        repTyp = repeatType
+        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
+        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+    }
+}
+

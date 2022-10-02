@@ -23,6 +23,7 @@ class RMO_Habit: Object {
     @Persisted var id = UUID().uuidString
     @Persisted var title: String = ""
     @Persisted var desc: String = ""
+    @Persisted var startDate: Date = Date()
     @Persisted var date: Date = Date()
     @Persisted var onGoing: Bool = true
     

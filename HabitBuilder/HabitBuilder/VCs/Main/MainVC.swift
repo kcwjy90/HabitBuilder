@@ -200,8 +200,10 @@ class MainVC: UIViewController {
     //MARK: Navi Bar에 있는 'Add' Button을 누르면 작동함.
     @objc func addItem(){
         let v = NewHabitVC()
-        v.modalPresentationStyle = .pageSheet //fullscreen 에서 pagesheet으로 바꾸니 내가 원하는 모양이 나옴. Also, you can swipe page down to go back.
-        present(v, animated:true)   // modal view 가능케 하는 코드
+        let newHabitVCNavi = UINavigationController(rootViewController: v)
+        newHabitVCNavi.modalPresentationStyle = .pageSheet
+        v.modalPresentationStyle = .pageSheet 
+        present(newHabitVCNavi, animated:true)   // modal view 가능케 하는 코드
     }
     
 }
@@ -218,9 +220,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
-        
-        habitDetailVC.modalPresentationStyle = .pageSheet //어? pagesheet해도 scroll 되는데?
-        present(habitDetailVC, animated:true)
+        let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
+        habitDetailVCNavi.modalPresentationStyle = .pageSheet //어? pagesheet해도 scroll 되는데?
+        present(habitDetailVCNavi, animated:true)
     }
     
     
