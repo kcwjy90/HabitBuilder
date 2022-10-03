@@ -217,6 +217,27 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         guard let habit = habits?[indexPath.row] else { return }
         
+        
+        //===========================================test===================
+        
+        print(habit)
+        
+        let realm = self.localRealm.objects(RMO_Habit.self)
+        let thisId = habit.id
+        
+        try! self.localRealm.write {
+            let deleteHabit = realm.where {
+                $0.id == thisId
+            }
+    
+        print(habit.rate)
+        habit.rate.append("appendthisplease")
+        }
+        
+        
+        //===========================================test===================
+
+        
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
         let habitDetailVC = HabitDetailVC(habit: habit)
