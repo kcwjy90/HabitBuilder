@@ -76,8 +76,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     lazy var habitDateTime: UIDatePicker = {
         let v = UIDatePicker()
         v.datePickerMode = .dateAndTime
-        let today = Date()
-        v.minimumDate = today
+        //MARK: two lines of code that doesn't allow user to pick PAST date. but if this is activated, then the time changes automatically when the user opens up existing habit.
+//        let today = Date()
+//        v.minimumDate = today
         v.layer.cornerRadius = 15
         return v
     }()
@@ -149,16 +150,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         return v
     }()
     
-    
-    // FIXME: needs to be scrollable
-    //Graph Related======================================
-    // for pieChart
-    var todayPiChart = PieChartView()
-    // 3 Labels for the pieChart
-    let results = ["Succeeded", "Failed", "Working"]
-    var counts = [0,0,0]
-    var compCount: Int = 0
-    //Graph Related======================================
+    //==GRAPH RELATED===
+    var habitLineChart = LineChartView()
+    //==GRAPH RELATED===
+
     
     lazy var scrollView: UIScrollView = {
         let v = UIScrollView()
@@ -189,8 +184,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     override func loadView() {
         super.loadView()
         
-        
-        
         setNaviBar()
         
         //MARK: tapGesture - Dismisses Keyboard
@@ -209,7 +202,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         scrollContentView.addSubview(repeatLabel)
         scrollContentView.addSubview(repeatButton)
         scrollContentView.addSubview(repeatTypeLabel)
-        scrollContentView.addSubview(todayPiChart)
+        scrollContentView.addSubview(habitLineChart)
         scrollContentView.addSubview(successButton)
         scrollContentView.addSubview(failButton)
         scrollContentView.addSubview(deleteButton)
@@ -302,17 +295,19 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.right.equalTo(scrollContentView).offset(-30)
         }
         
-        todayPiChart.snp.makeConstraints{ (make) in
-            make.top.equalTo(repeatBackView.snp.bottom)
-            make.bottom.equalTo(successButton.snp.top)
-            make.left.equalTo(scrollContentView)
-            make.right.equalTo(scrollContentView)
-            make.height.equalTo(300)
+        habitLineChart.snp.makeConstraints{ (make) in
+            make.top.equalTo(repeatBackView.snp.bottom).offset(10)
+            make.left.equalTo(scrollContentView).offset(50)
+            make.right.equalTo(scrollContentView).offset(-50)
+            make.height.equalTo(200)
         }
+        habitLineChart.center = view.center
+        habitLineChart.backgroundColor = .white
+        habitLineChart.delegate = self
         
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.top.equalTo(todayPiChart.snp.bottom)
+            make.top.equalTo(habitLineChart.snp.bottom).offset(30)
             make.height.equalTo(50)
             make.left.equalTo(scrollContentView).offset(16)
             make.right.equalTo(scrollContentView).offset(-16)
@@ -337,15 +332,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.centerX.equalTo(successButton)
         }
         
-        //Graph Related======================================
-        
-        todayPiChart.delegate = self
-        reloadChart()
-        
-        //Graph Related======================================
-        
-        
-        
+   
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
@@ -369,12 +356,54 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     //Graph Related======================================
     
-    //MARK: viewWillAppear -> reload graph
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        reloadChart()  // 이게 있어야 그레프가 업데이트됨
+    //MARK: time function that returns timeInterval
+    func time(lsh: Date, rhs: Date) -> TimeInterval {
+        return lsh.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+   
+        let startHabitDate = habit.startDate
+        let currentHabitDate = habit.date
+    
+        //MARK: Calculating the Date difference. converting seconds to date.
+        let secondDifference = time(lsh: startHabitDate, rhs: currentHabitDate)
+        let dayDifference = round(secondDifference/(60*60*24))
+     
+        
+        //일단 여기서 스톱
+        //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
+        let success = 3
+        let fail = 1
+        let total = Int(dayDifference) + 1
+        
+        //formula는 나중에 구상하자. rate var에 success/total을 넣을예정. fail은 필요 없을수도
+        print("===============================")
+        print(Double(success)/Double(total))
+        
+        let rate = [100, 50, 75, 82.5]
+        //나중에 dayDifference대신 habitdate(current date) - habit.startdate 을 적용하면 됨.
+        
+        // 1. Set ChartDataEntry
+        var entries = [ChartDataEntry]()
+        for x in 0...Int(dayDifference){
+            entries.append(ChartDataEntry(x: Double(x), y: Double(rate[x])))
+        }
+        
+        // 2. Set ChartDataSet
+        let set = LineChartDataSet(entries: entries, label: "")
+        set.colors = ChartColorTemplates.material()
+        
+        // 3. Set ChartData
+        let data = LineChartData(dataSet: set)
+        
+        // 4. Assign it to the chart’s data
+        habitLineChart.data = data
+        
+    }
+
+    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -384,50 +413,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                                         height: scrollContentView.frame.height)
     }
     
-    //MARK: Creates the piechart. Needs to reload so graph gets updated everytime Habit gets completed/deleted
-    func reloadChart() {
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let today = Date()
-        let todayDate = dateFormatter.string(from: today)
-        let countRealm = self.localRealm.objects(RMO_Count.self)
-        
-        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
-        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-        {return}
-        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-        counts[0] = todayCount.success
-        counts[1] = todayCount.fail
-        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
-        
-        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-        
-    }
     
-    //MARK: Chart Customizing.
-    func customizeChart(dataPoints: [String], values: [Double]) {
-        
-        // 1. Set ChartDataEntry
-        var dataEntries: [ChartDataEntry] = []
-        for i in 0..<dataPoints.count {
-            let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
-            dataEntries.append(dataEntry)
-        }
-        // 2. Set ChartDataSet
-        let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
-        pieChartDataSet.colors = ChartColorTemplates.colorful()
-        
-        // 3. Set ChartData
-        let pieChartData = PieChartData(dataSet: pieChartDataSet)
-        let format = NumberFormatter()
-        format.numberStyle = .percent
-        let formatter = DefaultValueFormatter(formatter: format)
-        pieChartData.setValueFormatter(formatter)
-        
-        // 4. Assign it to the chart’s data
-        todayPiChart.data = pieChartData
-    }
+    
     
     //Graph Related======================================
     
@@ -505,6 +492,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         
+        
+        //MARK: Success함에 따라 오늘 success한 count를 count_realm에 +. TodayProgressBar에 적용.
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return} //
         let taskToUpdate = countRealm[indexNumb]
@@ -512,12 +501,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         try! self.localRealm.write {
             taskToUpdate.success += 1
         }
-        //        print(self.localRealm.objects(RMO_Count.self))
+ 
+  
+        // MARK: 만약 repeatType 이 none 이면 RMO_Habit에서 delete. repeatType이 none이 아니면 ongoing만 false로 만든다.
         
-        
-        // ========================================= step 3
-        
-        // MARK: 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
@@ -533,10 +520,20 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 self.localRealm.delete(deleteHabit)
             }
         } else {
+           
+            var percentage : [String] = [String((Int(updateHabit.success+1)/Int(updateHabit.total)) * 100)]
+            print(percentage)
             
+            //FIXME: rate append
             try! self.localRealm.write {
                 updateHabit.onGoing = false
+                updateHabit.success += 1
+                updateHabit.rate.append(objectsIn: percentage)
             }
+            
+            //일단...rate이 append가 되기는 되는데, 뭔가 print해보면 그 특정 habit에 associate된 느낌이 아니라 그냥 append 되고 지워지는 느낌.."
+            print(updateHabit)
+            print(updateHabit.rate)
         }
         
         // ========================================= step 3
@@ -594,7 +591,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     
     
-    
+    //MARK: Making changes to the existing habit
     @objc func saveButtonPressed() {
         
         let dateFormatter = DateFormatter()
@@ -651,9 +648,24 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             else { return }
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
-            taskToUpdate.date = habitDateTime.date
-            taskToUpdate.startDate = habitDateTime.date
-            
+
+            //MARK: If Habit Date was updated
+            if taskToUpdate.date != habitDateTime.date {
+                print("theyare different")
+
+                taskToUpdate.date = habitDateTime.date
+                taskToUpdate.startDate = habitDateTime.date
+                taskToUpdate.total = 1
+                taskToUpdate.success = 0
+                taskToUpdate.rate.removeAll()
+                
+//            MARK: Maybe warning here that when the date/time changes the total is set to 0? OR maybe just calculate later?
+                
+            } else {
+                print("no changes")
+                return
+            }
+   
             if repTyp == nil {
                 taskToUpdate.repeatType = prevRep
             } else {
@@ -661,10 +673,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             }
         }
         
-        print("========================")
-        print(self.localRealm.objects(RMO_Habit.self))
-        print("========================")
-        
+
         // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
         NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
         delegate?.editComp()

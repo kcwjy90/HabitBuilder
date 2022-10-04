@@ -26,7 +26,9 @@ class RMO_Habit: Object {
     @Persisted var startDate: Date = Date()
     @Persisted var date: Date = Date()
     @Persisted var onGoing: Bool = true
-    let rate = RealmSwift.List<RateListItem>()
+    @Persisted var success: Int
+    @Persisted var total: Int
+    var rate = List<String>()
 
     @Persisted var privateRepeatType: Int = 0
     var repeatType: RepeatType? {
@@ -50,6 +52,4 @@ class RMO_Habit: Object {
     }
 }
 
-class RateListItem: Object {
-    @Persisted var rate: String?
-}
+

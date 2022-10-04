@@ -224,7 +224,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.date = newHabitDateTime.date
         habit.startDate = newHabitDateTime.date
         habit.repeatType = self.repTyp
-        
+        habit.total += 1
+                
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let habitDate = dateFormatter.string(from: newHabitDateTime.date)
