@@ -218,6 +218,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         let habit = RMO_Habit()
+        let rate = RMO_Rate()
         
         habit.title = titleText
         habit.desc = descText
@@ -225,6 +226,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.startDate = newHabitDateTime.date
         habit.repeatType = self.repTyp
         habit.total += 1
+        
+        rate.createdDate = newHabitDateTime.date
+        rate.habitID = habit.id
                 
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -258,8 +262,10 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //            print(existCount)
         }
         
+        //habit과 rate 을 추가
         try! localRealm.write {
             localRealm.add(habit)
+            localRealm.add(rate)
         }
         
         print("========================")
