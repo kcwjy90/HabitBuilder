@@ -15,93 +15,108 @@ import Charts
 
 class ProgressVC: UIViewController, ChartViewDelegate {
     
-    let localRealm = DBManager.SI.realm!
-    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
         v.backgroundColor = .white
         return v
     }()
-
-    var habitLineChart = LineChartView()
+    
+    let localRealm = DBManager.SI.realm!
+    var todayPiChart = PieChartView()
+    
+    //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공.
+    let results = ["Succeeded", "Failed", "Working"]
+    var counts = [0,0,0]
+    var compCount: Int = 0
+    
     
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
-        habitLineChart.delegate = self
         
         setNaviBar()
+        
+        todayPiChart.delegate = self
+        
+        reloadChart()
+        
     }
     
+    //MARK: viewWillAppear -> reload graph
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reloadChart()  // 이게 있어야 그레프가 업데이트됨
+    }
     
-    override func viewDidLayoutSubviews() {
+    override func viewDidLayoutSubviews() { //이렇게 따로 viewDidLayoutSubview에 넣어야지만 그래프가 뜨는데 왜인지는 모름.
         super.viewDidLayoutSubviews()
         
         view.addSubview(backView)
-        backView.addSubview(habitLineChart)
+        view.addSubview(todayPiChart)
         
-        backView.snp.makeConstraints{ (make) in
+        view.backgroundColor = .white
+        
+        // BackView grid
+        backView.snp.makeConstraints { (make) in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        habitLineChart.snp.makeConstraints{ (make) in
-            make.width.equalTo(backView)
-            make.height.equalTo(habitLineChart.snp.width)
+        // todayPiChart grid
+        todayPiChart.snp.makeConstraints{ (make) in
+            make.edges.equalTo(backView)
         }
-        habitLineChart.center = view.center
-        habitLineChart.backgroundColor = .white
-        
-        //MARK: time function that returns timeInterval
-        func time(lsh: Date, rhs: Date) -> TimeInterval {
-            return lsh.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
-        }
-        //TEST 용
-        let calendar = Calendar.current
-        let tmr = calendar.date(byAdding: .day, value: 3, to: Date())
-
-        var xAxisStart = Date()
-        var xAxisEnd = tmr
-        
-        //두 날짜의 차이를 계산한것. 역시나 테스트용
-        let secondDifference = time(lsh: xAxisEnd!, rhs: xAxisStart)
-        let dayDifference = round(secondDifference/(60*60*24))
-        
-        //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
-        let success = 3
-        let fail = 1
-        let total = Int(dayDifference) + 1
-        
-        //formula는 나중에 구상하자. rate var에 success/total을 넣을예정. fail은 필요 없을수도
-        print("===============================")
-        print(Double(success)/Double(total))
-        
-        let rate = [100, 50, 75, 82.5]
-        //나중에 dayDifference대신 habitdate(current date) - habit.startdate 을 적용하면 됨.
-        
-        // 1. Set ChartDataEntry
-        var entries = [ChartDataEntry]()
-        for x in 0...Int(dayDifference){
-            entries.append(ChartDataEntry(x: Double(x), y: Double(rate[x])))
-        }
-        
-        // 2. Set ChartDataSet
-        let set = LineChartDataSet(entries: entries, label: "")
-        set.colors = ChartColorTemplates.material()
-        
-        // 3. Set ChartData
-        let data = LineChartData(dataSet: set)
-        
-        // 4. Assign it to the chart’s data
-        habitLineChart.data = data
+        todayPiChart.center = backView.center
         
     }
+    
+    //MARK: code that creates the piechart. Needs to reload so graph gets updated
+    func reloadChart() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
 
-
-    //MARK: Navi Bar
+        
+        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
+        
+    }
+    //MARK: Chart Customize하는 func
+    func customizeChart(dataPoints: [String], values: [Double]) {
+        
+        // 1. Set ChartDataEntry
+        var dataEntries: [ChartDataEntry] = []
+        for i in 0..<dataPoints.count {
+            let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
+            dataEntries.append(dataEntry)
+        }
+        // 2. Set ChartDataSet
+        let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
+        pieChartDataSet.colors = ChartColorTemplates.colorful()
+        
+        // 3. Set ChartData
+        let pieChartData = PieChartData(dataSet: pieChartDataSet)
+        let format = NumberFormatter()
+        format.numberStyle = .percent
+        let formatter = DefaultValueFormatter(formatter: format)
+        pieChartData.setValueFormatter(formatter)
+        
+        // 4. Assign it to the chart’s data
+        todayPiChart.data = pieChartData
+    }
+    
+    //Navi Bar 만드는 func.
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
     }
 }
-
