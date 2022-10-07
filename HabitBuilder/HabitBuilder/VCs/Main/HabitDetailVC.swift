@@ -357,8 +357,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     //Graph Related======================================
     
     //MARK: time function that returns timeInterval
-    func time(lsh: Date, rhs: Date) -> TimeInterval {
-        return lsh.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
+    func time(current: Date, start: Date) -> TimeInterval {
+        return current.timeIntervalSinceReferenceDate - start.timeIntervalSinceReferenceDate
     }
     
     override func viewDidLayoutSubviews() {
@@ -368,7 +368,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let currentHabitDate = habit.date
     
         //MARK: Calculating the Date difference. converting seconds to date.
-        let secondDifference = time(lsh: startHabitDate, rhs: currentHabitDate)
+        let secondDifference = time(current: currentHabitDate, start: startHabitDate)
         let dayDifference = round(secondDifference/(60*60*24))
      
         
@@ -380,6 +380,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         //formula는 나중에 구상하자. rate var에 success/total을 넣을예정. fail은 필요 없을수도
         print("===============================")
+        print(dayDifference)
+        print(total)
         print(Double(success)/Double(total))
         
         let rate = [100, 50, 75, 82.5]
@@ -528,12 +530,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             try! self.localRealm.write {
                 updateHabit.onGoing = false
                 updateHabit.success += 1
-                updateHabit.rate.append(objectsIn: percentage)
+//                updateHabit.rate.append(objectsIn: percentage)
             }
             
             //일단...rate이 append가 되기는 되는데, 뭔가 print해보면 그 특정 habit에 associate된 느낌이 아니라 그냥 append 되고 지워지는 느낌.."
             print(updateHabit)
-            print(updateHabit.rate)
+//            print(updateHabit.rate)
         }
         
         // ========================================= step 3
@@ -657,7 +659,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 taskToUpdate.startDate = habitDateTime.date
                 taskToUpdate.total = 1
                 taskToUpdate.success = 0
-                taskToUpdate.rate.removeAll()
+//                taskToUpdate.rate.removeAll()
                 
 //            MARK: Maybe warning here that when the date/time changes the total is set to 0? OR maybe just calculate later?
                 

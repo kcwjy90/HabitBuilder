@@ -169,6 +169,7 @@ class MainVC: UIViewController {
             make.bottom.equalTo(backView)
         }
                 
+        initHabits()
         
         updateOngoing()
         setRealmNoti()
@@ -330,19 +331,21 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func initHabits() {
         
-        //To + today's habit's count
+        //To add today's habit's count
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
+        let rateRealm = self.localRealm.objects(RMO_Rate.self)
+
         
         //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
         var counts = 0
         
         //MARK: time function that returns timeInterval
-        func time(lsh: Date, rhs: Date) -> TimeInterval {
-            return lsh.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
+        func time(current: Date, habitDate: Date) -> TimeInterval {
+            return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
         }
         
         //TEST 용
@@ -356,15 +359,60 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let today = Date()
             let currentHabitDate = dailyHabit.date
 
-            //calculating time difference btwn today's date - current habit's date
-            let timeDifference = time(lsh: today, rhs: currentHabitDate)
-            print(timeDifference)
+            //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
+            //MARK: Converting seconds to date.
+            let secondDifference = time(current: today, habitDate: currentHabitDate)
+            let dayDifference = Int(round(secondDifference/(60*60*24)))
+            print("TIME DIFFERENCE =======================================")
+            print(dayDifference)
+            
+            //MARK: Calculating Total number of days of Habit being live. today - startdate + 1
+            //MARK: Converting seconds to date.
+            let totalSecondDifference = time(current: today, habitDate: dailyHabit.startDate)
+            let totalDayDifference = round(totalSecondDifference/(60*60*24))
+            let newTotal = Int(totalDayDifference + 1)
+            
+            print(newTotal)
+            
+            var habitRate = RMO_Rate()
+
+            //접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 10/2, 10/3이 접속하지 않은 날짜. 그러면 100% -> 50% -> 25% 순으로 내려가야 한다. 그리고 10/4일날 만약 success할 경우 50% 가 된다.
+            if dayDifference > 1 {
+                
+                for day in 1..<dayDifference{
+                    var success = Int(dailyHabit.success)
+                    var total = Int(dailyHabit.total) + day
+                    
+                    var successRate = success/total
+                    var oneMoreDay = Calendar.current.date(byAdding: .second,  value: day, to: currentHabitDate)
+                    guard let omd = oneMoreDay else {return}
+
+                    try! self.localRealm.write {
+                        habitRate.habitID = dailyHabit.id
+                        habitRate.createdDate = omd
+                        habitRate.rate = successRate
+                    }
+                    
+                }
+                    
+            } else {
+                return
+            }
         
-            if let newHabitDate = Calendar.current.date(byAdding: .second,  value: Int(timeDifference), to: currentHabitDate) {
+            if let newHabitDate = Calendar.current.date(byAdding: .second,  value: dayDifference, to: currentHabitDate) {
                 try! self.localRealm.write {
                     dailyHabit.date = newHabitDate
+                    dailyHabit.total = newTotal
+                    
                 }
             }
+            
+            print(rateRealm)
+            print(dailyHabit)
+           
+            print("THIS HABIT BEING PRINTED HERE=-------------------------------")
+
+         
             
             counts += 1
             print("daily repeat 357-----------------------------------------------------------")
