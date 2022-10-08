@@ -169,7 +169,6 @@ class MainVC: UIViewController {
             make.bottom.equalTo(backView)
         }
                 
-//        initHabits()
         
         updateOngoing()
         setRealmNoti()

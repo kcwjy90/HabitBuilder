@@ -179,7 +179,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     }
     
     
-    
+    var habits: Results<RMO_Rate>? = nil
     
     override func loadView() {
         super.loadView()
@@ -369,28 +369,24 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
         //MARK: Calculating the Date difference. converting seconds to date.
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
-        let dayDifference = round(secondDifference/(60*60*24))
+        let dayDifference = Int(round(secondDifference/(60*60*24)))
      
         
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
-        let success = 3
-        let fail = 1
-        let total = Int(dayDifference) + 1
-        
-        //formula는 나중에 구상하자. rate var에 success/total을 넣을예정. fail은 필요 없을수도
-        print("===============================")
-        print(dayDifference)
-        print(total)
-        print(Double(success)/Double(total))
-        
-        let rate = [100, 50, 75, 82.5]
-        //나중에 dayDifference대신 habitdate(current date) - habit.startdate 을 적용하면 됨.
-        
+        habits = self.localRealm.objects(RMO_Rate.self).filter("habitID == %@", habit.id)
+                    
+        print("habitdetailvc line 379---------habits--------------------------")
+        print(habits)
+ 
+        //FIXME: 만약 오늘 successButton이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
         // 1. Set ChartDataEntry
         var entries = [ChartDataEntry]()
-        for x in 0...Int(dayDifference){
-            entries.append(ChartDataEntry(x: Double(x), y: Double(rate[x])))
+        
+        guard let habitRates = habits else {return}
+        
+        for x in 0..<dayDifference{
+            entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
         }
         
         // 2. Set ChartDataSet
@@ -524,7 +520,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             }
         } else {
            
-            let rateRealm = self.localRealm.objects(RMO_Rate.self)
+//            let rateRealm = self.localRealm.objects(RMO_Rate.self) // not needed?
 
             let rate = RMO_Rate()
 
@@ -659,6 +655,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         }
         
         
+        
         //MARK: updating Habit
         try! self.localRealm.write {
             guard let titleText = habitTitle.text, let descText = habitDesc.text
@@ -666,6 +663,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
 
+            if repTyp == nil {
+                taskToUpdate.repeatType = prevRep
+            } else {
+                taskToUpdate.repeatType = repTyp
+            }
+            
             //MARK: If Habit Date was updated
             if taskToUpdate.date != habitDateTime.date {
                 print("theyare different")
@@ -674,20 +677,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 taskToUpdate.startDate = habitDateTime.date
                 taskToUpdate.total = 1
                 taskToUpdate.success = 0
-//                taskToUpdate.rate.removeAll()
-                
-//            MARK: Maybe warning here that when the date/time changes the total is set to 0? OR maybe just calculate later?
-                
+                                
             } else {
                 print("no changes")
                 return
             }
    
-            if repTyp == nil {
-                taskToUpdate.repeatType = prevRep
-            } else {
-                taskToUpdate.repeatType = repTyp
-            }
         }
         
 
