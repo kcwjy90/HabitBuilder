@@ -169,7 +169,7 @@ class MainVC: UIViewController {
             make.bottom.equalTo(backView)
         }
                 
-        initHabits()
+//        initHabits()
         
         updateOngoing()
         setRealmNoti()
@@ -363,35 +363,43 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //MARK: Converting seconds to date.
             let secondDifference = time(current: today, habitDate: currentHabitDate)
             let dayDifference = Int(round(secondDifference/(60*60*24)))
-            print("TIME DIFFERENCE =======================================")
-            print(dayDifference)
             
             //MARK: Calculating Total number of days of Habit being live. today - startdate + 1
-            //MARK: Converting seconds to date.
             let totalSecondDifference = time(current: today, habitDate: dailyHabit.startDate)
-            let totalDayDifference = round(totalSecondDifference/(60*60*24))
-            let newTotal = Int(totalDayDifference + 1)
-            
-            print(newTotal)
-            
-            var habitRate = RMO_Rate()
-
+            let totalDayDifference = Int(round(totalSecondDifference/(60*60*24)))
+            let newTotal = totalDayDifference + 1
+                        
             //접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 10/2, 10/3이 접속하지 않은 날짜. 그러면 100% -> 50% -> 25% 순으로 내려가야 한다. 그리고 10/4일날 만약 success할 경우 50% 가 된다.
             if dayDifference > 1 {
                 
                 for day in 1..<dayDifference{
-                    var success = Int(dailyHabit.success)
-                    var total = Int(dailyHabit.total) + day
                     
-                    var successRate = success/total
-                    var oneMoreDay = Calendar.current.date(byAdding: .second,  value: day, to: currentHabitDate)
+                    print(dayDifference)
+                    print(day)
+                    print(dailyHabit.success)
+                    print(dailyHabit.total)
+                    let success = Double(dailyHabit.success)
+                    let total = Double(dailyHabit.total) + Double(day)
+                    print(total)
+
+                    let successRate = Double(success/total)*100
+                    print(successRate)
+
+                    let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
                     guard let omd = oneMoreDay else {return}
 
+                    let habitRate = RMO_Rate()
+
+                    habitRate.habitID = dailyHabit.id
+                    habitRate.createdDate = omd
+                    habitRate.rate = successRate
+                    
                     try! self.localRealm.write {
-                        habitRate.habitID = dailyHabit.id
-                        habitRate.createdDate = omd
-                        habitRate.rate = successRate
+                        localRealm.add(habitRate)
                     }
+                    
+                    print("habitrate-----MainVC line 400--------------------------for each missing days")
+                    print(habitRate)
                     
                 }
                     
@@ -399,7 +407,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 return
             }
         
-            if let newHabitDate = Calendar.current.date(byAdding: .second,  value: dayDifference, to: currentHabitDate) {
+            if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
                 try! self.localRealm.write {
                     dailyHabit.date = newHabitDate
                     dailyHabit.total = newTotal
@@ -407,8 +415,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
             }
             
+            print("================MainVC=========================total rateREALM")
             print(rateRealm)
-            print(dailyHabit)
            
             print("THIS HABIT BEING PRINTED HERE=-------------------------------")
 

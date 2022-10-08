@@ -13,7 +13,7 @@ class RMO_Rate: Object {
     @Persisted var id = UUID().uuidString
     @Persisted var habitID: String = ""
     @Persisted var createdDate: Date = Date()
-    @Persisted var rate: Int
+    @Persisted var rate: Double
     
     //designating id as the primary key to prevent duplicate ones based on createdDate
     override static func primaryKey() -> String? {

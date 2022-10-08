@@ -511,9 +511,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return}
         let updateHabit = realm[indexNumb]
         
+        let thisId = habit.id
+
         if updateHabit.privateRepeatType == 0 {
             
-            let thisId = habit.id
             try! self.localRealm.write {
                 
                 let deleteHabit = realm.where {
@@ -523,23 +524,37 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             }
         } else {
            
-            var percentage : [String] = [String((Int(updateHabit.success+1)/Int(updateHabit.total)) * 100)]
-            print(percentage)
+            let rateRealm = self.localRealm.objects(RMO_Rate.self)
+
+            let rate = RMO_Rate()
+
+            rate.createdDate = updateHabit.date
+            rate.habitID = updateHabit.id
+            
+            let success = Double(updateHabit.success) + Double(1)
+            let total = Double(updateHabit.total)
+            print("NewHabitDetailVC line 534, success , total, successrat")
+            print(success)
+            print(total)
+            let successRate = Double(success/total)*100
+            print(successRate)
+            
+            rate.rate = successRate
+            
             
             //FIXME: rate append
             try! self.localRealm.write {
                 updateHabit.onGoing = false
                 updateHabit.success += 1
-//                updateHabit.rate.append(objectsIn: percentage)
+                localRealm.add(rate)
             }
             
-            //일단...rate이 append가 되기는 되는데, 뭔가 print해보면 그 특정 habit에 associate된 느낌이 아니라 그냥 append 되고 지워지는 느낌.."
+            
             print(updateHabit)
-//            print(updateHabit.rate)
+            print(rate)
+            print(self.localRealm.objects(RMO_Rate.self))
         }
-        
-        // ========================================= step 3
-        
+                
         delegate?.editComp()
         
         self.dismiss(animated: true, completion: nil)
