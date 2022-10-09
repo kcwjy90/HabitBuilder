@@ -64,6 +64,13 @@ class MainVC: UIViewController {
     // progressLabel 생성
     lazy var progressLabel: UILabel = {
         let v = UILabel()
+        v.textAlignment = .left
+        return v
+    }()
+    
+    // perecentLabel 생성
+    lazy var percentLabel: UILabel = {
+        let v = UILabel()
         v.textAlignment = .center
         return v
     }()
@@ -77,7 +84,7 @@ class MainVC: UIViewController {
     // progressBar 생성
     lazy var todayProgressBar: UIProgressView = {
         let v = UIProgressView(progressViewStyle: .bar)
-//        v.setProgress(0.5, animated: true)
+        //        v.setProgress(0.5, animated: true)
         v.trackTintColor = .cellGray
         v.tintColor = .todayBlue
         return v
@@ -117,8 +124,9 @@ class MainVC: UIViewController {
         backView.addSubview(todaysHabitTableView)
         backView.addSubview(progressImage)
         backView.addSubview(progressLabel)
+        backView.addSubview(percentLabel)
         backView.addSubview(todayProgressBar)
-
+        
         
         // BackView grid
         backView.snp.makeConstraints { (make) in
@@ -154,7 +162,7 @@ class MainVC: UIViewController {
         }
         progressImage.image = UIImage(named: "PF")
         
-        progressLabel.snp.makeConstraints{ (make) in
+        percentLabel.snp.makeConstraints{ (make) in
             make.top.equalTo(todaysHabitTableView.snp.bottom)
             make.height.equalTo(20)
             make.left.equalTo(todayProgressBar)
@@ -162,22 +170,30 @@ class MainVC: UIViewController {
             make.bottom.equalTo(todayProgressBar.snp.top)
         }
         
+//        progressLabel.snp.makeConstraints{ (make) in
+//            make.top.equalTo(todayProgressBar)
+//            make.height.equalTo(20)
+//            make.left.equalTo(todayProgressBar).offset(5)
+//            make.right.equalTo(todayProgressBar)
+//            make.bottom.equalTo(todayProgressBar)
+//        }
+        
         todayProgressBar.snp.makeConstraints{ (make) in
             make.height.equalTo(30)
             make.left.equalTo(progressImage.snp.right).offset(10)
             make.right.equalTo(backView).offset(-10)
             make.bottom.equalTo(backView)
         }
-                
+        
+       
+        
         
         updateOngoing()
         setRealmNoti()
-
+        
         updateProgressBar()
         
     }
-    
-    
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
     func setNaviBar() {
@@ -202,7 +218,7 @@ class MainVC: UIViewController {
         let v = NewHabitVC()
         let newHabitVCNavi = UINavigationController(rootViewController: v)
         newHabitVCNavi.modalPresentationStyle = .pageSheet
-        v.modalPresentationStyle = .pageSheet 
+        v.modalPresentationStyle = .pageSheet
         present(newHabitVCNavi, animated:true)   // modal view 가능케 하는 코드
     }
     
@@ -292,10 +308,13 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             initHabits()
             
             print("===========================true=============")
+            print(self.localRealm.objects(RMO_Habit.self))
+
             
         } else {
             //아직 다음날이 아니라서 아무것도 안함
             print("===========================false=============")
+            print(self.localRealm.objects(RMO_Habit.self))
             print(self.localRealm.objects(RMO_Count.self))
             return
         }
@@ -337,7 +356,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
-
+        
         
         //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
         var counts = 0
@@ -348,16 +367,16 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         //TEST 용
-//        let calendar = Calendar.current
-//        let tmr = calendar.date(byAdding: .day, value: 1, to: Date())
-
+        //        let calendar = Calendar.current
+        //        let tmr = calendar.date(byAdding: .day, value: 1, to: Date())
+        
         //daily repeat
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
             
             let today = Date()
             let currentHabitDate = dailyHabit.date
-
+            
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
             //MARK: Converting seconds to date.
             let secondDifference = time(current: today, habitDate: currentHabitDate)
@@ -367,7 +386,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let totalSecondDifference = time(current: today, habitDate: dailyHabit.startDate)
             let totalDayDifference = Int(round(totalSecondDifference/(60*60*24)))
             let newTotal = totalDayDifference + 1
-                        
+            
             //접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 10/2, 10/3이 접속하지 않은 날짜. 그러면 100% -> 50% -> 25% 순으로 내려가야 한다. 그리고 10/4일날 만약 success할 경우 50% 가 된다.
             if dayDifference > 1 {
                 
@@ -380,15 +399,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     let success = Double(dailyHabit.success)
                     let total = Double(dailyHabit.total) + Double(day)
                     print(total)
-
+                    
                     let successRate = Double(success/total)*100
                     print(successRate)
-
+                    
                     let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
                     guard let omd = oneMoreDay else {return}
-
+                    
                     let habitRate = RMO_Rate()
-
+                    
                     habitRate.habitID = dailyHabit.id
                     habitRate.createdDate = omd
                     habitRate.rate = successRate
@@ -401,11 +420,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     print(habitRate)
                     
                 }
-                    
+                
             } else {
-                return
+                print("difference less than 1")
             }
-        
+            
             if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
                 try! self.localRealm.write {
                     dailyHabit.date = newHabitDate
@@ -416,10 +435,10 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             print("================MainVC=========================total rateREALM")
             print(rateRealm)
-           
+            
             print("THIS HABIT BEING PRINTED HERE=-------------------------------")
-
-         
+            
+            
             
             counts += 1
             print("daily repeat 357-----------------------------------------------------------")
@@ -486,7 +505,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //Then execute
             if todayString == habitMonthAwayString {
                 
-               
+                
                 if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: monthlyHabit.date) {
                     
                     print("NEWHABITDATE+=======================================")
@@ -563,7 +582,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             try! localRealm.write {
                 localRealm.add(newCount)
-
+                
             }
         }
         
@@ -573,7 +592,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         try! localRealm.write {
             existCount.total += counts
-
+            
         }
         
     }
@@ -586,22 +605,26 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         
         let today = Date()
-        
+
         guard let beginningOfToday = Calendar.current.date(from: DateComponents(
             year: Calendar.current.component(.year, from: today),
             month: Calendar.current.component(.month, from: today),
-            day: Calendar.current.component(.day, from: today), hour: 0, minute: 0, second: 0)),
+            day: Calendar.current.component(.day, from: today),
+            hour: 0,
+            minute: 0,
+            second: 0)),
               
                 let endOfToday = Calendar.current.date(from: DateComponents(
                     year: Calendar.current.component(.year, from: today),
                     month: Calendar.current.component(.month, from: today),
-                    day: Calendar.current.component(.day, from: today), hour: 23, minute: 59, second: 59))
+                    day: Calendar.current.component(.day, from: today),
+                    hour: 23,
+                    minute: 59,
+                    second: 59))
                 
         else { return }
         
         habits = self.localRealm.objects(RMO_Habit.self).filter("date >= %@ AND date <= %@", beginningOfToday, endOfToday).filter("onGoing == True").sorted(byKeyPath: "date", ascending: true)
-        
-        
         //.sorted뒤에 나오는게 시간에 맞춰서 순서를 바꿔주는 핵심
         
         //notificationToken 은 ViewController 가 닫히기 전에 꼭 release 해줘야 함. 에러 나니까 코멘트
@@ -687,6 +710,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func updateProgressBar() {
         
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
@@ -700,11 +724,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         counts[0] = todayCount.success
         counts[1] = todayCount.fail
         counts[2] = todayCount.total
-
-        var progress = Float(counts[0])/Float(counts[2])
-        progressLabel.text = "\(String(counts[0])) SUCCESS / \(String(counts[2])) TOTAL              \(String(format: "%.1f", progress*100))%"
+        
+        let progress = Float(counts[0])/Float(counts[2])
+        
+//        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
+        
+        if counts[2] == 0 {
+            percentLabel.text = "Please Add Your Habits"
+        } else {
+            percentLabel.text = "\(String(format: "%.1f", progress*100))% Succeeded!"
+        }
         todayProgressBar.progress = progress
-                
+        
     }
     
     

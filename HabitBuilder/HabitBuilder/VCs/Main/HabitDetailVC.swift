@@ -442,6 +442,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         
+        //MARK: Fail함에 따라 오늘 Fail한 count를 count_realm에 +.
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return} //
         let taskToUpdate = countRealm[indexNumb]
@@ -452,7 +453,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         
         
-        // 만약 repeattype 이 none 이면 그냥 delete. 아닐경우 ongoing만 false로 만든다.
+        // MARK: 만약 repeatType 이 none 이면 RMO_Habit에서 delete. repeatType이 none이 아니면 ongoing만 false로 만든다.
+        
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
@@ -469,9 +471,29 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             }
         } else {
             
+            let rate = RMO_Rate()
+
+            rate.createdDate = updateHabit.date
+            rate.habitID = updateHabit.id
+            
+            let success = Double(updateHabit.success) //Fail했음으로 +1하지 않음.
+            let total = Double(updateHabit.total)
+            print("NewHabitDetailVC line 481, fail , total, successrate going down")
+            print(success)
+            print(total)
+            let successRate = Double(success/total)*100
+            print(successRate)
+            
+            rate.rate = successRate
+            
             try! self.localRealm.write {
                 updateHabit.onGoing = false
+                localRealm.add(rate)
             }
+            
+            print(updateHabit)
+            print(rate)
+            print(self.localRealm.objects(RMO_Rate.self))
         }
         
         delegate?.editComp()
@@ -520,7 +542,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             }
         } else {
            
-//            let rateRealm = self.localRealm.objects(RMO_Rate.self) // not needed?
 
             let rate = RMO_Rate()
 
@@ -538,7 +559,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             rate.rate = successRate
             
             
-            //FIXME: rate append
             try! self.localRealm.write {
                 updateHabit.onGoing = false
                 updateHabit.success += 1
