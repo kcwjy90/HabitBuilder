@@ -150,11 +150,6 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         return v
     }()
     
-    //==GRAPH RELATED===
-    var habitLineChart = LineChartView()
-    //==GRAPH RELATED===
-
-    
     lazy var scrollView: UIScrollView = {
         let v = UIScrollView()
         v.isUserInteractionEnabled = true
@@ -202,7 +197,6 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         scrollContentView.addSubview(repeatLabel)
         scrollContentView.addSubview(repeatButton)
         scrollContentView.addSubview(repeatTypeLabel)
-        scrollContentView.addSubview(habitLineChart)
         scrollContentView.addSubview(successButton)
         scrollContentView.addSubview(failButton)
         scrollContentView.addSubview(deleteButton)
@@ -295,19 +289,9 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.right.equalTo(scrollContentView).offset(-30)
         }
         
-        habitLineChart.snp.makeConstraints{ (make) in
-            make.top.equalTo(repeatBackView.snp.bottom).offset(10)
-            make.left.equalTo(scrollContentView).offset(50)
-            make.right.equalTo(scrollContentView).offset(-50)
-            make.height.equalTo(200)
-        }
-        habitLineChart.center = view.center
-        habitLineChart.backgroundColor = .white
-        habitLineChart.delegate = self
-        
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.top.equalTo(habitLineChart.snp.bottom).offset(30)
+            make.top.equalTo(repeatTypeLabel.snp.bottom).offset(30)
             make.height.equalTo(50)
             make.left.equalTo(scrollContentView).offset(16)
             make.right.equalTo(scrollContentView).offset(-16)
@@ -354,55 +338,6 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     }
     
     
-    //Graph Related======================================
-    
-    //MARK: time function that returns timeInterval
-    func time(current: Date, start: Date) -> TimeInterval {
-        return current.timeIntervalSinceReferenceDate - start.timeIntervalSinceReferenceDate
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-   
-        let startHabitDate = habit.startDate
-        let currentHabitDate = habit.date
-    
-        //MARK: Calculating the Date difference. converting seconds to date.
-        let secondDifference = time(current: currentHabitDate, start: startHabitDate)
-        let dayDifference = Int(round(secondDifference/(60*60*24)))
-     
-        
-        //일단 여기서 스톱
-        //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
-        habits = self.localRealm.objects(RMO_Rate.self).filter("habitID == %@", habit.id)
-                    
-        print("habitdetailvc line 379---------habits--------------------------")
-        print(habits)
- 
-        //FIXME: 만약 오늘 successButton이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
-        // 1. Set ChartDataEntry
-        var entries = [ChartDataEntry]()
-        
-        guard let habitRates = habits else {return}
-        
-        for x in 0..<dayDifference{
-            entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
-        }
-        
-        // 2. Set ChartDataSet
-        let set = LineChartDataSet(entries: entries, label: "")
-        set.colors = ChartColorTemplates.material()
-        
-        // 3. Set ChartData
-        let data = LineChartData(dataSet: set)
-        
-        // 4. Assign it to the chart’s data
-        habitLineChart.data = data
-        
-    }
-
-    
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -413,12 +348,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     
     
     
-    
-    //Graph Related======================================
-    
-    
-    
-    
+
     
     
     // MARK: functions for above buttons

@@ -148,14 +148,24 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
         let habit = searchedHabits[indexPath.row]
-        //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
-        let habitDetailVC = HabitDetailVC(habit: habit)
-        habitDetailVC.delegate = self
         
-        habitDetailVC.modalPresentationStyle = .pageSheet
-        present(habitDetailVC, animated:true)
+        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다, based on RepeatType
+        if habit.privateRepeatType == 0 {
+            //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
+            let habitDetailNoReVC = HabitDetailNoReVC(habit: habit)
+            let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailNoReVC)
+            habitDetailVCNavi.modalPresentationStyle = .pageSheet
+            present(habitDetailVCNavi, animated:true)
+            
+        } else {
+           
+            let habitDetailVC = HabitDetailVC(habit: habit)
+            let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
+            habitDetailVCNavi.modalPresentationStyle = .pageSheet
+            present(habitDetailVCNavi, animated:true)
+        }
+        
     }
     
     

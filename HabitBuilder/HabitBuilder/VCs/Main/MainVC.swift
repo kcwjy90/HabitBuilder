@@ -233,12 +233,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         guard let habit = habits?[indexPath.row] else { return }
         
-        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다.
-        //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
-        let habitDetailVC = HabitDetailVC(habit: habit)
-        let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
-        habitDetailVCNavi.modalPresentationStyle = .pageSheet //어? pagesheet해도 scroll 되는데?
-        present(habitDetailVCNavi, animated:true)
+        //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다, based on RepeatType
+        if habit.privateRepeatType == 0 {
+            //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
+            let habitDetailNoReVC = HabitDetailNoReVC(habit: habit)
+            let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailNoReVC)
+            habitDetailVCNavi.modalPresentationStyle = .pageSheet
+            present(habitDetailVCNavi, animated:true)
+            
+        } else {
+           
+            let habitDetailVC = HabitDetailVC(habit: habit)
+            let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
+            habitDetailVCNavi.modalPresentationStyle = .pageSheet
+            present(habitDetailVCNavi, animated:true)
+        }
+  
     }
     
     

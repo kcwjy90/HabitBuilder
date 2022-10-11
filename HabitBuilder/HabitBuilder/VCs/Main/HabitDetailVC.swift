@@ -73,15 +73,13 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     }()
     
     // habitDateTime 생성
-    lazy var habitDateTime: UIDatePicker = {
-        let v = UIDatePicker()
-        v.datePickerMode = .dateAndTime
-        //MARK: two lines of code that doesn't allow user to pick PAST date. but if this is activated, then the time changes automatically when the user opens up existing habit.
-//        let today = Date()
-//        v.minimumDate = today
-        v.layer.cornerRadius = 15
+    lazy var habitDateTime: UILabel = {
+        let v = UILabel()
+        v.text = ""
+        v.textColor = .black
         return v
     }()
+    
     
     // repeatBackview 생성
     lazy var repeatBackView: UIView = {
@@ -304,6 +302,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitLineChart.center = view.center
         habitLineChart.backgroundColor = .white
         habitLineChart.delegate = self
+        habitLineChart.isUserInteractionEnabled = false
+
         
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
@@ -337,7 +337,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
-        habitDateTime.date = habit.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d yyyy    h:mm a"
+        let habitDate = dateFormatter.string(from: habit.date)
+        habitDateTime.text = habitDate
         prevRep = habit.repeatType
         
         guard let rt = habit.repeatType else { return }
@@ -636,45 +639,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let taskToUpdate = realm[indexNumb]
-        
-        // 원래있던 habit의 date가 변동이 있을경우에만 실행됨.
-        if taskToUpdate.date != habitDateTime.date {
             
-            //만약 새로운 date에 해당하는 object가 RMO_Count에 없으면 새로 생성
-            let countDate = dateFormatter.string(from: habitDateTime.date)
-            if !countRealm.contains(where: { $0.date == countDate} )
-            {
-                let newCount = RMO_Count()
-                newCount.date = countDate
-                
-                try! localRealm.write {
-                    localRealm.add(newCount)
-                }
-                
-            }
-            
-            //예전 habit의 count 수를 -1
-            let removeDate = dateFormatter.string(from: taskToUpdate.date)
-            guard let indexNumb = countRealm.firstIndex(where: { $0.date == removeDate}) else
-            {return}
-            let minusCount = countRealm[indexNumb]
-            
-            try! localRealm.write {
-                minusCount.total -= 1
-                
-            }
-            
-            //새로운 habit의 count수를 +1
-            guard let indexNumb = countRealm.firstIndex(where: { $0.date == countDate}) else
-            {return}
-            let plusCount = countRealm[indexNumb]
-            try! localRealm.write {
-                plusCount.total += 1
-            }
-            
-        }
-        
-        
         
         //MARK: updating Habit
         try! self.localRealm.write {
@@ -688,21 +653,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             } else {
                 taskToUpdate.repeatType = repTyp
             }
-            
-            //MARK: If Habit Date was updated
-            if taskToUpdate.date != habitDateTime.date {
-                print("theyare different")
 
-                taskToUpdate.date = habitDateTime.date
-                taskToUpdate.startDate = habitDateTime.date
-                taskToUpdate.total = 1
-                taskToUpdate.success = 0
-                                
-            } else {
-                print("no changes")
-                return
-            }
-   
         }
         
 
