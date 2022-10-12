@@ -314,7 +314,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 realm.setValue(true, forKey: "onGoing")
             }
             
-            deletePrev()
             initHabits()
             
             print("===========================true=============")
@@ -332,31 +331,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
-    //MARK: Auto-deleting habits that are 2 days old
-    func deletePrev() {
-        let realm = self.localRealm.objects(RMO_Habit.self)
-        
-        let today = Date()
-        let calendar = Calendar.current
-        let midnight = calendar.startOfDay(for: today)
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: midnight)
-        
-        guard let ystday = yesterday else {return}
-        
-        // MARK: repeatType none이 애들은 이틀 이상 되면 delete
-        // FIXME: perhaps all the repeated habits should just respawn
-        try! self.localRealm.write {
-            
-            let deleteHabit = realm.where {
-                $0.date < ystday && $0.privateRepeatType == 0
-            }
-            self.localRealm.delete(deleteHabit)
-        }
+    //MARK: time function that returns timeInterval
+    func time(current: Date, habitDate: Date) -> TimeInterval {
+        return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
     }
     
-    
     //MARK: Intializing Habits. Updates day of the repeated habits to todays
-    
     func initHabits() {
         
         //To add today's habit's count
@@ -371,10 +351,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
         var counts = 0
         
-        //MARK: time function that returns timeInterval
-        func time(current: Date, habitDate: Date) -> TimeInterval {
-            return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
-        }
         
         //TEST 용
         //        let calendar = Calendar.current

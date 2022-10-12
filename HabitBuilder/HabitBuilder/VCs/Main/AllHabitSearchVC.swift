@@ -108,9 +108,14 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
+    //MARK: time function that returns timeInterval
+    func time(current: Date, habitDate: Date) -> TimeInterval {
+        return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
+    }
+    
     func reloadData() {
-        // MARK: Get all habits with onGoing = true in the realm
-        habits = localRealm.objects(RMO_Habit.self).filter("onGoing == True").toArray() //updating habits []
+        // MARK: Get all habits with onGoing = true in the realm. Doesn't have to be ONGOING
+        habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
         print("reloaddata-\(habits)")
         //
         habits = habits.sorted(by: {
@@ -196,10 +201,17 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
-        
+     
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US")
         dateFormatter.dateFormat = "MMM d, yyyy"
+        
+        if newHabit.privateRepeatType != 0 {
+            dateFormatter.dateFormat = "h:MM a"
+        } else {
+            print("NVM")
+        }
+        
         let today = Date()
     
         let newHabitDate = dateFormatter.string(from: date)
@@ -209,15 +221,20 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitDesc.text = desc
         cell.newHabitDate.text = newHabitDate
         
-        //MARK: 오래된 habit의 색을 까맣게 바꿈.
-        //FIXME: 오래된 habit의 색을 까맣게 바꾸고 날짜가 더 오래 됨에 따라 자동적으로 지워지면서 noti도 같이 지워져야함.
-        //아 혹은 repeat된 애들은 만약 하루보다 더 오래 되면 자동적으로 날짜가 바뀌면 되는구나! 이거를 다른 vc로 그냥 옮기자
+        //MARK: 오래된 habit의 색을 까맣게 바꾸고 date를 missed로 바꿈
         
-//        if newHabitDate < todayDate {
-//            cell.cellStackView.backgroundColor = .pastGray
-//        } else {
-//            cell.cellStackView.backgroundColor = .cellBlue
-//        }
+        let calendar = Calendar.current
+        let todayStartOfDay = calendar.startOfDay(for: today)
+        let habitStartOfDay = calendar.startOfDay(for: date)
+        let secondDifference = time(current: todayStartOfDay, habitDate: habitStartOfDay)
+        let dayDifference = Int(round(secondDifference/(60*60*24)))
+        
+        if dayDifference >= 1 && newHabit.privateRepeatType == 0 {
+            cell.cellStackView.backgroundColor = .pastGray
+            cell.newHabitDate.text = "Missed"
+        } else {
+            cell.cellStackView.backgroundColor = .cellGray
+        }
         
         
         //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
@@ -227,10 +244,10 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             cell.middleLine.backgroundColor = cell.cellStackView.backgroundColor
         }
         
-       
         
         switch newHabit.privateRepeatType {
-        case 1 : cell.titleBackground.backgroundColor = .pureGreen
+        case 1 : cell.titleBackground.backgroundColor = .pureGreen;
+                
         case 2 : cell.titleBackground.backgroundColor = .pureOrange
         case 3 : cell.titleBackground.backgroundColor = .pureBlue
         case 4 : cell.titleBackground.backgroundColor = .purePurple
@@ -258,6 +275,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         }
         self.allHabitsTableView.reloadData()
     }
+    
     
     
     //MARK: SWIPE action
