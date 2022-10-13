@@ -382,6 +382,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         print("habitdetailvc line 379---------habits--------------------------")
         print(habits)
  
+        if habits!.count == 0 {
+            print("0")
+        } else {
+            print("NO zero")
+        }
         //FIXME: 만약 오늘 successButton이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
         // 1. Set ChartDataEntry
         var entries = [ChartDataEntry]()
@@ -436,7 +441,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
-    //FIXME: failButtonPressed, successButtonPressed, deleteButtonPressed all being worked on after fixing how to work realm noti.
+    //MARK: fail button pressed
     @objc func failButtonPressed(sender: UIButton){
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
@@ -454,26 +459,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             taskToUpdate.fail += 1
         }
         
-        
-        
-        // MARK: 만약 repeatType 이 none 이면 RMO_Habit에서 delete. repeatType이 none이 아니면 ongoing만 false로 만든다.
-        
+        // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
         
-        if updateHabit.privateRepeatType == 0 {
-            
-            let thisId = habit.id
-            try! self.localRealm.write {
-                
-                let deleteHabit = realm.where {
-                    $0.id == thisId
-                }
-                self.localRealm.delete(deleteHabit)
-            }
-        } else {
-            
+                    
             let rate = RMO_Rate()
 
             rate.createdDate = updateHabit.date
@@ -481,11 +472,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             
             let success = Double(updateHabit.success) //Fail했음으로 +1하지 않음.
             let total = Double(updateHabit.total)
-            print("NewHabitDetailVC line 481, fail , total, successrate going down")
-            print(success)
-            print(total)
             let successRate = Double(success/total)*100
-            print(successRate)
             
             rate.rate = successRate
             
@@ -493,14 +480,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 updateHabit.onGoing = false
                 localRealm.add(rate)
             }
-            
-            print(updateHabit)
-            print(rate)
-            print(self.localRealm.objects(RMO_Rate.self))
-        }
-        
         delegate?.editComp()
-        
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -526,26 +506,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         }
  
   
-        // MARK: 만약 repeatType 이 none 이면 RMO_Habit에서 delete. repeatType이 none이 아니면 ongoing만 false로 만든다.
-        
+        // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
         
         let thisId = habit.id
 
-        if updateHabit.privateRepeatType == 0 {
             
-            try! self.localRealm.write {
-                
-                let deleteHabit = realm.where {
-                    $0.id == thisId
-                }
-                self.localRealm.delete(deleteHabit)
-            }
-        } else {
-           
-
             let rate = RMO_Rate()
 
             rate.createdDate = updateHabit.date
@@ -553,12 +521,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             
             let success = Double(updateHabit.success) + Double(1)
             let total = Double(updateHabit.total)
-            print("NewHabitDetailVC line 534, success , total, successrat")
-            print(success)
-            print(total)
             let successRate = Double(success/total)*100
-            print(successRate)
-            
+           
             rate.rate = successRate
             
             
@@ -568,14 +532,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 localRealm.add(rate)
             }
             
-            
-            print(updateHabit)
-            print(rate)
-            print(self.localRealm.objects(RMO_Rate.self))
-        }
-                
         delegate?.editComp()
-        
         self.dismiss(animated: true, completion: nil)
     }
     

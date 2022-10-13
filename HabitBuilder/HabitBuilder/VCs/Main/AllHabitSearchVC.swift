@@ -130,7 +130,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
 
 
 //MARK: HabitDetail에서 Habit을 수정 할경우 다시 tableview가 reload 됨
-extension AllHabitSearchVC: habitDetailVCDelegate {
+extension AllHabitSearchVC: habitDetailVCDelegate, habitDetailNoReVCDelegate {
     func editComp() {
         
         self.reloadData() //this code prevents app from crashing when realm noti already deletes the habit. but AllHabitSearchVC doesn't have realm noti, so it has to RELOAD first. THEN show searched vs unsearched
@@ -201,25 +201,28 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
+        let habitTime = newHabit.date
      
         let dateFormatter = DateFormatter()
+        let timeFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US")
+        timeFormatter.locale = Locale(identifier: "en_US")
+
+        timeFormatter.dateFormat = "h:MM a"
         dateFormatter.dateFormat = "MMM d, yyyy"
+
+        var newHabitDate = dateFormatter.string(from: date)
+        var newHabitTime = timeFormatter.string(from: habitTime)
         
-        if newHabit.privateRepeatType != 0 {
-            dateFormatter.dateFormat = "h:MM a"
-        } else {
-            print("NVM")
-        }
+        
+       
         
         let today = Date()
     
-        let newHabitDate = dateFormatter.string(from: date)
         let todayDate = dateFormatter.string(from: today)
         
-        cell.newHabitTitle.text = title
-        cell.newHabitDesc.text = desc
-        cell.newHabitDate.text = newHabitDate
+      
+
         
         //MARK: 오래된 habit의 색을 까맣게 바꾸고 date를 missed로 바꿈
         
@@ -236,23 +239,37 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             cell.cellStackView.backgroundColor = .cellGray
         }
         
+        switch newHabit.privateRepeatType {
+        case 1 : cell.titleBackground.backgroundColor = .pureGreen;
+        case 2 : cell.titleBackground.backgroundColor = .pureOrange;
+        case 3 : cell.titleBackground.backgroundColor = .pureBlue;
+        case 4 : cell.titleBackground.backgroundColor = .purePurple
+        default: cell.titleBackground.backgroundColor = .pureGray;
+        }
         
         //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
         if newHabitDate == todayDate {
-            cell.middleLine.backgroundColor = .todayBlue
+            cell.newHabitDate.textColor = UIColor.todayBlue
+            newHabitDate = "Today"
         } else {
-            cell.middleLine.backgroundColor = cell.cellStackView.backgroundColor
+            cell.newHabitDate.textColor = UIColor.black
+
+            switch newHabit.privateRepeatType {
+            case 1 : newHabitDate = "Daily"
+            case 2 : newHabitDate = "Tues"
+            case 3 : newHabitDate = "15th"
+            case 4 : newHabitDate = "2022"
+            default: dateFormatter.dateFormat = "MMM d, yyyy"
+                    
+            }
         }
         
+        cell.newHabitTitle.text = title
+        cell.newHabitDesc.text = desc
+        cell.newHabitDate.text = newHabitDate
+        cell.newHabitTime.text = newHabitTime
         
-        switch newHabit.privateRepeatType {
-        case 1 : cell.titleBackground.backgroundColor = .pureGreen;
-                
-        case 2 : cell.titleBackground.backgroundColor = .pureOrange
-        case 3 : cell.titleBackground.backgroundColor = .pureBlue
-        case 4 : cell.titleBackground.backgroundColor = .purePurple
-        default: cell.titleBackground.backgroundColor = .pureGray
-        }
+    
         
         return cell
     }

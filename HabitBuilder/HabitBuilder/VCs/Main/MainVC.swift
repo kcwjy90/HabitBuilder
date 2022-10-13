@@ -293,7 +293,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         cell.newHabitTitle.text = title
         cell.newHabitDesc.text = desc
-        cell.newHabitDate.text = newHabitDate
+        cell.newHabitTime.text = newHabitDate
         
         return cell
     }

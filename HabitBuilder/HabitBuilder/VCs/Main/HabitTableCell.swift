@@ -35,16 +35,17 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
-    // No longer needed but to take space for stackView
-    lazy var newHabitRepeat: UILabel = {
-        let v = UILabel()
-        v.textAlignment = .center
-        return v
-    }()
-    
     lazy var newHabitDate: UILabel = {
         let v = UILabel()
         v.textAlignment = .center
+        v.font = UIFont.boldSystemFont(ofSize: 17.0)
+        return v
+    }()
+    
+    lazy var newHabitTime: UILabel = {
+        let v = UILabel()
+        v.textAlignment = .center
+        v.font = UIFont.systemFont(ofSize: 15.0)
         return v
     }()
     
@@ -102,8 +103,9 @@ class HabitTableCell: UITableViewCell {
         titleStackView.addArrangedSubview(newHabitTitle)
         dateStackView.addSubview(titleBackground)
         titleStackView.addArrangedSubview(newHabitDesc)
-        dateStackView.addArrangedSubview(newHabitRepeat)
         dateStackView.addArrangedSubview(newHabitDate)
+        dateStackView.addArrangedSubview(newHabitTime)
+
         
         
         backView.snp.makeConstraints{ (make) in
@@ -162,13 +164,13 @@ class HabitTableCell: UITableViewCell {
             make.left.equalTo(titleStackView).offset(15)
         }
         
-        newHabitRepeat.snp.makeConstraints{ (make) in
-            make.height.equalTo(35)
+        newHabitDate.snp.makeConstraints{ (make) in
+            make.top.equalTo(titleStackView).offset(10)
+            make.height.equalTo(40)
             make.left.equalTo(dateStackView)
         }
         
-        
-        newHabitDate.snp.makeConstraints{ (make) in
+        newHabitTime.snp.makeConstraints{ (make) in
             make.height.equalTo(30)
             make.left.equalTo(dateStackView)
         }
