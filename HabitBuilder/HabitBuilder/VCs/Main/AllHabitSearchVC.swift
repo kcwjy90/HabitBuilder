@@ -197,48 +197,33 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
+        //Getting data for each cell
         let newHabit = searchedHabits[indexPath.row] //원래는 habits[indexPath.row] 였으나 searchedHabits으로
         let title = newHabit.title
         let desc = newHabit.desc
         let date = newHabit.date
         let habitTime = newHabit.date
      
+        //Dateformatter
         let dateFormatter = DateFormatter()
-        let timeFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US")
-        timeFormatter.locale = Locale(identifier: "en_US")
-
-        timeFormatter.dateFormat = "h:MM a"
         dateFormatter.dateFormat = "MMM d, yyyy"
+        let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US")
+        timeFormatter.dateFormat = "h:mm a"
 
+        //Changing date & time to string
         var newHabitDate = dateFormatter.string(from: date)
         var newHabitTime = timeFormatter.string(from: habitTime)
-        
-        
-       
-        
-        let today = Date()
-    
-        let todayDate = dateFormatter.string(from: today)
-        
       
-
-        
-        //MARK: 오래된 habit의 색을 까맣게 바꾸고 date를 missed로 바꿈
-        
+        //MARK: 오늘 날짜와 저장된 habit날짜를 비교
         let calendar = Calendar.current
-        let todayStartOfDay = calendar.startOfDay(for: today)
+        let todayStartOfDay = calendar.startOfDay(for: Date())
         let habitStartOfDay = calendar.startOfDay(for: date)
         let secondDifference = time(current: todayStartOfDay, habitDate: habitStartOfDay)
         let dayDifference = Int(round(secondDifference/(60*60*24)))
         
-        if dayDifference >= 1 && newHabit.privateRepeatType == 0 {
-            cell.cellStackView.backgroundColor = .pastGray
-            cell.newHabitDate.text = "Missed"
-        } else {
-            cell.cellStackView.backgroundColor = .cellGray
-        }
-        
+        //MARK: repeatType에 따라서 titleBackground color를 바꾼다.
         switch newHabit.privateRepeatType {
         case 1 : cell.titleBackground.backgroundColor = .pureGreen;
         case 2 : cell.titleBackground.backgroundColor = .pureOrange;
@@ -247,21 +232,32 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         default: cell.titleBackground.backgroundColor = .pureGray;
         }
         
-        //MARK: repeatType에 따라서 혹은 오늘이냐에 따라서 바뀌는 text 색. 색은 좀 더 어떤게 좋은지 생각해보고 apply 하자
-        if newHabitDate == todayDate {
-            cell.newHabitDate.textColor = UIColor.todayBlue
-            newHabitDate = "Today"
-        } else {
-            cell.newHabitDate.textColor = UIColor.black
-
-            switch newHabit.privateRepeatType {
-            case 1 : newHabitDate = "Daily"
-            case 2 : newHabitDate = "Tues"
-            case 3 : newHabitDate = "15th"
-            case 4 : newHabitDate = "2022"
-            default: dateFormatter.dateFormat = "MMM d, yyyy"
-                    
+        //MARK: 만약 habit날짜가 오늘일 경우
+        if dayDifference == 0 {
+            
+            //MARK: 오늘 habit은 Today란 파란문구가 뜬다. complete 했으면 Completed가 뜬다.
+            switch newHabit.onGoing {
+            case true :
+                cell.newHabitDate.textColor = UIColor.todayBlue;
+                newHabitDate = "Today"
+            default :
+                cell.newHabitDate.textColor = UIColor.compBlue;
+                newHabitDate = "Completed"
             }
+           
+        } else {
+            cell.newHabitDate.textColor = UIColor.black;
+        }
+        
+        
+        //MARK: 하빗 날짜가 지났고 repeat되는 애들이 아니라면 habit의 색을 까맣게 바꾸고 date를 dispaly 되는 missed로 바꿈
+        if dayDifference >= 1 && newHabit.privateRepeatType == 0 {
+            cell.cellStackView.backgroundColor = .pastGray
+            newHabitDate = "Missed"
+            newHabitTime = ""
+        } else {
+        //MARK: habit날짜가 안 지났거나, 지났어도 repeat되는 애들인 경우는 색이 바뀌거나 miss 되지 않음.
+            cell.cellStackView.backgroundColor = .cellGray
         }
         
         cell.newHabitTitle.text = title

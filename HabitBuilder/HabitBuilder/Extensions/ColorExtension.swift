@@ -30,6 +30,8 @@ extension UIColor {
     @nonobjc class var tintBlue: UIColor { return UIColor(red:82/255, green:150/255, blue: 247/255, alpha: 1.00) }
     @nonobjc class var cellBlue: UIColor { return UIColor(red:236/255, green:244/255, blue: 255/255, alpha: 1.00) }
     @nonobjc class var todayBlue: UIColor { return UIColor(red:67/255, green:144/255, blue: 255/255, alpha: 1.00) }
+    @nonobjc class var compBlue: UIColor { return UIColor(red:58/255, green:68/255, blue: 105/255, alpha: 1.00) }
+
 }
 
 // Spuit 설치

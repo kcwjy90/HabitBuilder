@@ -385,27 +385,35 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         if habits!.count == 0 {
             print("0")
         } else {
-            print("NO zero")
+            //MARK: 만약 오늘 success/fail이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
+            // 1. Set ChartDataEntry
+            var entries = [ChartDataEntry]()
+            
+            guard let habitRates = habits else {return}
+            
+            switch habit.onGoing {
+            case false :
+                for x in 0...dayDifference{
+                    entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
+                }
+            default :
+                for x in 0..<dayDifference{
+                    entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
+                }
+            }
+            
+            
+            // 2. Set ChartDataSet
+            let set = LineChartDataSet(entries: entries, label: "")
+            set.colors = ChartColorTemplates.material()
+            
+            // 3. Set ChartData
+            let data = LineChartData(dataSet: set)
+            
+            // 4. Assign it to the chart’s data
+            habitLineChart.data = data
         }
-        //FIXME: 만약 오늘 successButton이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
-        // 1. Set ChartDataEntry
-        var entries = [ChartDataEntry]()
         
-        guard let habitRates = habits else {return}
-        
-        for x in 0..<dayDifference{
-            entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
-        }
-        
-        // 2. Set ChartDataSet
-        let set = LineChartDataSet(entries: entries, label: "")
-        set.colors = ChartColorTemplates.material()
-        
-        // 3. Set ChartData
-        let data = LineChartData(dataSet: set)
-        
-        // 4. Assign it to the chart’s data
-        habitLineChart.data = data
         
     }
 

@@ -131,7 +131,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         // newHabitTitle TextField size grid
         newHabitTitle.snp.makeConstraints { (make) in
-            make.top.equalTo(backView).offset(20)
+            make.top.equalTo(backView).offset(60)
             make.left.equalTo(backView).offset(16)
             make.right.equalTo(backView).offset(-16)
             make.height.equalTo(50)
