@@ -303,7 +303,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitLineChart.backgroundColor = .white
         habitLineChart.delegate = self
         habitLineChart.isUserInteractionEnabled = false
-
+        habitLineChart.xAxis.granularity = 1
+        habitLineChart.leftAxis.granularity = 1
+        habitLineChart.leftAxis.axisMinimum = 0
+        habitLineChart.leftAxis.axisMaximum = 100
+        
         
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
@@ -373,7 +377,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         //MARK: Calculating the Date difference. converting seconds to date.
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
         let dayDifference = Int(round(secondDifference/(60*60*24)))
-     
         
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
@@ -388,30 +391,38 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             //MARK: 만약 오늘 success/fail이 눌러 졌으면..0...daydifference, 안눌러 졌으면 0..<dayDifference
             // 1. Set ChartDataEntry
             var entries = [ChartDataEntry]()
-            
+            var xAxis: [String] = []
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd"
+
             guard let habitRates = habits else {return}
             
             switch habit.onGoing {
             case false :
                 for x in 0...dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
+                    xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
             default :
                 for x in 0..<dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
+                    xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
             }
             
-            
+    
             // 2. Set ChartDataSet
             let set = LineChartDataSet(entries: entries, label: "")
-            set.colors = ChartColorTemplates.material()
+//            set.colors = ChartColorTemplates.material()
             
             // 3. Set ChartData
             let data = LineChartData(dataSet: set)
             
             // 4. Assign it to the chart’s data
             habitLineChart.data = data
+            
+            habitLineChart.xAxis.axisMaximum = 10
+            habitLineChart.xAxis.axisMinimum = 0
         }
         
         
@@ -693,4 +704,5 @@ extension HabitDetailVC: RepeatVCDelegate {
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
     }
 }
+
 

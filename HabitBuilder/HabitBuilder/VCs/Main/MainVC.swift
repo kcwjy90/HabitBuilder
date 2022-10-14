@@ -360,7 +360,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {
             
-            let today = Date()
             let currentHabitDate = dailyHabit.date
             
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
