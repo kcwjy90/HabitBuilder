@@ -328,6 +328,16 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         let repeatTypeString = String(describing: rt)
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
         
+        let secondDifference = time(current: Date(), habitDate: habit.date)
+        let dayDifference = Int(round(secondDifference/(60*60*24)))
+        
+        if dayDifference > 1 {
+            successButton.isHidden = true
+            failButton.isHidden = true
+        } else {
+            successButton.isHidden = false
+            failButton.isHidden = false
+        }
         
         // Button Actions -  repeatButton, failButton, successButton, deleteButton
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
@@ -348,7 +358,10 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     
     
     
-
+    //MARK: time function that returns timeInterval
+    func time(current: Date, habitDate: Date) -> TimeInterval {
+        return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
+    }
     
     
     // MARK: functions for above buttons

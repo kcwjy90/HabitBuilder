@@ -351,6 +351,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let repeatTypeString = String(describing: rt)
         repeatTypeLabel.text = repeatTypeString.capitalized + " >"
         
+        //MARK: If Habit already completed, hide Success/Fail buttons
+        if habit.onGoing == false {
+            successButton.isHidden = true
+            failButton.isHidden = true
+        } else {
+            successButton.isHidden = false
+            failButton.isHidden = false
+        }
         
         // Button Actions -  repeatButton, failButton, successButton, deleteButton
         repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
@@ -384,6 +392,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                     
         print("habitdetailvc line 379---------habits--------------------------")
         print(habits)
+       
  
         if habits!.count == 0 {
             print("0")
