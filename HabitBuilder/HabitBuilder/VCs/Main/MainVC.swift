@@ -434,36 +434,44 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let weeklyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 2")
         for weeklyHabit in weeklyHabits {
             
-            //If current Habit + 1 week == today's date...
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
-            var dateComponent = DateComponents()
-            dateComponent.day = 7
-            let futureWeek = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date)
             
-            guard let weeklyDate = futureWeek else { return }
-            let habitWeekAwayString = dateFormatter.string(from: weeklyDate)
-            let todayString = dateFormatter.string(from: Date())
-            
-            
-            //Then execute
-            if todayString == habitWeekAwayString {
+            let currentHabitDate = weeklyHabit.date
+
+            //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
+            //MARK: Converting seconds to date.
+            let secondDifference = time(current: today, habitDate: currentHabitDate)
+            let dayDifference = Int(round(secondDifference/(60*60*24)))
+            print("today ==========================\(today)")
+            print("current habitDay ==========================\(currentHabitDate)")
+            print("secondDIfference  ==========================\(secondDifference)")
+
+
+            print("Daydifference NOT div by 7==========================\(dayDifference)")
+            if dayDifference%7 == 0 {
+                print("Daydifference divisble by 7 ==========================\(dayDifference)")
+                let multiplesOfSeven = dayDifference/7
+                print("multiplesOfSEven ==========================\(multiplesOfSeven)")
+
+
+                var dateComponent = DateComponents()
+                dateComponent.day = dayDifference
                 
+                              
                 if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
                     try! self.localRealm.write {
+                        weeklyHabit.total += multiplesOfSeven
                         weeklyHabit.date = newHabitDate
                     }
+                    print("newHabitDate ==========================\(newHabitDate)")
+                    print("weeklyHabit.total ==========================\(weeklyHabit.total)")
+
                 }
                 
                 counts += 1
-                print("week repeat 392-----------------------------------------------------------")
-                print(counts)
-                
+                print("counts ==========================\(counts)")
+
             } else {
-                print("FAlse")
-                print(todayString)
-                print(habitWeekAwayString)
-                print(weeklyHabit.date)
+                print("False")
                 print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
             }

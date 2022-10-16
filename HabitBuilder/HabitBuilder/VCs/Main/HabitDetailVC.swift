@@ -529,8 +529,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return} //
         let taskToUpdate = countRealm[indexNumb]
         
+        print("TASK TO UPDATE +==========================\(taskToUpdate)")
         try! self.localRealm.write {
             taskToUpdate.success += 1
+    
         }
  
   
@@ -539,6 +541,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return}
         let updateHabit = realm[indexNumb]
         
+        print("updateHabit +==========================\(updateHabit)")
+
         let thisId = habit.id
 
             
