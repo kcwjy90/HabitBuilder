@@ -159,6 +159,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         if habit.privateRepeatType == 0 {
             //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
             let habitDetailNoReVC = HabitDetailNoReVC(habit: habit)
+            habitDetailNoReVC.delegate = self
             let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailNoReVC)
             habitDetailVCNavi.modalPresentationStyle = .pageSheet
             present(habitDetailVCNavi, animated:true)
@@ -166,6 +167,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         } else {
            
             let habitDetailVC = HabitDetailVC(habit: habit)
+            habitDetailVC.delegate = self
             let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
             habitDetailVCNavi.modalPresentationStyle = .pageSheet
             present(habitDetailVCNavi, animated:true)
