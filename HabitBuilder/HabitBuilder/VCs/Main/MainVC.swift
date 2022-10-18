@@ -447,7 +447,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
             print("Daydifference NOT div by 7==========================\(dayDifference)")
-            if dayDifference%7 == 0 {
+            if dayDifference%7 == 0 && dayDifference != 0 {
                 print("Daydifference divisble by 7 ==========================\(dayDifference)")
                 let multiplesOfSeven = dayDifference/7
                 print("multiplesOfSEven ==========================\(multiplesOfSeven)")
