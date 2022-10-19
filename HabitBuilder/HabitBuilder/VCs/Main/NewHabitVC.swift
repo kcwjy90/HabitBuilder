@@ -258,13 +258,34 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 //            print(existCount)
         }
         
+        
+        
         //habit 을 추가
         try! localRealm.write {
             localRealm.add(habit)
         }
         
+        //Creating default RMO_Rate with 0% completion, so if the user doesn't do anything for the first day, it automatically saves 0%
+        let rate = RMO_Rate()
+
+        rate.createdDate = habit.date
+        rate.habitID = habit.id
+        
+        let success = Double(0)
+        let total = Double(1)
+        let successRate = Double(success/total)*100
+       
+        rate.rate = successRate
+        
+        
+        try! self.localRealm.write {
+            localRealm.add(rate)
+        }
+        
+        
         print("=========printing RMO_Habit in NewHabitVC line 271===============")
         print(self.localRealm.objects(RMO_Habit.self))
+        print(self.localRealm.objects(RMO_Rate.self))
         print("=========printing RMO_Habit in NewHabitVC line 271===============")
 
         //MARK: adding notification to Scheduler

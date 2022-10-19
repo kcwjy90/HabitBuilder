@@ -492,26 +492,18 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return}
         let updateHabit = realm[indexNumb]
         
-                    
-            let rate = RMO_Rate()
-
-            rate.createdDate = updateHabit.date
-            rate.habitID = updateHabit.id
-            
-            let success = Double(updateHabit.success) //Fail했음으로 +1하지 않음.
-            let total = Double(updateHabit.total)
-            let successRate = Double(success/total)*100
-            
-            rate.rate = successRate
-            
             try! self.localRealm.write {
                 updateHabit.onGoing = false
-                localRealm.add(rate)
             }
+        
+        
+        print(self.localRealm.objects(RMO_Habit.self))
+        print(self.localRealm.objects(RMO_Rate.self))
+        
+        
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
     }
-    
     
     
     @objc func successButtonPressed(sender: UIButton){
@@ -522,6 +514,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
+        let rateRealm = self.localRealm.objects(RMO_Rate.self)
+
         
         
         //MARK: Success함에 따라 오늘 success한 count를 count_realm에 +. TodayProgressBar에 적용.
@@ -535,6 +529,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
         }
  
+      
   
         // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
@@ -543,26 +538,27 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         print("updateHabit +==========================\(updateHabit)")
 
-        let thisId = habit.id
-
-            
-            let rate = RMO_Rate()
-
-            rate.createdDate = updateHabit.date
-            rate.habitID = updateHabit.id
-            
+        guard let indexNumb = rateRealm.firstIndex(where: { $0.habitID == self.habit.id && $0.createdDate == self.habit.date}) else
+        {return}
+        let updateRate = rateRealm[indexNumb]
+        
+        print("updateRate ===========================================\(updateRate)")
+        
+        
             let success = Double(updateHabit.success) + Double(1)
             let total = Double(updateHabit.total)
             let successRate = Double(success/total)*100
            
-            rate.rate = successRate
             
             
             try! self.localRealm.write {
                 updateHabit.onGoing = false
                 updateHabit.success += 1
-                localRealm.add(rate)
+                updateRate.rate = successRate
             }
+        
+        print(self.localRealm.objects(RMO_Habit.self))
+        print(self.localRealm.objects(RMO_Rate.self))
             
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)

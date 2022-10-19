@@ -372,10 +372,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let totalDayDifference = Int(round(totalSecondDifference/(60*60*24)))
             let newTotal = totalDayDifference + 1
             
-            //접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 10/2, 10/3이 접속하지 않은 날짜. 그러면 100% -> 50% -> 25% 순으로 내려가야 한다. 그리고 10/4일날 만약 success할 경우 50% 가 된다.
-            if dayDifference > 1 {
+            //MARK: 접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 접속하지 않은 10/2 = 50%, 10/3 = 33%. 접속한 날짜인 10/4는 일단 무조건 fail 로 간주한다. 그래서 user가 rate을 하지 않거나 app을 열기만 하고 아무것도 하지 않은경우 자동적으로 fail이 됨 (25%). cell을 touch해서 success를 할 경우만 rate이 올라감.
                 
-                for day in 1..<dayDifference{
+                for day in 1...dayDifference{
                     
                     print(dayDifference)
                     print(day)
@@ -403,12 +402,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     
                     print("habitrate-----MainVC line 400--------------------------for each missing days")
                     print(habitRate)
+                    print(self.localRealm.objects(RMO_Habit.self))
+                    print(self.localRealm.objects(RMO_Rate.self))
                     
                 }
                 
-            } else {
-                print("difference less than 1")
-            }
+          
             
             if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
                 try! self.localRealm.write {
