@@ -414,19 +414,31 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
                     xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
+                
+                let last = entries.last
+                
                 //Updating last rate as % in currentSuccessRate
-                let lastRate = habitRates[dayDifference].rate
-                currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
-
+                if last == nil {
+                    currentSuccessRate.text = "0.0%"
+                } else {
+                    let lastRate = habitRates[dayDifference].rate
+                    currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+                }
+            
             default :
                 for x in 0..<dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
                     xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
-                //Updating last rate as % in currentSuccessRate
-                let lastRate = habitRates[dayDifference-1].rate
-                currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+                let last = entries.last
 
+                //Updating last rate as % in currentSuccessRate.
+                if last == nil {
+                    currentSuccessRate.text = "0.0%"
+                } else {
+                    let lastRate = habitRates[dayDifference-1].rate
+                    currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+                }
             }
             
             //Formatting xAxis from Numb to String
