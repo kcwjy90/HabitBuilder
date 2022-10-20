@@ -64,57 +64,40 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         return v
     }()
     
-    // habitDateTimeLabel 생성
-    lazy var habitDateTimeLabel: UILabel = {
-        let v = UILabel()
-        v.text = "Date and Time"
-        v.textColor = .pureBlack
-        return v
-    }()
-    
     // habitDateTime 생성
     lazy var habitDateTime: UILabel = {
         let v = UILabel()
         v.text = ""
+        v.font = UIFont.boldSystemFont(ofSize: 20.0)
         v.textColor = .black
         return v
     }()
     
-    
     // repeatBackview 생성
-    lazy var repeatBackView: UIView = {
+    lazy var currentSuccessRateBackView: UIView = {
         let v = UIView()
         v.layer.cornerRadius = 15
         v.backgroundColor = .white
         return v
     }()
     
-    // repeatLabel 생성
-    lazy var repeatLabel: UILabel = {
+    // currentSuccessRate 생성
+    lazy var currentSuccessRateLabel: UILabel = {
         let v = UILabel()
-        v.text = "Repeat"
-        v.textColor = .systemGray
-        return v
-    }()
-    
-    // repeatButton 생성
-    lazy var repeatButton: UIButton = {
-        let v = UIButton()
-        return v
-    }()
-    
-    // repeatTypeLabel 생성
-    lazy var repeatTypeLabel: UILabel = {
-        let v = UILabel()
-        v.text = "None >"
+        v.text = "Current Success Rate :"
+        v.font = UIFont.systemFont(ofSize: 17.0)
         v.textColor = .black
         return v
     }()
     
-    //default Repeat Type when user creates Habit
-    var prevRep: RepeatType?
-    var repTyp: RepeatType?
-    
+    lazy var currentSuccessRate: UILabel = {
+        let v = UILabel()
+        v.text = ""
+        v.font = UIFont.systemFont(ofSize: 40.0)
+        v.textColor = .black
+        return v
+    }()
+ 
     // successButton 생성
     lazy var successButton: UIButton = {
         let v = UIButton()
@@ -194,12 +177,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         scrollContentView.addSubview(habitTitle)
         scrollContentView.addSubview(habitDesc)
         scrollContentView.addSubview(habitDateTimeBackView)
-        scrollContentView.addSubview(habitDateTimeLabel)
         scrollContentView.addSubview(habitDateTime)
-        scrollContentView.addSubview(repeatBackView)
-        scrollContentView.addSubview(repeatLabel)
-        scrollContentView.addSubview(repeatButton)
-        scrollContentView.addSubview(repeatTypeLabel)
+        scrollContentView.addSubview(currentSuccessRateBackView)
+        scrollContentView.addSubview(currentSuccessRateLabel)
+        scrollContentView.addSubview(currentSuccessRate)
         scrollContentView.addSubview(habitLineChart)
         scrollContentView.addSubview(successButton)
         scrollContentView.addSubview(failButton)
@@ -239,79 +220,75 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         textViewDidEndEditing(habitDesc)
         habitDesc.addPadding()
         habitDesc.addPadding()
-        
+
         
         // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDesc.snp.bottom).offset(10)
             make.left.equalTo(habitTitle)
             make.right.equalTo(habitTitle)
-            make.height.equalTo(60)
-        }
-        
-        // habitDateTimeLabel size grid
-        habitDateTimeLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateTimeBackView)
-            make.left.equalTo(scrollContentView).offset(39)
-            make.height.equalTo(habitDateTimeBackView)
+            make.height.equalTo(40)
         }
         
         // habitDateTime size grid
         habitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateTimeBackView)
-            make.right.equalTo(scrollContentView).offset(-34)
+            make.centerX.equalTo(scrollContentView)
             make.height.equalTo(habitDateTimeBackView)
         }
         
-        // repeatBackview size grid
-        repeatBackView.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
-            make.left.equalTo(habitTitle)
-            make.right.equalTo(habitTitle)
-            make.height.equalTo(habitDateTimeBackView)
-        }
-        
-        // repeatLabel size grid
-        repeatLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
-            make.left.equalTo(scrollContentView).offset(39)
-            make.height.equalTo(60)
-        }
-        
-        // repeatButton size grid
-        repeatButton.snp.makeConstraints { (make) in
-            make.centerY.equalTo(repeatBackView)
-            make.width.equalTo(repeatTypeLabel)
-            make.height.equalTo(40)
-            make.right.equalTo(scrollContentView).offset(-30)
-        }
-        
-        // repeatTypeLabel size grid
-        repeatTypeLabel.snp.makeConstraints { (make) in
-            make.centerY.equalTo(repeatBackView)
-            make.height.equalTo(40)
-            make.right.equalTo(scrollContentView).offset(-30)
-        }
         
         habitLineChart.snp.makeConstraints{ (make) in
-            make.top.equalTo(repeatBackView.snp.bottom).offset(10)
-            make.left.equalTo(scrollContentView).offset(50)
-            make.right.equalTo(scrollContentView).offset(-50)
-            make.height.equalTo(200)
+            make.top.equalTo(habitDateTime.snp.bottom).offset(10)
+            make.left.equalTo(scrollContentView).offset(10)
+            make.right.equalTo(scrollContentView).offset(-10)
+            make.height.equalTo(220)
         }
         habitLineChart.center = view.center
         habitLineChart.backgroundColor = .white
         habitLineChart.delegate = self
         habitLineChart.isUserInteractionEnabled = false
-        habitLineChart.xAxis.granularity = 1
-        habitLineChart.leftAxis.granularity = 1
+//        habitLineChart.xAxis.granularity = 1
+        habitLineChart.xAxis.labelPosition = .bottom
+        habitLineChart.xAxis.labelFont = .boldSystemFont(ofSize: 12)
+        habitLineChart.xAxis.setLabelCount(5, force: false)
+        
+        habitLineChart.rightAxis.enabled = false
+        habitLineChart.leftAxis.labelFont = .boldSystemFont(ofSize: 12)
+        habitLineChart.leftAxis.setLabelCount(6, force: false)
+        habitLineChart.leftAxis.labelTextColor = .black
+        habitLineChart.leftAxis.axisLineColor = .black
         habitLineChart.leftAxis.axisMinimum = 0
         habitLineChart.leftAxis.axisMaximum = 100
+//        habitLineChart.leftAxis.granularity = 1
         
+        
+        // currentSuccessRateBackView size grid
+        currentSuccessRateBackView.snp.makeConstraints { (make) in
+            make.top.equalTo(habitLineChart.snp.bottom)
+            make.left.equalTo(habitTitle)
+            make.right.equalTo(habitTitle)
+            make.height.equalTo(habitDateTimeBackView)
+        }
+        
+        // currentSuccessRateLabel size grid
+        currentSuccessRateLabel.snp.makeConstraints { (make) in
+            make.right.equalTo(currentSuccessRate.snp.left).offset(-4)
+            make.bottom.equalTo(currentSuccessRate)
+            make.height.equalTo(20)
+        }
+        
+        // currentSuccessRate size grid
+        currentSuccessRate.snp.makeConstraints { (make) in
+            make.top.equalTo(habitLineChart.snp.bottom)
+            make.centerY.equalTo(currentSuccessRateBackView)
+            make.height.equalTo(40)
+            make.right.equalTo(currentSuccessRateBackView)
+        }
         
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.top.equalTo(habitLineChart.snp.bottom).offset(30)
+            make.top.equalTo(currentSuccessRateBackView.snp.bottom).offset(10)
             make.height.equalTo(50)
             make.left.equalTo(scrollContentView).offset(16)
             make.right.equalTo(scrollContentView).offset(-16)
@@ -342,14 +319,38 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitDesc.text = habit.desc
         changeTextColor(habitDesc) // Description이 없을경우 placeholder처럼 꾸미기
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d yyyy    h:mm a"
-        let habitDate = dateFormatter.string(from: habit.date)
-        habitDateTime.text = habitDate
-        prevRep = habit.repeatType
+        dateFormatter.dateFormat = "h:mm a"
+        let habitTime = dateFormatter.string(from: habit.date)
         
-        guard let rt = habit.repeatType else { return }
-        let repeatTypeString = String(describing: rt)
-        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+            
+        switch habit.privateRepeatType {
+        case 1 : habitDateTime.text = "Everyday at \(habitTime)"
+            
+        case 2 : dateFormatter.dateFormat = "EEEE";
+                 let habitDay = dateFormatter.string(from: habit.date);
+                 habitDateTime.text = "Every \(habitDay) at \(habitTime)"
+            
+        case 3 : dateFormatter.dateFormat = "dd";
+                let habitDay = dateFormatter.string(from: habit.date);
+            
+            var day = ""
+            
+            switch habitDay {
+            case "1": day = "\(habitDay)st"
+            case "2": day = "\(habitDay)nd"
+            case "3": day = "\(habitDay)rd"
+            case "21": day = "\(habitDay)st"
+            case "22": day = "\(habitDay)nd"
+            case "23": day = "\(habitDay)rd"
+            case "31": day = "\(habitDay)st"
+            default: day = "\(habitDay)th"
+
+            }
+                habitDateTime.text = "Every \(day) of the Month at \(habitTime)"
+            
+        default: habitDateTime.text = "Everyday at \(habitTime)"
+        }
+            
         
         //MARK: If Habit already completed, hide Success/Fail buttons
         if habit.onGoing == false {
@@ -360,8 +361,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             failButton.isHidden = false
         }
         
-        // Button Actions -  repeatButton, failButton, successButton, deleteButton
-        repeatButton.addTarget(self, action: #selector(repeatButtonPressed), for: .touchUpInside)
         failButton.addTarget(self, action: #selector(failButtonPressed), for: .touchUpInside)
         successButton.addTarget(self, action: #selector(successButtonPressed), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector(deleteButtonPressed), for: .touchUpInside)
@@ -382,6 +381,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let startHabitDate = habit.startDate
         let currentHabitDate = habit.date
     
+        var xStrings: [String] = []
+
+        
         //MARK: Calculating the Date difference. converting seconds to date.
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
         let dayDifference = Int(round(secondDifference/(60*60*24)))
@@ -402,7 +404,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             var entries = [ChartDataEntry]()
             var xAxis: [String] = []
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd"
+            dateFormatter.dateFormat = "MM/dd/YY"
 
             guard let habitRates = habits else {return}
             
@@ -412,26 +414,49 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
                     xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
+                //Updating last rate as % in currentSuccessRate
+                let lastRate = habitRates[dayDifference].rate
+                currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+
             default :
                 for x in 0..<dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
                     xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
+                //Updating last rate as % in currentSuccessRate
+                let lastRate = habitRates[dayDifference-1].rate
+                currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+
             }
             
-    
+            //Formatting xAxis from Numb to String
+            habitLineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values: xAxis)
+            
+            
             // 2. Set ChartDataSet
-            let set = LineChartDataSet(entries: entries, label: "")
-//            set.colors = ChartColorTemplates.material()
+            let set = LineChartDataSet(entries: entries, label: "% Succeeded")
+            // Makes the line smooth, changes radius of circle = 3 + line thickness = 2
+            set.mode = .cubicBezier
+            set.circleRadius = 3
+            set.lineWidth = 2
+            //            set.drawCirclesEnabled = false //Removes points on the graph
             
             // 3. Set ChartData
             let data = LineChartData(dataSet: set)
+            data.setDrawValues(false) //Removes label
+            print(xAxis)
             
             // 4. Assign it to the chart’s data
             habitLineChart.data = data
             
-            habitLineChart.xAxis.axisMaximum = 10
-            habitLineChart.xAxis.axisMinimum = 0
+            if xAxis.count <= 10 {
+                habitLineChart.xAxis.axisMaximum = 10
+                habitLineChart.xAxis.axisMinimum = 0
+            } else {
+                habitLineChart.xAxis.axisMaximum = Double(xAxis.count + 1)
+                habitLineChart.xAxis.axisMinimum = 0
+            }
+          
         }
         
         
@@ -460,13 +485,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     // MARK: functions for above buttons
     @objc func backButtonPressed(){
         self.dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func repeatButtonPressed(sender: UIButton){
-        let v = RepeatVC()
-        v.delegate = self
-        v.modalPresentationStyle = .pageSheet
-        present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     //MARK: fail button pressed
@@ -632,13 +650,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             else { return }
             taskToUpdate.title = titleText
             taskToUpdate.desc = descText
-
-            if repTyp == nil {
-                taskToUpdate.repeatType = prevRep
-            } else {
-                taskToUpdate.repeatType = repTyp
-            }
-
         }
         
 
@@ -704,14 +715,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
 
 
 
-//MARK: Receiving Updated Repeat Type from RepeatVC
-extension HabitDetailVC: RepeatVCDelegate {
-    
-    func didChangeRepeatType(repeatType: RepeatType) {
-        repTyp = repeatType
-        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
-        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
-    }
-}
+
+
 
 
