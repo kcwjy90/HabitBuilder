@@ -16,39 +16,6 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
-    lazy var newHabitTitle: UILabel = {
-        let v = UILabel()
-        v.font = UIFont.boldSystemFont(ofSize: 28.0)
-        return v
-    }()
-    
-    lazy var titleBackground: UIButton = {
-        let v = UIButton()
-        v.layer.masksToBounds = true
-        v.layer.cornerRadius = 5
-        v.backgroundColor = .cellGray
-        return v
-    }()
-    
-    lazy var newHabitDesc: UILabel = {
-        let v = UILabel()
-        return v
-    }()
-    
-    lazy var newHabitDate: UILabel = {
-        let v = UILabel()
-        v.textAlignment = .center
-        v.font = UIFont.boldSystemFont(ofSize: 17.0)
-        return v
-    }()
-    
-    lazy var newHabitTime: UILabel = {
-        let v = UILabel()
-        v.textAlignment = .center
-        v.font = UIFont.systemFont(ofSize: 15.0)
-        return v
-    }()
-    
     lazy var boxCell: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.horizontal
@@ -76,6 +43,25 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
+    lazy var titleBackground: UIButton = {
+        let v = UIButton()
+        v.layer.masksToBounds = true
+        v.layer.cornerRadius = 5
+        v.backgroundColor = .cellGray
+        return v
+    }()
+    
+    lazy var newHabitTitle: UILabel = {
+        let v = UILabel()
+        v.font = UIFont.boldSystemFont(ofSize: 28.0)
+        return v
+    }()
+    
+    lazy var newHabitDesc: UILabel = {
+        let v = UILabel()
+        return v
+    }()
+    
     lazy var middleLine: UIStackView = {
         let v = UIStackView()
         v.axis = NSLayoutConstraint.Axis.vertical
@@ -90,6 +76,26 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
+    lazy var newHabitDate: UILabel = {
+        let v = UILabel()
+        v.textAlignment = .center
+        v.font = UIFont.boldSystemFont(ofSize: 17.0)
+        return v
+    }()
+    
+    lazy var newHabitTime: UILabel = {
+        let v = UILabel()
+        v.textAlignment = .center
+        v.font = UIFont.systemFont(ofSize: 15.0)
+        return v
+    }()
+    
+   
+    
+  
+    
+  
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier )
         
@@ -98,13 +104,13 @@ class HabitTableCell: UITableViewCell {
         backView.addSubview(boxCell)
         boxCell.addSubview(cellStackView)
         cellStackView.addArrangedSubview(titleStackView)
+        titleStackView.addSubview(titleBackground)
+        titleStackView.addSubview(newHabitTitle)
+        titleStackView.addSubview(newHabitDesc)
         cellStackView.addArrangedSubview(middleLine)
         cellStackView.addArrangedSubview(dateStackView)
-        titleStackView.addArrangedSubview(newHabitTitle)
-        dateStackView.addSubview(titleBackground)
-        titleStackView.addArrangedSubview(newHabitDesc)
-        dateStackView.addArrangedSubview(newHabitDate)
-        dateStackView.addArrangedSubview(newHabitTime)
+        dateStackView.addSubview(newHabitDate)
+        dateStackView.addSubview(newHabitTime)
 
         
         
@@ -112,10 +118,12 @@ class HabitTableCell: UITableViewCell {
             make.edges.equalTo(self)
         }
         
+        //Each Cell Space
         boxCell.snp.makeConstraints{ (make) in
             make.edges.equalTo(backView)
         }
         
+        //Acutal cell with roundcornders w/i BoxCell(Space)
         cellStackView.snp.makeConstraints{ (make) in
             make.top.equalTo(boxCell).offset(5)
             make.bottom.equalTo(boxCell).offset(-5)
@@ -128,50 +136,54 @@ class HabitTableCell: UITableViewCell {
 //        cellStackView.layer.masksToBounds = false;
 //        cellStackView.layer.borderColor = UIColor.white.cgColor
         
+        //StackView containing title and desc
         titleStackView.snp.makeConstraints{ (make) in
             make.left.equalTo(cellStackView)
             make.right.equalTo(middleLine.snp.left)
-            make.height.equalTo(70)
+            make.height.equalTo(cellStackView)
         }
         
+        //Square in front of Title
+        titleBackground.snp.makeConstraints{ (make) in
+            make.height.equalTo(25)
+            make.centerY.equalTo(newHabitTitle)
+            make.width.equalTo(25)
+            make.left.equalTo(titleStackView).offset(15)
+        }
+
+        newHabitTitle.snp.makeConstraints{ (make) in
+            make.top.equalTo(titleStackView).offset(8)
+            make.left.equalTo(titleBackground.snp.right).offset(7)
+        }
+        
+        newHabitDesc.snp.makeConstraints{ (make) in
+            make.top.equalTo(newHabitTitle.snp.bottom).offset(3)
+            make.left.equalTo(titleBackground)
+        }
+        
+        //middleLine separating titleStackView and dateStackView
         middleLine.snp.makeConstraints{ (make) in
             make.left.equalTo(cellStackView).offset(275)
             make.width.equalTo(5)
             make.height.equalTo(70)
         }
         
+        //StackView containing date and time
         dateStackView.snp.makeConstraints{ (make) in
             make.left.equalTo(middleLine.snp.right)
             make.right.equalTo(cellStackView)
             make.height.equalTo(70)
         }
         
-        newHabitTitle.snp.makeConstraints{ (make) in
-            make.top.equalTo(titleStackView).offset(10)
-            make.height.equalTo(40)
-            make.left.equalTo(titleBackground).offset(35)
-        }
-        
-        titleBackground.snp.makeConstraints{ (make) in
-            make.height.equalTo(25)
-            make.centerY.equalTo(newHabitTitle)
-            make.width.equalTo(25)
-            make.left.equalTo(titleStackView.snp.left).offset(15)
-        }
-        
-        newHabitDesc.snp.makeConstraints{ (make) in
-            make.height.equalTo(30)
-            make.left.equalTo(titleStackView).offset(15)
-        }
-        
         newHabitDate.snp.makeConstraints{ (make) in
-            make.top.equalTo(titleStackView).offset(10)
-            make.height.equalTo(40)
+            make.centerY.equalTo(newHabitTitle)
+            make.centerX.equalTo(dateStackView)
             make.left.equalTo(dateStackView)
         }
         
         newHabitTime.snp.makeConstraints{ (make) in
-            make.height.equalTo(30)
+            make.centerY.equalTo(newHabitDesc)
+            make.centerX.equalTo(newHabitDate)
             make.left.equalTo(dateStackView)
         }
         
