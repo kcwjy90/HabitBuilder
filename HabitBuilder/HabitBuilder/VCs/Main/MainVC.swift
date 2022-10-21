@@ -190,9 +190,43 @@ class MainVC: UIViewController {
         
         updateOngoing()
         setRealmNoti()
-        
         updateProgressBar()
         
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillEnterForeground(_:)),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil)
+    }
+    
+    //MARK: when the app was in the background but day has passed, app needs to be refreshed
+    @objc func applicationWillEnterForeground(_ notification: NSNotification) {
+        
+        if checkTheDay() == true {
+            let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
+            
+            try! self.localRealm.write {
+                realm.setValue(true, forKey: "onGoing")
+            }
+            
+            initHabits()
+            setRealmNoti()
+            updateProgressBar()
+            refreshTodaysDate()
+
+        } else {
+            print("")
+        }
+        
+    }
+    
+    //MARK: when app enters foreground, refreshes today's date
+    func refreshTodaysDate () {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let currentDate = dateFormatter.string(from: Date())
+        dateLabel.text = currentDate
+        dateLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
     }
     
     //MARK: Navi Bar 만드는 func. loadview() 밖에!
@@ -871,13 +905,3 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
 
 
 
-
-
-//아직 해야 할것 -
-// HMM..maybe we need something to update the date of the renewed habits when the app gets deleted, b/c what if someone needs a notification at 6 am, but doesn't run the app til 8 am? 아! 노티는 상관없이 매일 fire되지 참. 그냥 tableview에 보여주는게 중요하지. 근데 역시 다 디스플레이하는게 필요할까? allHabits에서 미래것도 보고 싶을수도?
-
-
-//-내가 혼자 해결할수 있지 않을까...하는것-
-
-//2. HabitDetailVC 에서 edit 하면 noti도 업데이트 되어야함. 예) 시간을 바꾼다 -> 바꾼 시간으로 노티가 와야함
-//3. past는 success/fail이 안되고, 오직 save나 delete밖에 못해야 된다. -> 조금 더 생각해보자

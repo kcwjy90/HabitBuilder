@@ -219,7 +219,11 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         guard let titleText = newHabitTitle.text, let descText = newHabitDesc.text else { return }
         let habit = RMO_Habit()
         
-        habit.title = titleText
+        if newHabitTitle.text == "" {
+            habit.title = "No Title"
+        } else {
+            habit.title = titleText
+        }
         habit.desc = descText
         habit.date = newHabitDateTime.date
         habit.startDate = newHabitDateTime.date
@@ -317,7 +321,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
-            textView.text = "Description of your New Habit"
+            textView.text = "Please Add Description"
             textView.textColor = UIColor.lightGray
         }
     }

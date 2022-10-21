@@ -562,7 +562,12 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         try! self.localRealm.write {
             guard let titleText = habitTitle.text, let descText = habitDesc.text
             else { return }
-            taskToUpdate.title = titleText
+            
+            if habitTitle.text == "" {
+                taskToUpdate.title = "No Title"
+            } else {
+                taskToUpdate.title = titleText
+            }
             taskToUpdate.desc = descText
 
             if repTyp == nil {
@@ -606,7 +611,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     //만약 Desc가 없으면 마치 placeholder인것처럼 "Description of your New Habit" 이라는 문구를 회색으로 넣음.
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
-            textView.text = "Description of your New Habit"
+            textView.text = "Please Add Description"
             textView.textColor = UIColor.lightGray
         }
     }
@@ -614,7 +619,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     //처음 Habit을 정할때 Desc을 안넣으면 그냥 "Desc of your New Habit"이 value 로서 저장 되는데, 이것을 다시 불러 왔을때 text color가 까만색이 아니라 여전히 placeholder로서 회색이 되게 함.
     func changeTextColor(_ textView: UITextView) {
         
-        if textView.text == "Description of your New Habit" {
+        if textView.text == "Please Add Description" {
             textView.textColor = UIColor.lightGray
             
             textViewDidBeginEditing(habitDesc)
