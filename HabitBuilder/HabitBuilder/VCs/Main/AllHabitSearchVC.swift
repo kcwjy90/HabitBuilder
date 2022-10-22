@@ -178,13 +178,28 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if habits.count != 0 {
-            print("search 됨")
-            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
+        
+        
+        //If there's no habit, display noDataImage
+        if habits.count == 0 {
+            
+            let image = UIImage(named: "HB logo")
+            //FIXME: need to redraw the image
+            let noDataImage = UIImageView(image: image)
+            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50)
+            noDataImage.layer.opacity = 0.5
+            tableView.backgroundView = noDataImage
+            tableView.separatorStyle = .none
+            return 0
+//            return habits.count
+
         } else {
-            print("안돼")
-            return habits.count
+            
+            //Otherwise display SearchedHabits
+            tableView.backgroundView = .none
+            return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
         }
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat

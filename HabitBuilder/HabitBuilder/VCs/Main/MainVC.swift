@@ -289,7 +289,27 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         guard let theHabits = self.habits else { return 0 }
-        return theHabits.count
+      
+        
+        if theHabits.count == 0 {
+            let image = UIImage(named: "HB logo")
+            //FIXME: need to redraw the image
+            let noDataImage = UIImageView(image: image)
+            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50)
+            noDataImage.layer.opacity = 0.5
+            tableView.backgroundView = noDataImage
+            tableView.separatorStyle = .none
+
+            return 0
+            
+        } else {
+            tableView.backgroundView = .none
+            return theHabits.count
+            
+        }
+        
+        
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
