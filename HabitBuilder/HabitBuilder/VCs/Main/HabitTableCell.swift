@@ -159,6 +159,7 @@ class HabitTableCell: UITableViewCell {
         newHabitDesc.snp.makeConstraints{ (make) in
             make.top.equalTo(newHabitTitle.snp.bottom).offset(3)
             make.left.equalTo(titleBackground)
+            make.right.equalTo(middleLine)
         }
         
         //middleLine separating titleStackView and dateStackView

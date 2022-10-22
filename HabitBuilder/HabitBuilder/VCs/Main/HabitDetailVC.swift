@@ -605,9 +605,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         //MARK: creating Alert with two buttons - Cancel: to cancel delete. Confirm: to Delete
         let alert = UIAlertController(
-            title: "Delete this Habit",
-            message: "",
-            preferredStyle: .alert)
+            title: "\(habit.title)",
+            message: "will be Permanently Deleted",
+            preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
