@@ -489,6 +489,10 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             self.dismiss(animated: true) {
                 let realm = self.localRealm.objects(RMO_Habit.self)
                 let thisId = self.habit.id
+                
+                //MARK: to remove notification when habit is deleted.
+                NotificationManger.SI.removeNoti(id: thisId)
+                
                 try! self.localRealm.write {
                     let deleteHabit = realm.where {
                         $0.id == thisId
