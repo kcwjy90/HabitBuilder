@@ -206,6 +206,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.right.equalTo(scrollContentView).offset(-16)
             make.height.equalTo(50)
         }
+        habitTitle.layer.borderWidth = 1.5
+        habitTitle.layer.borderColor = UIColor.pastGray.cgColor
         
         // habitDesc TextView size grid
         habitDesc.snp.makeConstraints { (make) in
@@ -220,6 +222,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         textViewDidEndEditing(habitDesc)
         habitDesc.addPadding()
         habitDesc.addPadding()
+        habitDesc.layer.borderWidth = 1.5
+        habitDesc.layer.borderColor = UIColor.pastGray.cgColor
 
         
         // habitDateTimeBackview size grid
@@ -239,7 +243,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         
         habitLineChart.snp.makeConstraints{ (make) in
-            make.top.equalTo(habitDateTime.snp.bottom).offset(10)
+            make.top.equalTo(habitDateTime.snp.bottom)
             make.left.equalTo(scrollContentView).offset(10)
             make.right.equalTo(scrollContentView).offset(-10)
             make.height.equalTo(220)

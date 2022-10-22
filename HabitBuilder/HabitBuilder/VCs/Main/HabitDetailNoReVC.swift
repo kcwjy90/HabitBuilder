@@ -102,6 +102,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     // repeatButton 생성
     lazy var repeatButton: UIButton = {
         let v = UIButton()
+        v.layer.cornerRadius = 8
         return v
     }()
     
@@ -221,6 +222,9 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.right.equalTo(scrollContentView).offset(-16)
             make.height.equalTo(50)
         }
+        habitTitle.layer.borderWidth = 1.5
+        habitTitle.layer.borderColor = UIColor.pastGray.cgColor
+        
         
         // habitDesc TextView size grid
         habitDesc.snp.makeConstraints { (make) in
@@ -235,7 +239,9 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         textViewDidEndEditing(habitDesc)
         habitDesc.addPadding()
         habitDesc.addPadding()
-        
+        habitDesc.layer.borderWidth = 1.5
+        habitDesc.layer.borderColor = UIColor.pastGray.cgColor
+
         
         // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
@@ -258,7 +264,8 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.right.equalTo(scrollContentView).offset(-34)
             make.height.equalTo(habitDateTimeBackView)
         }
-        
+        habitDateTime.tintColor = .compBlue
+
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
@@ -277,16 +284,20 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         // repeatButton size grid
         repeatButton.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
-            make.width.equalTo(repeatTypeLabel)
-            make.height.equalTo(40)
-            make.right.equalTo(scrollContentView).offset(-30)
+            make.left.equalTo(repeatTypeLabel).offset(-10)
+            make.height.equalTo(32)
+            make.right.equalTo(habitDateTime)
         }
-        
+        repeatButton.layer.borderWidth = 1.5
+        //FIXME: needs to change gray color to match Date and TIme
+        repeatButton.layer.borderColor = UIColor.systemGray6.cgColor
+        repeatButton.layer.backgroundColor = UIColor.systemGray6.cgColor
+                
         // repeatTypeLabel size grid
         repeatTypeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
             make.height.equalTo(40)
-            make.right.equalTo(scrollContentView).offset(-30)
+            make.right.equalTo(habitDateTime).offset(-10)
         }
         
         // successButton size grid
