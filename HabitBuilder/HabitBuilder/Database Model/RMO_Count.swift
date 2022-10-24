@@ -17,6 +17,7 @@ class RMO_Count: Object {
     @Persisted var remove: Int
     @Persisted var success: Int
     @Persisted var fail: Int
+    @Persisted var finalPercent: Float
     
     convenience init(title: Int) {
         self.init()

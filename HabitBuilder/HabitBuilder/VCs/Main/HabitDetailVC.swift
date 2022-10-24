@@ -385,8 +385,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
    
         let startHabitDate = habit.startDate
         let currentHabitDate = habit.date
-    
-        var xStrings: [String] = []
 
         
         //MARK: Calculating the Date difference. converting seconds to date.

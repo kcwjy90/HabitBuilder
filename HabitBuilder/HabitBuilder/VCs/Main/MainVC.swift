@@ -773,6 +773,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         let progress = Float(counts[0])/Float(counts[2])
         
+//        try! self.localRealm.write {
+  //            todayCount.finalPercent = progress
+  //        }
+
+            
 //        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
         
         if counts[2] == 0 {

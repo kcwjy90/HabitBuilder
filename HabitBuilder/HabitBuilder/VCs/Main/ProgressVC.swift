@@ -23,22 +23,28 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     }()
     
     let localRealm = DBManager.SI.realm!
-    var todayPiChart = PieChartView()
+    var totalLineChart = LineChartView()
     
-    //지금은 좀 조잡한데 어찌돼었든 일단 그래프가 뜨니가 성공.
-    let results = ["Succeeded", "Failed", "Working"]
-    var counts = [0,0,0]
-    var compCount: Int = 0
+    // RMO_Habit에서 온 data를 넣을 empty한 array들
+    var habits: [RMO_Count] = []
+    var rates: Results<RMO_Count>? = nil
+
+    var success: Float?
     
-    
+//    lazy var currentSuccessRate: UILabel = {
+//        let v = UILabel()
+//        v.text = ""
+//        v.font = UIFont.systemFont(ofSize: 40.0)
+//        v.textColor = .black
+//        return v
+//    }()
+//
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
         
         setNaviBar()
-        
-        todayPiChart.delegate = self
-        
+        totalLineChart.delegate = self
         reloadChart()
         
     }
@@ -53,7 +59,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         super.viewDidLayoutSubviews()
         
         view.addSubview(backView)
-        view.addSubview(todayPiChart)
+        view.addSubview(totalLineChart)
         
         view.backgroundColor = .white
         
@@ -63,56 +69,98 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         }
         
         // todayPiChart grid
-        todayPiChart.snp.makeConstraints{ (make) in
+        totalLineChart.snp.makeConstraints{ (make) in
             make.edges.equalTo(backView)
         }
-        todayPiChart.center = backView.center
+        totalLineChart.center = backView.center
         
     }
     
+    
     //MARK: code that creates the piechart. Needs to reload so graph gets updated
     func reloadChart() {
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
-        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        //MARK: todayLineChart 에 들어가는 count들을 넣어주는 코드
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
-        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-        counts[0] = todayCount.success
-        counts[1] = todayCount.fail
-        counts[2] = todayCount.total - (todayCount.success + todayCount.fail + todayCount.remove)
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count 의 successRate을 불러옴
+        success = Float(todayCount.finalPercent)
+                
+        habits = localRealm.objects(RMO_Count.self).toArray() //updating habits []
+
+        habits = habits.sorted(by: {
+            $0.date.compare($1.date) == .orderedAscending
+        })
+        
+        print(habits)
+        //FIXME: LATER
+//        let number = habits.firstIndex(of: $0.date == todayDate)
+//        habits =
+//        let dayDifference = Int(indexNumb + 1)
+        
+        let dayDifference = Int(0)
+        
+        rates = self.localRealm.objects(RMO_Count.self)
+        
+        guard let habitRates = rates else {return}
 
         
-        customizeChart(dataPoints: results, values: counts.map{ Double($0) })
-        
-    }
-    //MARK: Chart Customize하는 func
-    func customizeChart(dataPoints: [String], values: [Double]) {
-        
         // 1. Set ChartDataEntry
-        var dataEntries: [ChartDataEntry] = []
-        for i in 0..<dataPoints.count {
-            let dataEntry = PieChartDataEntry(value: values[i], label: dataPoints[i], data: dataPoints[i] as AnyObject)
-            dataEntries.append(dataEntry)
+        var entries = [ChartDataEntry]()
+        var xAxis: [String] = []
+  
+        
+        for x in 0...dayDifference{
+            entries.append(ChartDataEntry(x: Double(x), y: Double(habitRates[x].finalPercent)))
+            xAxis.append(habitRates[x].date)
         }
+        
+        //FIMXE: also fix later
+//        let last = entries.last
+        
+//        //Updating last rate as % in currentSuccessRate
+//        if last == nil {
+//            currentSuccessRate.text = "0.0%"
+//        } else {
+//            let lastRate = habitRates[dayDifference].rate
+//            currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+//        }
+//
+        //Formatting xAxis from Numb to String
+        totalLineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values: xAxis)
+        
         // 2. Set ChartDataSet
-        let pieChartDataSet = PieChartDataSet(entries: dataEntries, label: "")
-        pieChartDataSet.colors = ChartColorTemplates.colorful()
+        let set = LineChartDataSet(entries: entries, label: "% Succeeded")
+        // Makes the line smooth, changes radius of circle = 3 + line thickness = 2
+        set.mode = .cubicBezier
+        set.circleRadius = 3
+        set.lineWidth = 2
+        //            set.drawCirclesEnabled = false //Removes points on the graph
         
         // 3. Set ChartData
-        let pieChartData = PieChartData(dataSet: pieChartDataSet)
-        let format = NumberFormatter()
-        format.numberStyle = .percent
-        let formatter = DefaultValueFormatter(formatter: format)
-        pieChartData.setValueFormatter(formatter)
+        let data = LineChartData(dataSet: set)
+        data.setDrawValues(false) //Removes label
+        print(xAxis)
         
         // 4. Assign it to the chart’s data
-        todayPiChart.data = pieChartData
+        totalLineChart.data = data
+        
+        if xAxis.count <= 10 {
+            totalLineChart.xAxis.axisMaximum = 10
+            totalLineChart.xAxis.axisMinimum = 0
+        } else {
+            totalLineChart.xAxis.axisMaximum = Double(xAxis.count + 1)
+            totalLineChart.xAxis.axisMinimum = 0
+        }
+        
     }
+ 
     
     //Navi Bar 만드는 func.
     func setNaviBar() {
