@@ -183,10 +183,11 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         //If there's no habit, display noDataImage
         if habits.count == 0 {
             
-            let image = UIImage(named: "HB logo")
-            //FIXME: need to redraw the image
+        //MARK: image display when tableView is empty
+
+            let image = UIImage(named: "No")
             let noDataImage = UIImageView(image: image)
-            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50)
+            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height)
             noDataImage.layer.opacity = 0.5
             tableView.backgroundView = noDataImage
             tableView.separatorStyle = .none

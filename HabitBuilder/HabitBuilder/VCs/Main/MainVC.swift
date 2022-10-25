@@ -290,12 +290,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         guard let theHabits = self.habits else { return 0 }
       
-        
+        //MARK: image display when tableView is empty
         if theHabits.count == 0 {
-            let image = UIImage(named: "HB logo")
-            //FIXME: need to redraw the image
+            let image = UIImage(named: "Add")
             let noDataImage = UIImageView(image: image)
-            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 50)
+            //FIXME: How do I resize? CGRect doesn't seem to do anything?
             noDataImage.layer.opacity = 0.5
             tableView.backgroundView = noDataImage
             tableView.separatorStyle = .none
