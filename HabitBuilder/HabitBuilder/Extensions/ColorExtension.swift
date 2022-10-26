@@ -9,7 +9,7 @@ import UIKit
 
 extension UIColor {
     @nonobjc class var exoticLiras: UIColor { return UIColor(red:0.87, green:0.16, blue: 0.16, alpha: 1.00) }
-    @nonobjc class var starWhite: UIColor { return UIColor(red:0.94, green:0.94, blue: 0.96, alpha: 1.00) }
+    @nonobjc class var dateGray: UIColor { return UIColor(red:0.94, green:0.94, blue: 0.94, alpha: 1.00) }
     @nonobjc class var baseBrown: UIColor { return UIColor(red:247/255, green:237/255, blue: 219/255, alpha: 1.00) }
     @nonobjc class var weekGreen: UIColor { return UIColor(red:166/255, green:245/255, blue: 231/255, alpha: 1.00) }
     @nonobjc class var restGreen: UIColor { return UIColor(red:217/255, green:255/255, blue: 248/255, alpha: 1.00) }
@@ -31,7 +31,5 @@ extension UIColor {
     @nonobjc class var cellBlue: UIColor { return UIColor(red:236/255, green:244/255, blue: 255/255, alpha: 1.00) }
     @nonobjc class var todayBlue: UIColor { return UIColor(red:67/255, green:144/255, blue: 255/255, alpha: 1.00) }
     @nonobjc class var compBlue: UIColor { return UIColor(red:14/255, green:37/255, blue: 125/255, alpha: 1.00) }
-
 }
 
-// Spuit 설치

@@ -197,6 +197,7 @@ class MainVC: UIViewController {
             selector: #selector(applicationWillEnterForeground(_:)),
             name: UIApplication.willEnterForegroundNotification,
             object: nil)
+        
     }
     
     //MARK: when the app was in the background but day has passed, app needs to be refreshed
