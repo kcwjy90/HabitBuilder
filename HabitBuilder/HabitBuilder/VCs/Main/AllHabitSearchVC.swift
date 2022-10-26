@@ -36,7 +36,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     lazy var allHabitsTableView: UITableView = {
         let v = UITableView()
         v.register(HabitTableCell.self,
-                   forCellReuseIdentifier:"MyCell")
+                   forCellReuseIdentifier:"HabitTableCell")
         v.delegate = self
         v.dataSource = self
         v.backgroundColor = .white
@@ -210,7 +210,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "HabitTableCell", for: indexPath) as? HabitTableCell
         else {
             return UITableViewCell()
         }

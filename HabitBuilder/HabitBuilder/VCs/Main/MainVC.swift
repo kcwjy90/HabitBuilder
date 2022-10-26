@@ -318,7 +318,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as? HabitTableCell,
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "HabitTableCell", for: indexPath) as? HabitTableCell,
               let theHabits = self.habits
         else {
             return UITableViewCell()
