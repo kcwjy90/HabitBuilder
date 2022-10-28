@@ -381,10 +381,48 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
     }
     
     @objc func repeatButtonPressed(sender: UIButton){
-        let v = RepeatVC()
-        v.delegate = self
-        v.modalPresentationStyle = .pageSheet
-        present(v, animated:true)   // modal view 가능케 하는 코드
+        var repeatLabel: String?
+        
+        let alert = UIAlertController(
+            title: "Select Repeat Frequency",
+            message: "",
+            preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Daily", style: .default, handler: {_ in
+            repeatLabel = "Daily"
+            guard let label = repeatLabel else {return}
+            self.repeatTypeLabel.text = label.capitalized + " >"
+            guard let repeatType = RepeatType(rawValue: 1) else { return }
+            self.repTyp = repeatType
+        }))
+        alert.addAction(UIAlertAction(title: "Weekly", style: .default, handler: {_ in
+            repeatLabel = "Weekly"
+            guard let label = repeatLabel else {return}
+            self.repeatTypeLabel.text = label.capitalized + " >"
+            guard let repeatType = RepeatType(rawValue: 2) else { return }
+            self.repTyp = repeatType
+        }))
+        alert.addAction(UIAlertAction(title: "Monthly", style: .default, handler: {_ in
+            repeatLabel = "Monthly"
+            guard let label = repeatLabel else {return}
+            self.repeatTypeLabel.text = label.capitalized + " >"
+            guard let repeatType = RepeatType(rawValue: 3) else { return }
+            self.repTyp = repeatType
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: {_ in
+            repeatLabel = "None"
+            guard let label = repeatLabel else {return}
+            self.repeatTypeLabel.text = label.capitalized + " >"
+            guard let repeatType = RepeatType(rawValue: 0) else { return }
+            self.repTyp = repeatType
+        }))
+
+        self.present(alert, animated: true)
+        
+//        let v = RepeatVC()
+//        v.delegate = self
+//        v.modalPresentationStyle = .pageSheet
+//        present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     //MARK: Fail Button Pressed
