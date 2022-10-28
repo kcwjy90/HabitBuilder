@@ -97,7 +97,7 @@ class MainVC: UIViewController {
     lazy var todaysHabitTableView: UITableView = {
         let v = UITableView()
         v.register(HabitTableCell.self,
-                   forCellReuseIdentifier:"MyCell")
+                   forCellReuseIdentifier:"HabitTableCell")
         v.delegate = self
         v.dataSource = self
         v.backgroundColor = .white

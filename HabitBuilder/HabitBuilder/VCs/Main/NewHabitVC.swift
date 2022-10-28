@@ -317,9 +317,9 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     
     @objc func repeatButtonPressed(sender: UIButton){
         let v = RepeatVC()
-        v.delegate = self
-        v.modalPresentationStyle = .pageSheet
-        present(v, animated:true)   // modal view 가능케 하는 코드
+            v.delegate = self
+            v.modalPresentationStyle = .pageSheet
+            present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     
