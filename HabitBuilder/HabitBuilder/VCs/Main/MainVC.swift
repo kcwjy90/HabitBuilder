@@ -242,17 +242,18 @@ class MainVC: UIViewController {
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
         let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-        counts[0] = todayCount.success
-        counts[1] = todayCount.fail
-        counts[2] = todayCount.total
-        
-        finalPercent = Float(counts[0])/Float(counts[2])
+//        counts[0] = todayCount.success
+//        counts[1] = todayCount.fail
+//        counts[2] = todayCount.total
+//
+//        finalPercent = Float(counts[0])/Float(counts[2])
 
         guard let progress = finalPercent else {return}
 
         try! self.localRealm.write {
               todayCount.finalPercent = progress
           }
+        print("todaycount in 257===================\(todayCount)")
         print("Final Percent is==========================\(progress)")
 
     }
