@@ -93,6 +93,9 @@ class MainVC: UIViewController {
     // progressBar에 필요한 count
     var counts = [0,0,0]
     
+    // 오늘에 해당하는 하빗의 finalPercent. progress VC에서 사용됨
+    var finalPercent: Float?
+    
     // todaysHabitTablewView 생성
     lazy var todaysHabitTableView: UITableView = {
         let v = UITableView()
@@ -190,14 +193,21 @@ class MainVC: UIViewController {
         
         updateOngoing()
         setRealmNoti()
-        updateProgressBar()
-        
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillEnterForeground(_:)),
             name: UIApplication.willEnterForegroundNotification,
             object: nil)
         
+    }
+    
+    
+    //Updating FinalPercent in RMO_Count
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        updateFinalPercent()
     }
     
     //MARK: when the app was in the background but day has passed, app needs to be refreshed
@@ -212,15 +222,40 @@ class MainVC: UIViewController {
             
             initHabits()
             setRealmNoti()
-            updateProgressBar()
             refreshTodaysDate()
 
         } else {
             print("")
         }
-        
+                
     }
     
+    func updateFinalPercent() {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let today = Date()
+        let todayDate = dateFormatter.string(from: today)
+        let countRealm = self.localRealm.objects(RMO_Count.self)
+        
+        //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
+        guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+        let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
+        counts[0] = todayCount.success
+        counts[1] = todayCount.fail
+        counts[2] = todayCount.total
+        
+        finalPercent = Float(counts[0])/Float(counts[2])
+
+        guard let progress = finalPercent else {return}
+
+        try! self.localRealm.write {
+              todayCount.finalPercent = progress
+          }
+        print("Final Percent is==========================\(progress)")
+
+    }
     //MARK: when app enters foreground, refreshes today's date
     func refreshTodaysDate () {
         let dateFormatter = DateFormatter()
@@ -771,13 +806,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         counts[1] = todayCount.fail
         counts[2] = todayCount.total
         
-        let progress = Float(counts[0])/Float(counts[2])
+        finalPercent = Float(counts[0])/Float(counts[2])
         
-//        try! self.localRealm.write {
-  //            todayCount.finalPercent = progress
-  //        }
+        // "The Realm is already in a write transaction" 에러가 뜸.
+        // 내 생각에 이 이유는 line 708이 setRealmNoti 안에 있기 때문. 하지만 얘를 } 밖으로 보내버리면 새로운 하빗이 추가 되었을때 progressBar가 업데이트 되지 않음.
+        guard let progress = finalPercent else {return}
 
-            
 //        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
         
         if counts[2] == 0 {
@@ -788,10 +822,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         todayProgressBar.progress = progress
         
     }
-    
-    
-    
-    
     
     
     //MARK: SWIPE action
