@@ -98,18 +98,10 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             $0.date.compare($1.date) == .orderedAscending
         })
         
-        print(habits)
-        //FIXME: LATER
-//        let number = habits.firstIndex(of: $0.date == todayDate)
-//        habits =
-//        let dayDifference = Int(indexNumb + 1)
-        
-        let dayDifference = Int(0)
-        
-        rates = self.localRealm.objects(RMO_Count.self)
-        
-        guard let habitRates = rates else {return}
-
+        print("progressVC line 101=========================================\(habits)")
+ 
+        let dayDifference = habits.count - 1
+        print(dayDifference)
         
         // 1. Set ChartDataEntry
         var entries = [ChartDataEntry]()
@@ -117,8 +109,8 @@ class ProgressVC: UIViewController, ChartViewDelegate {
   
         
         for x in 0...dayDifference{
-            entries.append(ChartDataEntry(x: Double(x), y: Double(habitRates[x].finalPercent)))
-            xAxis.append(habitRates[x].date)
+            entries.append(ChartDataEntry(x: Double(x), y: Double((habits[x].finalPercent)*100)))
+            xAxis.append(habits[x].date)
         }
         
         //FIMXE: also fix later
