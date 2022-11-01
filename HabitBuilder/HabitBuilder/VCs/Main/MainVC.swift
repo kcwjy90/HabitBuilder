@@ -305,7 +305,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         guard let habit = habits?[indexPath.row] else { return }
         
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다, based on RepeatType
-        if habit.privateRepeatType == 0 {
+        
+        if habit.repeatType == RepeatType.none {
             //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
             let habitDetailNoReVC = HabitDetailNoReVC(habit: habit)
             let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailNoReVC)
@@ -371,12 +372,18 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         dateFormatter.dateFormat = "h:mm a"
         let newHabitDate = dateFormatter.string(from: date)
         
-        switch newHabit.privateRepeatType {
-        case 1 : cell.titleBackground.backgroundColor = .pureGreen
-        case 2 : cell.titleBackground.backgroundColor = .pureOrange
-        case 3 : cell.titleBackground.backgroundColor = .pureBlue
-        case 4 : cell.titleBackground.backgroundColor = .purePurple
-        default: cell.titleBackground.backgroundColor = .pureGray
+        guard let repeatType = newHabit.repeatType else { return cell }
+        switch repeatType {
+        case .none:
+            cell.titleBackground.backgroundColor = .pureGray
+        case .daily:
+            cell.titleBackground.backgroundColor = .pureGreen
+        case .weekly:
+            cell.titleBackground.backgroundColor = .pureOrange
+        case .monthly:
+            cell.titleBackground.backgroundColor = .pureBlue
+        case .yearly:
+            cell.titleBackground.backgroundColor = .purePurple
         }
         
         cell.backgroundColor = .white
@@ -446,6 +453,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         //        let calendar = Calendar.current
         //        let tmr = calendar.date(byAdding: .day, value: 1, to: Date())
         
+        //FIXME: 여기서 privateRepeatType 말고 repeatType 을 쓰니 찾을수 없다고 나오는디...
         //daily repeat
         let dailyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 1")
         for dailyHabit in dailyHabits {

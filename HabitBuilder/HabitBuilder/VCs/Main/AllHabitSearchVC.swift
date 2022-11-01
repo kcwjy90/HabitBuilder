@@ -156,7 +156,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let habit = searchedHabits[indexPath.row]
         
         //MARK: cell을 touch 하면 이 data들이 HabitDetailVC로 날라간다, based on RepeatType
-        if habit.privateRepeatType == 0 {
+        if habit.repeatType == RepeatType.none {
             //MARK: CONSTRUCTOR. HabitDetailVC에 꼭 줘야함.
             let habitDetailNoReVC = HabitDetailNoReVC(habit: habit)
             habitDetailNoReVC.delegate = self
@@ -242,13 +242,20 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let dayDifference = Int(round(secondDifference/(60*60*24)))
         
         //MARK: repeatType에 따라서 titleBackground color를 바꾼다.
-        switch newHabit.privateRepeatType {
-        case 1 : cell.titleBackground.backgroundColor = .pureGreen;
-        case 2 : cell.titleBackground.backgroundColor = .pureOrange;
-        case 3 : cell.titleBackground.backgroundColor = .pureBlue;
-        case 4 : cell.titleBackground.backgroundColor = .purePurple
-        default: cell.titleBackground.backgroundColor = .pureGray;
+        guard let repeatType = newHabit.repeatType else { return cell }
+        switch repeatType {
+        case .none:
+            cell.titleBackground.backgroundColor = .pureGray
+        case .daily:
+            cell.titleBackground.backgroundColor = .pureGreen
+        case .weekly:
+            cell.titleBackground.backgroundColor = .pureOrange
+        case .monthly:
+            cell.titleBackground.backgroundColor = .pureBlue
+        case .yearly:
+            cell.titleBackground.backgroundColor = .purePurple
         }
+        
         
         //MARK: 만약 habit날짜가 오늘일 경우
         if dayDifference == 0 {
@@ -267,9 +274,9 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             cell.newHabitDate.textColor = UIColor.black;
         }
         
-        
+                
         //MARK: 하빗 날짜가 지났고 repeat되는 애들이 아니라면 habit의 색을 까맣게 바꾸고 date를 dispaly 되는 missed로 바꿈
-        if dayDifference >= 1 && newHabit.privateRepeatType == 0 {
+        if dayDifference >= 1 && newHabit.repeatType == RepeatType.none {
             cell.cellStackView.backgroundColor = .pastGray
             newHabitDate = "Missed"
             newHabitTime = ""

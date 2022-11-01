@@ -327,33 +327,43 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         dateFormatter.dateFormat = "h:mm a"
         let habitTime = dateFormatter.string(from: habit.date)
         
-            
-        switch habit.privateRepeatType {
-        case 1 : habitDateTime.text = "Everyday at \(habitTime)"
-            
-        case 2 : dateFormatter.dateFormat = "EEEE";
-                 let habitDay = dateFormatter.string(from: habit.date);
-                 habitDateTime.text = "Every \(habitDay) at \(habitTime)"
-            
-        case 3 : dateFormatter.dateFormat = "dd";
-                let habitDay = dateFormatter.string(from: habit.date);
-            
-            var day = ""
-            
-            switch habitDay {
-            case "1": day = "\(habitDay)st"
-            case "2": day = "\(habitDay)nd"
-            case "3": day = "\(habitDay)rd"
-            case "21": day = "\(habitDay)st"
-            case "22": day = "\(habitDay)nd"
-            case "23": day = "\(habitDay)rd"
-            case "31": day = "\(habitDay)st"
-            default: day = "\(habitDay)th"
 
-            }
-                habitDateTime.text = "Every \(day) of the Month at \(habitTime)"
+        guard let repeatType = habit.repeatType else { return }
+        switch repeatType {
+        case .none:
+            habitDateTime.text = "Everyday at \(habitTime)"
             
-        default: habitDateTime.text = "Everyday at \(habitTime)"
+        case .daily:
+            habitDateTime.text = "Everyday at \(habitTime)"
+            
+        case .weekly:
+            dateFormatter.dateFormat = "EEEE";
+            let habitDay = dateFormatter.string(from: habit.date);
+            habitDateTime.text = "Every \(habitDay) at \(habitTime)"
+            
+        case .monthly:
+            dateFormatter.dateFormat = "d";
+            let habitDay = dateFormatter.string(from: habit.date);
+                
+            var day = ""
+                
+                switch habitDay {
+                case "1": day = "\(habitDay)st"
+                case "2": day = "\(habitDay)nd"
+                case "3": day = "\(habitDay)rd"
+                case "21": day = "\(habitDay)st"
+                case "22": day = "\(habitDay)nd"
+                case "23": day = "\(habitDay)rd"
+                case "31": day = "\(habitDay)st"
+                default: day = "\(habitDay)th"
+
+                }
+            habitDateTime.text = "Every \(day) of the Month at \(habitTime)"
+            
+        case .yearly:
+            dateFormatter.dateFormat = "MM/d";
+            let habitDay = dateFormatter.string(from: habit.date);
+            habitDateTime.text = "Every \(habitDay) at \(habitTime)"
         }
             
         
