@@ -173,13 +173,13 @@ class MainVC: UIViewController {
             make.bottom.equalTo(todayProgressBar.snp.top)
         }
         
-//        progressLabel.snp.makeConstraints{ (make) in
-//            make.top.equalTo(todayProgressBar)
-//            make.height.equalTo(20)
-//            make.left.equalTo(todayProgressBar).offset(5)
-//            make.right.equalTo(todayProgressBar)
-//            make.bottom.equalTo(todayProgressBar)
-//        }
+        //        progressLabel.snp.makeConstraints{ (make) in
+        //            make.top.equalTo(todayProgressBar)
+        //            make.height.equalTo(20)
+        //            make.left.equalTo(todayProgressBar).offset(5)
+        //            make.right.equalTo(todayProgressBar)
+        //            make.bottom.equalTo(todayProgressBar)
+        //        }
         
         todayProgressBar.snp.makeConstraints{ (make) in
             make.height.equalTo(30)
@@ -188,12 +188,12 @@ class MainVC: UIViewController {
             make.bottom.equalTo(backView)
         }
         
-       
+        
         
         
         updateOngoing()
         setRealmNoti()
-
+        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillEnterForeground(_:)),
@@ -223,11 +223,11 @@ class MainVC: UIViewController {
             initHabits()
             setRealmNoti()
             refreshTodaysDate()
-
+            
         } else {
             print("")
         }
-                
+        
     }
     
     func updateFinalPercent() {
@@ -242,20 +242,20 @@ class MainVC: UIViewController {
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
         let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-//        counts[0] = todayCount.success
-//        counts[1] = todayCount.fail
-//        counts[2] = todayCount.total
-//
-//        finalPercent = Float(counts[0])/Float(counts[2])
-
+        //        counts[0] = todayCount.success
+        //        counts[1] = todayCount.fail
+        //        counts[2] = todayCount.total
+        //
+        //        finalPercent = Float(counts[0])/Float(counts[2])
+        
         guard let progress = finalPercent else {return}
-
+        
         try! self.localRealm.write {
-              todayCount.finalPercent = progress
-          }
+            todayCount.finalPercent = progress
+        }
         print("todaycount in 257===================\(todayCount)")
         print("Final Percent is==========================\(progress)")
-
+        
     }
     //MARK: when app enters foreground, refreshes today's date
     func refreshTodaysDate () {
@@ -314,33 +314,33 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             present(habitDetailVCNavi, animated:true)
             
         } else {
-           
+            
             let habitDetailVC = HabitDetailVC(habit: habit)
             let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
             habitDetailVCNavi.modalPresentationStyle = .pageSheet
             present(habitDetailVCNavi, animated:true)
         }
-  
+        
     }
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         guard let theHabits = self.habits else { return 0 }
-      
+        
         //MARK: image display when tableView is empty
         if theHabits.count == 0 {
-            let image = UIImage(named: "Add")
-            let noDataImage = UIImageView(image: image)
-            //FIXME: How do I resize? CGRect doesn't seem to do anything?
-            noDataImage.layer.opacity = 0.5
-            tableView.backgroundView = noDataImage
-            tableView.separatorStyle = .none
-
+            let messageLabel = UILabel()
+            messageLabel.text = "Please Add Your Habit :)"
+            messageLabel.numberOfLines = 0
+            messageLabel.textAlignment = .center
+            messageLabel.font = UIFont(name: "TrebuchetMS", size: 20)
+            tableView.backgroundView = messageLabel
+            //                    tableView.frame = CGRect(x: 0, y: 100, width: tableView.bounds.size.width, height: 20)
             return 0
             
         } else {
-            tableView.backgroundView = .none
+            tableView.backgroundView = nil
             return theHabits.count
             
         }
@@ -415,7 +415,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             print("===========================true=============")
             print(self.localRealm.objects(RMO_Habit.self))
-
+            
             
         } else {
             //아직 다음날이 아니라서 아무것도 안함
@@ -471,41 +471,41 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let newTotal = totalDayDifference + 1
             
             //MARK: 접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 접속하지 않은 10/2 = 50%, 10/3 = 33%. 접속한 날짜인 10/4는 일단 무조건 fail 로 간주한다. 그래서 user가 rate을 하지 않거나 app을 열기만 하고 아무것도 하지 않은경우 자동적으로 fail이 됨 (25%). cell을 touch해서 success를 할 경우만 rate이 올라감.
+            
+            for day in 1...dayDifference{
                 
-                for day in 1...dayDifference{
-                    
-                    print(dayDifference)
-                    print(day)
-                    print(dailyHabit.success)
-                    print(dailyHabit.total)
-                    let success = Double(dailyHabit.success)
-                    let total = Double(dailyHabit.total) + Double(day)
-                    print(total)
-                    
-                    let successRate = Double(success/total)*100
-                    print(successRate)
-                    
-                    let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
-                    guard let omd = oneMoreDay else {return}
-                    
-                    let habitRate = RMO_Rate()
-                    
-                    habitRate.habitID = dailyHabit.id
-                    habitRate.createdDate = omd
-                    habitRate.rate = successRate
-                    
-                    try! self.localRealm.write {
-                        localRealm.add(habitRate)
-                    }
-                    
-                    print("habitrate-----MainVC line 400--------------------------for each missing days")
-                    print(habitRate)
-                    print(self.localRealm.objects(RMO_Habit.self))
-                    print(self.localRealm.objects(RMO_Rate.self))
-                    
+                print(dayDifference)
+                print(day)
+                print(dailyHabit.success)
+                print(dailyHabit.total)
+                let success = Double(dailyHabit.success)
+                let total = Double(dailyHabit.total) + Double(day)
+                print(total)
+                
+                let successRate = Double(success/total)*100
+                print(successRate)
+                
+                let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
+                guard let omd = oneMoreDay else {return}
+                
+                let habitRate = RMO_Rate()
+                
+                habitRate.habitID = dailyHabit.id
+                habitRate.createdDate = omd
+                habitRate.rate = successRate
+                
+                try! self.localRealm.write {
+                    localRealm.add(habitRate)
                 }
                 
-          
+                print("habitrate-----MainVC line 400--------------------------for each missing days")
+                print(habitRate)
+                print(self.localRealm.objects(RMO_Habit.self))
+                print(self.localRealm.objects(RMO_Rate.self))
+                
+            }
+            
+            
             
             if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
                 try! self.localRealm.write {
@@ -533,7 +533,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             let currentHabitDate = weeklyHabit.date
-
+            
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
             //MARK: Converting seconds to date.
             let secondDifference = time(current: today, habitDate: currentHabitDate)
@@ -541,19 +541,19 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print("today ==========================\(today)")
             print("current habitDay ==========================\(currentHabitDate)")
             print("secondDIfference  ==========================\(secondDifference)")
-
-
+            
+            
             print("Daydifference NOT div by 7==========================\(dayDifference)")
             if dayDifference%7 == 0 && dayDifference != 0 {
                 print("Daydifference divisble by 7 ==========================\(dayDifference)")
                 let multiplesOfSeven = dayDifference/7
                 print("multiplesOfSEven ==========================\(multiplesOfSeven)")
-
-
+                
+                
                 var dateComponent = DateComponents()
                 dateComponent.day = dayDifference
                 
-                              
+                
                 if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
                     try! self.localRealm.write {
                         weeklyHabit.total += multiplesOfSeven
@@ -561,12 +561,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     }
                     print("newHabitDate ==========================\(newHabitDate)")
                     print("weeklyHabit.total ==========================\(weeklyHabit.total)")
-
+                    
                 }
                 
                 counts += 1
                 print("counts ==========================\(counts)")
-
+                
             } else {
                 print("False")
                 print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -695,7 +695,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         
         let today = Date()
-
+        
         guard let beginningOfToday = Calendar.current.date(from: DateComponents(
             year: Calendar.current.component(.year, from: today),
             month: Calendar.current.component(.month, from: today),
@@ -800,7 +800,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func updateProgressBar() {
         
-
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let today = Date()
@@ -820,8 +820,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         // "The Realm is already in a write transaction" 에러가 뜸.
         // 내 생각에 이 이유는 line 708이 setRealmNoti 안에 있기 때문. 하지만 얘를 } 밖으로 보내버리면 새로운 하빗이 추가 되었을때 progressBar가 업데이트 되지 않음.
         guard let progress = finalPercent else {return}
-
-//        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
+        
+        //        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
         
         if counts[2] == 0 {
             percentLabel.text = "Please Add Your Habits"

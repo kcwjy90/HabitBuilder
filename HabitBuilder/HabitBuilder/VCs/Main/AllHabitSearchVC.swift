@@ -42,7 +42,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         v.backgroundColor = .white
         return v
     }()
-        
+    
     // habit이 검색됨에 따라 tableView에 보여지는걸 다르게 하기 위해서
     var habitSearched: Bool = false
     var searchedT: String = ""
@@ -82,7 +82,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
             make.left.right.bottom.equalTo(backView)
         }
         allHabitsTableView.separatorStyle = .none //removes lines btwn tableView cells
-
+        
         
         reloadData()
         
@@ -100,8 +100,8 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     func setNaviBar() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
-
-      
+        
+        
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
         // Swip to dismiss tableView
@@ -134,7 +134,7 @@ extension AllHabitSearchVC: habitDetailVCDelegate, habitDetailNoReVCDelegate {
     func editComp() {
         
         self.reloadData() //this code prevents app from crashing when realm noti already deletes the habit. but AllHabitSearchVC doesn't have realm noti, so it has to RELOAD first. THEN show searched vs unsearched
-
+        
         if habitSearched {
             searchedHabits = habits.filter { habit in
                 //Search한 상태에서 title의 value를 바꾸고 난후 reload 되었을때 계속 search한 상태의 스크린이 뜬다. 원래는 tableView가 그냥 reload 되서, search 안 한 상태로 바뀌어 버렸다.
@@ -165,7 +165,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             present(habitDetailVCNavi, animated:true)
             
         } else {
-           
+            
             let habitDetailVC = HabitDetailVC(habit: habit)
             habitDetailVC.delegate = self
             let habitDetailVCNavi = UINavigationController(rootViewController: habitDetailVC)
@@ -183,17 +183,18 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         //If there's no habit, display noDataImage
         if habits.count == 0 {
             
-        //MARK: image display when tableView is empty
-
-            let image = UIImage(named: "No")
-            let noDataImage = UIImageView(image: image)
-            noDataImage.frame = CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height)
-            noDataImage.layer.opacity = 0.5
-            tableView.backgroundView = noDataImage
-            tableView.separatorStyle = .none
+            //MARK: image display when tableView is empty
+            let messageLabel = UILabel()
+            messageLabel.text = "No Habit to Display :("
+            messageLabel.numberOfLines = 0
+            messageLabel.textAlignment = .center
+            messageLabel.font = UIFont(name: "TrebuchetMS", size: 20)
+            tableView.backgroundView = messageLabel
+            //                    tableView.frame = CGRect(x: 0, y: 100, width: tableView.bounds.size.width, height: 20)
+            
             return 0
-//            return habits.count
-
+            
+            
         } else {
             
             //Otherwise display SearchedHabits
@@ -221,7 +222,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let desc = newHabit.desc
         let date = newHabit.date
         let habitTime = newHabit.date
-     
+        
         //Dateformatter
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US")
@@ -229,11 +230,11 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "h:mm a"
-
+        
         //Changing date & time to string
         var newHabitDate = dateFormatter.string(from: date)
         var newHabitTime = timeFormatter.string(from: habitTime)
-      
+        
         //MARK: 오늘 날짜와 저장된 habit날짜를 비교
         let calendar = Calendar.current
         let todayStartOfDay = calendar.startOfDay(for: Date())
@@ -269,19 +270,19 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
                 cell.newHabitDate.textColor = UIColor.compBlue;
                 newHabitDate = "Completed"
             }
-           
+            
         } else {
             cell.newHabitDate.textColor = UIColor.black;
         }
         
-                
+        
         //MARK: 하빗 날짜가 지났고 repeat되는 애들이 아니라면 habit의 색을 까맣게 바꾸고 date를 dispaly 되는 missed로 바꿈
         if dayDifference >= 1 && newHabit.repeatType == RepeatType.none {
             cell.cellStackView.backgroundColor = .pastGray
             newHabitDate = "Missed"
             newHabitTime = ""
         } else {
-        //MARK: habit날짜가 안 지났거나, 지났어도 repeat되는 애들인 경우는 색이 바뀌거나 miss 되지 않음.
+            //MARK: habit날짜가 안 지났거나, 지났어도 repeat되는 애들인 경우는 색이 바뀌거나 miss 되지 않음.
             cell.cellStackView.backgroundColor = .cellGray
         }
         
@@ -290,7 +291,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         cell.newHabitDate.text = newHabitDate
         cell.newHabitTime.text = newHabitTime
         
-    
+        
         
         return cell
     }
@@ -318,7 +319,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-                
+        
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM/dd/yyyy"
