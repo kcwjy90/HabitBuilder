@@ -15,6 +15,21 @@ class RMO_Rate: Object {
     @Persisted var createdDate: Date = Date()
     @Persisted var rate: Double
     
+    @Persisted var privateRepeatType: Int = 0
+    var repeatType: RepeatType? {
+        get {
+            if let r = RepeatType(rawValue: privateRepeatType) {
+                return r
+            } else {
+                return nil
+            }
+        }
+        set {
+            if let v = newValue {
+                privateRepeatType = v.rawValue
+            }
+        }
+    }
     //designating id as the primary key to prevent duplicate ones based on createdDate
     override static func primaryKey() -> String? {
         return "id"

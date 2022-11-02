@@ -10,7 +10,6 @@ import Foundation
 import RealmSwift
 
 //Temporary Local Database created
-
 enum RepeatType: Int {
     case none = 0
     case daily = 1

@@ -399,7 +399,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         //MARK: Calculating the Date difference. converting seconds to date.
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
-        let dayDifference = Int(round(secondDifference/(60*60*24)))
+        var dayDifference = Int(round(secondDifference/(60*60*24)))
         
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
@@ -419,7 +419,25 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM/dd/YY"
 
+            
+            //MARK: changing dayDifference depending on what type of repeat type habit is
             guard let habitRates = habits else {return}
+            
+            guard let repeatType = habitRates[0].repeatType else { return }
+            switch repeatType {
+            case .none:
+                print("none")
+            case .daily:
+                print("daily")
+            case .weekly:
+                dayDifference = dayDifference/7
+            case .monthly:
+                //FIXME: monthly fix needed
+                dayDifference = dayDifference/31
+            case .yearly:
+                print("yearly")
+            }
+            
             
             switch habit.onGoing {
             case false :

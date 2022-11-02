@@ -287,6 +287,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
 
         rate.createdDate = habit.date
         rate.habitID = habit.id
+        rate.privateRepeatType = habit.privateRepeatType
         
         let success = Double(0)
         let total = Double(1)
