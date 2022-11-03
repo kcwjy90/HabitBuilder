@@ -541,14 +541,48 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print("today ==========================\(today)")
             print("current habitDay ==========================\(currentHabitDate)")
             print("secondDIfference  ==========================\(secondDifference)")
+            let multiplesOfSeven = dayDifference/7
+            print("multiplesOfSEven ==========================\(multiplesOfSeven)")
+            
             
             
             print("Daydifference NOT div by 7==========================\(dayDifference)")
             if dayDifference%7 == 0 && dayDifference != 0 {
                 print("Daydifference divisble by 7 ==========================\(dayDifference)")
-                let multiplesOfSeven = dayDifference/7
-                print("multiplesOfSEven ==========================\(multiplesOfSeven)")
-                
+               
+                //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
+                for day in 1...multiplesOfSeven{
+                    
+                    print(multiplesOfSeven)
+                    print(day)
+                    print(weeklyHabit.success)
+                    print(weeklyHabit.total)
+                    let success = Double(weeklyHabit.success)
+                    let total = Double(weeklyHabit.total) + Double(day)
+                    print(total)
+                    
+                    let successRate = Double(success/total)*100
+                    print(successRate)
+                    
+                    let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
+                    guard let omd = oneMoreWeek else {return}
+                    
+                    let habitRate = RMO_Rate()
+                    
+                    habitRate.habitID = weeklyHabit.id
+                    habitRate.createdDate = omd
+                    habitRate.rate = successRate
+                    
+                    try! self.localRealm.write {
+                        localRealm.add(habitRate)
+                    }
+                    
+                    print("habitrate-----MainVC line 400--------------------------for each missing days")
+                    print(habitRate)
+                    print(self.localRealm.objects(RMO_Habit.self))
+                    print(self.localRealm.objects(RMO_Rate.self))
+                    
+                }
                 
                 var dateComponent = DateComponents()
                 dateComponent.day = dayDifference

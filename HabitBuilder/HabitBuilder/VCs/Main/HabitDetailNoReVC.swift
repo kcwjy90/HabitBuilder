@@ -566,6 +566,8 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         dateFormatter.dateFormat = "MM/dd/yyyy"
         let countRealm = localRealm.objects(RMO_Count.self)
         let realm = localRealm.objects(RMO_Habit.self)
+        let rateRealm = self.localRealm.objects(RMO_Rate.self)
+
         
         //Filtering the habit where ID matches
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
@@ -610,6 +612,17 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         }
         
         
+        guard let rateIndex = rateRealm.firstIndex(where: { $0.habitID == self.habit.id}) else {return}
+        let rateToUpdate = rateRealm[rateIndex]
+
+        try! self.localRealm.write {
+            
+            if repTyp == nil {
+                rateToUpdate.repeatType = prevRep
+            } else {
+                rateToUpdate.repeatType = repTyp
+            }
+        }
         
         //MARK: updating Habit
         try! self.localRealm.write {
