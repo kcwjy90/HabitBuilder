@@ -619,7 +619,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //FIMXE: Somehow need to fix this so it can properly calculate the difference in months
             let formatter = DateComponentsFormatter()
             formatter.unitsStyle = .full
-            formatter.allowedUnits = [.month, .day, .hour, .minute, .second]
+            formatter.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
             formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
 
             let string = formatter.string(from: thisDate, to: today)
