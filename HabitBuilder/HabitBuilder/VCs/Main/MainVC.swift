@@ -617,14 +617,15 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let thisDate = monthlyHabit.date
 
             //FIMXE: Somehow need to fix this so it can properly calculate the difference in months
-            let formatter = DateComponentsFormatter()
-            formatter.unitsStyle = .full
-            formatter.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
-            formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
-
-            let string = formatter.string(from: thisDate, to: today)
-            
-            print(string)
+//            let formatter = DateComponentsFormatter()
+//            formatter.unitsStyle = .full
+//            formatter.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
+//            formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
+//
+//            let string = formatter.string(from: thisDate, to: today)
+//
+//
+//            print(string)
     
             let months = thisDate.months(from: today)
             print("here is month. mainvc line 619-------------------------------\(months)")
@@ -635,7 +636,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM/dd/yyyy"
             var dateComponent = DateComponents()
-            dateComponent.month = 1
+            dateComponent.month = months
             let futureMonth = Calendar.current.date(byAdding: dateComponent, to: monthlyHabit.date)
             
             guard let monthlyDate = futureMonth else { return }
