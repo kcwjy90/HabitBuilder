@@ -548,11 +548,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             print("Daydifference NOT div by 7==========================\(dayDifference)")
-            if dayDifference%7 == 0 && dayDifference != 0 {
+            if dayDifference%7 == 0 && dayDifference != 0 { //&& dayDifference != 0 is needed for upper bound. then what about a habit that is in a future date but the daydifference
                 print("Daydifference divisble by 7 ==========================\(dayDifference)")
                
                 //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
-                for day in 1...multiplesOfSeven{
+                for day in 0...multiplesOfSeven{
                     
                     print(multiplesOfSeven)
                     print(day)
@@ -610,6 +610,95 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
         }
         
+//        move this into the above {}
+//         // right after "Print day differenc edivisible by 7). also delete && dayDifference
+//         switch dayDifference {
+//         case 0:
+//
+//             //오늘 처음 weekly habit이 시작 되거나 dayDifference가 0 인경우. 이렇게 해야 line 594의 for문에서 upperbound 문제를 해결할수 있다.
+//             let habitRate = RMO_Rate()
+//
+//             let success = Double(weeklyHabit.success)
+//             let total = Double(weeklyHabit.total) + Double(1)
+//             print(total)
+//
+//             let successRate = Double(success/total)*100
+//             print(successRate)
+//
+//             habitRate.habitID = weeklyHabit.id
+//             habitRate.createdDate = weeklyHabit.date
+//             habitRate.rate = successRate
+//
+//             try! self.localRealm.write {
+//                 localRealm.add(habitRate)
+//             }
+//
+//
+//                 try! self.localRealm.write {
+//                     weeklyHabit.total += 1
+//                 }
+//                 print("weeklyHabit.total ==========================\(weeklyHabit.total)")
+//
+//
+//             counts += 1
+//             print("counts ==========================\(counts)")
+//
+//         default:
+//             //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
+//             for day in 1...multiplesOfSeven{
+//
+//                 print(multiplesOfSeven)
+//                 print(day)
+//                 print(weeklyHabit.success)
+//                 print(weeklyHabit.total)
+//                 let success = Double(weeklyHabit.success)
+//                 let total = Double(weeklyHabit.total) + Double(day)
+//                 print(total)
+//
+//                 let successRate = Double(success/total)*100
+//                 print(successRate)
+//
+//                 let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
+//                 guard let omd = oneMoreWeek else {return}
+//
+//                 let habitRate = RMO_Rate()
+//
+//                 habitRate.habitID = weeklyHabit.id
+//                 habitRate.createdDate = omd
+//                 habitRate.rate = successRate
+//
+//                 try! self.localRealm.write {
+//                     localRealm.add(habitRate)
+//                 }
+//
+//                 print("habitrate-----MainVC line 400--------------------------for each missing days")
+//                 print(habitRate)
+//                 print(self.localRealm.objects(RMO_Habit.self))
+//                 print(self.localRealm.objects(RMO_Rate.self))
+//
+//             }
+//
+//             var dateComponent = DateComponents()
+//             dateComponent.day = dayDifference
+//
+//
+//             if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
+//                 try! self.localRealm.write {
+//                     weeklyHabit.total += multiplesOfSeven
+//                     weeklyHabit.date = newHabitDate
+//                 }
+//                 print("newHabitDate ==========================\(newHabitDate)")
+//                 print("weeklyHabit.total ==========================\(weeklyHabit.total)")
+//
+//             }
+//
+//             counts += 1
+//             print("counts ==========================\(counts)")
+//
+//         }
+//
+//         //right before "else" print(false"
+        
         //monthly repeat
         let monthlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 3")
         for monthlyHabit in monthlyHabits {
@@ -631,13 +720,77 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print("here is month. mainvc line 619-------------------------------\(months)")
             //FIMXE: Somehow need to fix this so it can properly calculate the difference in months
 
-            
-            //If current Habit + 1 month == today's date...
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
+            //Adding months to existing habit.date
             var dateComponent = DateComponents()
             dateComponent.month = months
             let futureMonth = Calendar.current.date(byAdding: dateComponent, to: monthlyHabit.date)
+//
+//            if months>0 && dayDifference != 0 {
+//                print("Daydifference divisble by 7 ==========================\(dayDifference)")
+//
+//                //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
+//                for day in 1...multiplesOfSeven{
+//
+//                    print(multiplesOfSeven)
+//                    print(day)
+//                    print(weeklyHabit.success)
+//                    print(weeklyHabit.total)
+//                    let success = Double(weeklyHabit.success)
+//                    let total = Double(weeklyHabit.total) + Double(day)
+//                    print(total)
+//
+//                    let successRate = Double(success/total)*100
+//                    print(successRate)
+//
+//                    let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
+//                    guard let omd = oneMoreWeek else {return}
+//
+//                    let habitRate = RMO_Rate()
+//
+//                    habitRate.habitID = weeklyHabit.id
+//                    habitRate.createdDate = omd
+//                    habitRate.rate = successRate
+//
+//                    try! self.localRealm.write {
+//                        localRealm.add(habitRate)
+//                    }
+//
+//                    print("habitrate-----MainVC line 400--------------------------for each missing days")
+//                    print(habitRate)
+//                    print(self.localRealm.objects(RMO_Habit.self))
+//                    print(self.localRealm.objects(RMO_Rate.self))
+//
+//                }
+//
+//                var dateComponent = DateComponents()
+//                dateComponent.day = dayDifference
+//
+//
+//                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
+//                    try! self.localRealm.write {
+//                        weeklyHabit.total += multiplesOfSeven
+//                        weeklyHabit.date = newHabitDate
+//                    }
+//                    print("newHabitDate ==========================\(newHabitDate)")
+//                    print("weeklyHabit.total ==========================\(weeklyHabit.total)")
+//
+//                }
+//
+//                counts += 1
+//                print("counts ==========================\(counts)")
+//
+//            } else {
+//                print("False")
+//                print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
+//
+//            }
+            
+            let dateFormatter = DateFormatter()
+
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+
+            
+         
             
             guard let monthlyDate = futureMonth else { return }
             let habitMonthAwayString = dateFormatter.string(from: monthlyDate)
