@@ -94,10 +94,11 @@ class ProgressVC: UIViewController, ChartViewDelegate {
                 
         habits = localRealm.objects(RMO_Count.self).toArray() //updating habits []
 
+        //FIXME: somehoe do order by year. then date. so......flip the date and save it as reverse date so it's yy/mm/dd
         habits = habits.sorted(by: {
             $0.date.compare($1.date) == .orderedAscending
         })
-        
+
         print("progressVC line 101=========================================\(habits)")
  
         let dayDifference = habits.count - 1

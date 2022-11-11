@@ -497,6 +497,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = JDSC8J9R2Y;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JDSC8J9R2Y;
 				INFOPLIST_FILE = HabitBuilder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -505,6 +506,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chikim.habitbuilder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = dev_habitbuilder;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = dev_habitbuilder;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -518,6 +520,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = JDSC8J9R2Y;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JDSC8J9R2Y;
 				INFOPLIST_FILE = HabitBuilder/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -526,6 +529,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chikim.habitbuilder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = dev_habitbuilder;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = dev_habitbuilder;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
