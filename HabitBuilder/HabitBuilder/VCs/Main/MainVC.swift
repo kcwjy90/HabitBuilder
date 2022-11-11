@@ -460,51 +460,62 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         for dailyHabit in dailyHabits {
             
             let currentHabitDate = dailyHabit.date
+            let habitStartDate = dailyHabit.startDate
             
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
-            //MARK: Converting seconds to date.
             let secondDifference = time(current: today, habitDate: currentHabitDate)
             let dayDifference = Int(round(secondDifference/(60*60*24)))
             
             //MARK: Calculating Total number of days of Habit being live. today - startdate + 1
-            let totalSecondDifference = time(current: today, habitDate: dailyHabit.startDate)
+            let totalSecondDifference = time(current: today, habitDate: habitStartDate)
             let totalDayDifference = Int(round(totalSecondDifference/(60*60*24)))
             let newTotal = totalDayDifference + 1
             
             //MARK: 접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 접속하지 않은 10/2 = 50%, 10/3 = 33%. 접속한 날짜인 10/4는 일단 무조건 fail 로 간주한다. 그래서 user가 rate을 하지 않거나 app을 열기만 하고 아무것도 하지 않은경우 자동적으로 fail이 됨 (25%). cell을 touch해서 success를 할 경우만 rate이 올라감.
             
-            for day in 1...dayDifference{
+            if dayDifference > 0 {
                 
-                //Calculating successRate (all putting 0%)
-                let success = Double(dailyHabit.success)
-                let total = Double(dailyHabit.total) + Double(day)
-                let successRate = Double(success/total)*100
-                
-                let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
-                guard let omd = oneMoreDay else {return}
-                
-                let habitRate = RMO_Rate()
-                
-                habitRate.habitID = dailyHabit.id
-                habitRate.createdDate = omd
-                habitRate.rate = successRate
-                
-                try! self.localRealm.write {
-                    localRealm.add(habitRate)
+                for day in 1...dayDifference{
+                    
+                    //Calculating successRate (all putting 0%)
+                    let success = Double(dailyHabit.success)
+                    let total = Double(dailyHabit.total) + Double(day)
+                    let successRate = Double(success/total)*100
+                    
+                    let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
+                    guard let omd = oneMoreDay else {return}
+                    
+                    let habitRate = RMO_Rate()
+                    
+                    habitRate.habitID = dailyHabit.id
+                    habitRate.createdDate = omd
+                    habitRate.rate = successRate
+                    
+                    try! self.localRealm.write {
+                        localRealm.add(habitRate)
+                    }
                 }
-            }
-            
-            
-            //habit의 date을 newHabitDate으로 바꿔주는것
-            if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
-                try! self.localRealm.write {
-                    dailyHabit.date = newHabitDate
-                    dailyHabit.total = newTotal
+                
+                
+                //habit의 date을 newHabitDate으로 바꿔주는것
+                if let newHabitDate = Calendar.current.date(byAdding: .day,  value: dayDifference, to: currentHabitDate) {
+                    try! self.localRealm.write {
+                        dailyHabit.date = newHabitDate
+                        dailyHabit.total = newTotal
+                    }
                 }
+                
+                counts += 1
+                print(self.localRealm.objects(RMO_Habit.self))
+                print(self.localRealm.objects(RMO_Rate.self))
+                
+            } else {
+                print("Daily - daydifference = 0 ")
+                print(self.localRealm.objects(RMO_Habit.self))
+                print(self.localRealm.objects(RMO_Rate.self))
             }
-            
-            counts += 1
         }
+        
         
         
         //weekly repeat

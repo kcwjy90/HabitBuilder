@@ -648,6 +648,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             {return} //
             let taskToUpdate = countRealm[indexNumb]
             
+            //Removing total from CountRealm
             try! self.localRealm.write {
                 taskToUpdate.total -= 1
             }
