@@ -401,6 +401,18 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
         var dayDifference = Int(round(secondDifference/(60*60*24)))
         
+        //MARK: Cutting unnecessary "months" from string. then converting to Int
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .full
+        formatter.allowedUnits = [.year, .month]
+        formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
+        
+        let monthDiff = formatter.string(from: startHabitDate, to: currentHabitDate)
+        guard let stringMD = monthDiff else { return }
+        let intMonthDiff = Int(stringMD.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
+        guard let months = intMonthDiff else {return}
+        print(months)
+        
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
         habits = self.localRealm.objects(RMO_Rate.self).filter("habitID == %@", habit.id)
@@ -433,7 +445,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 dayDifference = dayDifference/7
             case .monthly:
                 //FIXME: monthly fix needed
-                dayDifference = dayDifference/31
+                dayDifference = months
             case .yearly:
                 print("yearly")
             }
