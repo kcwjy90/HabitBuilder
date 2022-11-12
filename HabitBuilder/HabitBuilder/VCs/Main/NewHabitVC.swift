@@ -244,18 +244,19 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.total += 1
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let habitDate = dateFormatter.string(from: newHabitDateTime.date)
         
         let countRealm = localRealm.objects(RMO_Count.self)
         
         
         //MARK:RMO_Count 확인 -> either 새로운 날짜 추가 or existing 날짜에 total +1
-        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다.
+        //새로 생성된 habit의 날짜가 RMO_Count에 있는지 확인하고, 없을 경우 RMO_Count에 추가한다. FinalPercent는 default로 0%
         if !countRealm.contains(where: { $0.date == habitDate} )
         {
             let newCount = RMO_Count()
             newCount.date = habitDate
+            newCount.finalPercent = Float(0)
             
             try! localRealm.write {
                 localRealm.add(newCount)

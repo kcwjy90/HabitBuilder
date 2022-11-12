@@ -73,6 +73,17 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.edges.equalTo(backView)
         }
         totalLineChart.center = backView.center
+        totalLineChart.isUserInteractionEnabled = false
+        totalLineChart.xAxis.labelPosition = .bottom
+        totalLineChart.xAxis.labelFont = .boldSystemFont(ofSize: 12)
+        totalLineChart.xAxis.setLabelCount(5, force: false)
+        totalLineChart.rightAxis.enabled = false
+        totalLineChart.leftAxis.labelFont = .boldSystemFont(ofSize: 12)
+        totalLineChart.leftAxis.setLabelCount(6, force: false)
+        totalLineChart.leftAxis.labelTextColor = .black
+        totalLineChart.leftAxis.axisLineColor = .black
+        totalLineChart.leftAxis.axisMinimum = 0
+        totalLineChart.leftAxis.axisMaximum = 100
         
     }
     
@@ -81,7 +92,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     func reloadChart() {
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)

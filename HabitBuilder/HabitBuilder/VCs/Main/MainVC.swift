@@ -233,7 +233,7 @@ class MainVC: UIViewController {
     func updateFinalPercent() {
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
@@ -439,7 +439,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //To add today's habit's count
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
@@ -485,6 +485,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     let oneMoreDay = Calendar.current.date(byAdding: .day,  value: day, to: currentHabitDate)
                     guard let omd = oneMoreDay else {return}
                     
+                    //Adding Rates (0%) for all the missing days
                     let habitRate = RMO_Rate()
                     
                     habitRate.habitID = dailyHabit.id
@@ -493,6 +494,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     
                     try! self.localRealm.write {
                         localRealm.add(habitRate)
+                    }
+                    
+                    //Adding FinalPercent (0%) for all the missing days if they don't already exist.
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy/MM/dd"
+                    let countDate = dateFormatter.string(from: omd)
+                
+                    if !countRealm.contains(where: { $0.date == countDate} )
+                    {
+                        let habitCount = RMO_Count()
+                        habitCount.date = countDate
+                        habitCount.finalPercent = Float(0)
+                        
+                        try! localRealm.write {
+                            localRealm.add(habitCount)
+                        }
                     }
                 }
                 
@@ -554,12 +571,12 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         print("WEEKLY - SuccessRate \(successRate)")
                         
                         let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
-                        guard let omd = oneMoreWeek else {return}
+                        guard let omw = oneMoreWeek else {return}
                         
                         let habitRate = RMO_Rate()
                         
                         habitRate.habitID = weeklyHabit.id
-                        habitRate.createdDate = omd
+                        habitRate.createdDate = omw
                         habitRate.rate = successRate
                         
                         try! self.localRealm.write {
@@ -570,6 +587,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         print(self.localRealm.objects(RMO_Habit.self))
                         print(self.localRealm.objects(RMO_Rate.self))
                         print("WEEKLY MainVC ====================================================")
+                        
+                        //Adding FinalPercent (0%) for all the missing days if they don't already exist.
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy/MM/dd"
+                        let countDate = dateFormatter.string(from: omw)
+                    
+                        if !countRealm.contains(where: { $0.date == countDate} )
+                        {
+                            let habitCount = RMO_Count()
+                            habitCount.date = countDate
+                            habitCount.finalPercent = Float(0)
+                            
+                            try! localRealm.write {
+                                localRealm.add(habitCount)
+                            }
+                        }
                         
                     }
                     
@@ -617,6 +650,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             guard let stringMD = monthDiff else { return }
             let intMonthDiff = Int(stringMD.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
             guard let months = intMonthDiff else {return}
+            print(months)
             
             print("MONTHLHY START- this is MONTHS not accessed=======================\(months)")
             
@@ -646,6 +680,22 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         localRealm.add(habitRate)
                     }
                     
+                    //Adding FinalPercent (0%) for all the missing days if they don't already exist.
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy/MM/dd"
+                    let countDate = dateFormatter.string(from: omm)
+                
+                    if !countRealm.contains(where: { $0.date == countDate} )
+                    {
+                        let habitCount = RMO_Count()
+                        habitCount.date = countDate
+                        habitCount.finalPercent = Float(0)
+                        
+                        try! localRealm.write {
+                            localRealm.add(habitCount)
+                        }
+                    }
+                    
                     print("MONTHLY HabitRate-----\(habitRate)")
                     print(self.localRealm.objects(RMO_Habit.self))
                     print(self.localRealm.objects(RMO_Rate.self))
@@ -666,7 +716,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도 없이 모든 habit은 0%
                     counts += 1
                     print("ONLY 오늘거만 counts ==========================\(counts)")
-                    
+                    print(monthlyHabit)
+
                 } else {
                     print("MONTHLY if let NewHabitDate은 fail한 경우")
                 }
@@ -686,7 +737,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             //If current Habit + 1 week == today's date...
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
+            dateFormatter.dateFormat = "yyyy/MM/dd"
             var dateComponent = DateComponents()
             dateComponent.year = 1
             let futureYear = Calendar.current.date(byAdding: dateComponent, to: yearlyHabit.date)
@@ -822,7 +873,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             //FIXME: Need to somehow compare the dates (only days), not strings
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM/dd/yyyy"
+            dateFormatter.dateFormat = "yyyy/MM/dd"
             let todayString = dateFormatter.string(from: today)
             let exeString = dateFormatter.string(from: exeToday)
             
@@ -859,7 +910,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
@@ -895,7 +946,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy"
+        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
