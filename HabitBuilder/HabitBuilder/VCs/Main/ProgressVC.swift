@@ -31,14 +31,57 @@ class ProgressVC: UIViewController, ChartViewDelegate {
 
     var success: Float?
     
-//    lazy var currentSuccessRate: UILabel = {
-//        let v = UILabel()
-//        v.text = ""
-//        v.font = UIFont.systemFont(ofSize: 40.0)
-//        v.textColor = .black
-//        return v
-//    }()
-//
+    // numberOfHundred 생성
+    lazy var numberOfHundredLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Number of 100% Reached :"
+        v.font = UIFont.systemFont(ofSize: 17.0)
+        v.textColor = .black
+        return v
+    }()
+    
+    lazy var numberOfHundred: UILabel = {
+        let v = UILabel()
+        v.text = "14/30"
+        v.font = UIFont.systemFont(ofSize: 40.0)
+        v.textColor = .black
+        return v
+    }()
+    
+    // mostFrequentPercent 생성
+    lazy var mostFrequentPercentLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Most Frequent % :"
+        v.font = UIFont.systemFont(ofSize: 17.0)
+        v.textColor = .black
+        return v
+    }()
+    
+    lazy var mostFrequentPercent: UILabel = {
+        let v = UILabel()
+        v.text = "80%"
+        v.font = UIFont.systemFont(ofSize: 40.0)
+        v.textColor = .black
+        return v
+    }()
+    
+    // currentSuccessRate 생성
+    lazy var currentSuccessRateLabel: UILabel = {
+        let v = UILabel()
+        v.text = "Current Success Rate :"
+        v.font = UIFont.systemFont(ofSize: 17.0)
+        v.textColor = .black
+        return v
+    }()
+    
+    lazy var currentSuccessRate: UILabel = {
+        let v = UILabel()
+        v.text = "50%"
+        v.font = UIFont.systemFont(ofSize: 40.0)
+        v.textColor = .black
+        return v
+    }()
+    
     //MARK: ViewController Life Cycle
     override func loadView() {
         super.loadView()
@@ -59,7 +102,14 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         super.viewDidLayoutSubviews()
         
         view.addSubview(backView)
-        view.addSubview(totalLineChart)
+        backView.addSubview(totalLineChart)
+        backView.addSubview(mostFrequentPercentLabel)
+        backView.addSubview(mostFrequentPercent)
+        backView.addSubview(numberOfHundredLabel)
+        backView.addSubview(numberOfHundred)
+        backView.addSubview(currentSuccessRateLabel)
+        backView.addSubview(currentSuccessRate)
+
         
         view.backgroundColor = .white
         
@@ -68,9 +118,63 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
+        // BackView grid
+        backView.snp.makeConstraints { (make) in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        // BackView grid
+        backView.snp.makeConstraints { (make) in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        // mostFrequentPercentLabel size grid
+        mostFrequentPercentLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(backView)
+            make.left.equalTo(backView).offset(10)
+            make.height.equalTo(40)
+        }
+        
+        // mostFrequentPercent size grid
+        mostFrequentPercent.snp.makeConstraints { (make) in
+            make.top.equalTo(mostFrequentPercentLabel)
+            make.left.equalTo(mostFrequentPercentLabel.snp.right).offset(10)
+            make.height.equalTo(40)
+        }
+        
+        // numberOfHundredLabel size grid
+        numberOfHundredLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(mostFrequentPercentLabel.snp.bottom).offset(10)
+            make.left.equalTo(mostFrequentPercentLabel)
+            make.height.equalTo(40)
+        }
+        
+        // numberOfHundred size grid
+        numberOfHundred.snp.makeConstraints { (make) in
+            make.top.equalTo(numberOfHundredLabel)
+            make.left.equalTo(numberOfHundredLabel.snp.right).offset(10)
+            make.height.equalTo(40)
+        }
+        
+        // currentSuccessRateLabel size grid
+        currentSuccessRateLabel.snp.makeConstraints { (make) in
+            make.top.equalTo(numberOfHundredLabel.snp.bottom).offset(10)
+            make.left.equalTo(mostFrequentPercentLabel)
+            make.height.equalTo(40)
+        }
+        
+        // currentSuccessRate size grid
+        currentSuccessRate.snp.makeConstraints { (make) in
+            make.top.equalTo(currentSuccessRateLabel)
+            make.left.equalTo(currentSuccessRateLabel.snp.right).offset(10)
+            make.height.equalTo(40)
+        }
+        
         // todayPiChart grid
         totalLineChart.snp.makeConstraints{ (make) in
-            make.edges.equalTo(backView)
+            make.top.equalTo(currentSuccessRateLabel.snp.bottom).offset(20)
+            make.left.right.bottom.equalTo(backView)
+
         }
         totalLineChart.center = backView.center
         totalLineChart.isUserInteractionEnabled = false
