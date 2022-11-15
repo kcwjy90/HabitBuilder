@@ -289,7 +289,6 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.right.equalTo(habitDateTime)
         }
         repeatButton.layer.borderWidth = 1.5
-        //FIXME: needs to change gray color to match Date and TIme
         repeatButton.layer.borderColor = UIColor.dateGray.cgColor
         repeatButton.layer.backgroundColor = UIColor.dateGray.cgColor
                 

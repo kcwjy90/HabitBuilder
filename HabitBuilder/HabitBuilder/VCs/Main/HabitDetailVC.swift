@@ -367,8 +367,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         }
             
         
-        //MARK: If Habit already completed, hide Success/Fail buttons
-        if habit.onGoing == false {
+        //MARK: If Habit already completed or Habit in the FUTURE, hide Success/Fail buttons
+        if habit.onGoing == false || habit.date > Date() {
             successButton.isHidden = true
             failButton.isHidden = true
         } else {
@@ -660,9 +660,14 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             {return} //
             let taskToUpdate = countRealm[indexNumb]
             
+            //updating Final Total and Final Percent recorded in the habit about to be deleted
+            let updatedTotal = taskToUpdate.total - 1
+            let updatedFinalPercent = Float(taskToUpdate.success)/Float(updatedTotal)
+            
             //Removing total from CountRealm
             try! self.localRealm.write {
-                taskToUpdate.total -= 1
+                taskToUpdate.total = updatedTotal
+                taskToUpdate.finalPercent = updatedFinalPercent
             }
             
             

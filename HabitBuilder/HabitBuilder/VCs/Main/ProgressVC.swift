@@ -31,39 +31,39 @@ class ProgressVC: UIViewController, ChartViewDelegate {
 
     var success: Float?
     
-    // numberOfHundred 생성
-    lazy var numberOfHundredLabel: UILabel = {
-        let v = UILabel()
-        v.text = "Number of 100% Reached :"
-        v.font = UIFont.systemFont(ofSize: 17.0)
-        v.textColor = .black
-        return v
-    }()
+//    // numberOfHundred 생성
+//    lazy var numberOfHundredLabel: UILabel = {
+//        let v = UILabel()
+//        v.text = "Number of 100% Reached :"
+//        v.font = UIFont.systemFont(ofSize: 17.0)
+//        v.textColor = .black
+//        return v
+//    }()
+//
+//    lazy var numberOfHundred: UILabel = {
+//        let v = UILabel()
+//        v.text = ""
+//        v.font = UIFont.systemFont(ofSize: 40.0)
+//        v.textColor = .black
+//        return v
+//    }()
     
-    lazy var numberOfHundred: UILabel = {
-        let v = UILabel()
-        v.text = "14/30"
-        v.font = UIFont.systemFont(ofSize: 40.0)
-        v.textColor = .black
-        return v
-    }()
-    
-    // mostFrequentPercent 생성
-    lazy var mostFrequentPercentLabel: UILabel = {
-        let v = UILabel()
-        v.text = "Most Frequent % :"
-        v.font = UIFont.systemFont(ofSize: 17.0)
-        v.textColor = .black
-        return v
-    }()
-    
-    lazy var mostFrequentPercent: UILabel = {
-        let v = UILabel()
-        v.text = "80%"
-        v.font = UIFont.systemFont(ofSize: 40.0)
-        v.textColor = .black
-        return v
-    }()
+//    // mostFrequentPercent 생성
+//    lazy var mostFrequentPercentLabel: UILabel = {
+//        let v = UILabel()
+//        v.text = "Most Frequent % :"
+//        v.font = UIFont.systemFont(ofSize: 17.0)
+//        v.textColor = .black
+//        return v
+//    }()
+//
+//    lazy var mostFrequentPercent: UILabel = {
+//        let v = UILabel()
+//        v.text = "80%"
+//        v.font = UIFont.systemFont(ofSize: 40.0)
+//        v.textColor = .black
+//        return v
+//    }()
     
     // currentSuccessRate 생성
     lazy var currentSuccessRateLabel: UILabel = {
@@ -103,10 +103,10 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
         view.addSubview(backView)
         backView.addSubview(totalLineChart)
-        backView.addSubview(mostFrequentPercentLabel)
-        backView.addSubview(mostFrequentPercent)
-        backView.addSubview(numberOfHundredLabel)
-        backView.addSubview(numberOfHundred)
+//        backView.addSubview(mostFrequentPercentLabel)
+//        backView.addSubview(mostFrequentPercent)
+//        backView.addSubview(numberOfHundredLabel)
+//        backView.addSubview(numberOfHundred)
         backView.addSubview(currentSuccessRateLabel)
         backView.addSubview(currentSuccessRate)
 
@@ -128,38 +128,38 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        // mostFrequentPercentLabel size grid
-        mostFrequentPercentLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(backView)
-            make.left.equalTo(backView).offset(10)
-            make.height.equalTo(40)
-        }
-        
-        // mostFrequentPercent size grid
-        mostFrequentPercent.snp.makeConstraints { (make) in
-            make.top.equalTo(mostFrequentPercentLabel)
-            make.left.equalTo(mostFrequentPercentLabel.snp.right).offset(10)
-            make.height.equalTo(40)
-        }
-        
-        // numberOfHundredLabel size grid
-        numberOfHundredLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(mostFrequentPercentLabel.snp.bottom).offset(10)
-            make.left.equalTo(mostFrequentPercentLabel)
-            make.height.equalTo(40)
-        }
-        
-        // numberOfHundred size grid
-        numberOfHundred.snp.makeConstraints { (make) in
-            make.top.equalTo(numberOfHundredLabel)
-            make.left.equalTo(numberOfHundredLabel.snp.right).offset(10)
-            make.height.equalTo(40)
-        }
+//        // mostFrequentPercentLabel size grid
+//        mostFrequentPercentLabel.snp.makeConstraints { (make) in
+//            make.top.equalTo(backView)
+//            make.left.equalTo(backView).offset(10)
+//            make.height.equalTo(40)
+//        }
+//
+//        // mostFrequentPercent size grid
+//        mostFrequentPercent.snp.makeConstraints { (make) in
+//            make.top.equalTo(mostFrequentPercentLabel)
+//            make.left.equalTo(mostFrequentPercentLabel.snp.right).offset(10)
+//            make.height.equalTo(40)
+//        }
+//
+//        // numberOfHundredLabel size grid
+//        numberOfHundredLabel.snp.makeConstraints { (make) in
+//            make.top.equalTo(mostFrequentPercentLabel.snp.bottom).offset(10)
+//            make.left.equalTo(mostFrequentPercentLabel)
+//            make.height.equalTo(40)
+//        }
+//
+//        // numberOfHundred size grid
+//        numberOfHundred.snp.makeConstraints { (make) in
+//            make.top.equalTo(numberOfHundredLabel)
+//            make.left.equalTo(numberOfHundredLabel.snp.right).offset(10)
+//            make.height.equalTo(40)
+//        }
         
         // currentSuccessRateLabel size grid
         currentSuccessRateLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(numberOfHundredLabel.snp.bottom).offset(10)
-            make.left.equalTo(mostFrequentPercentLabel)
+            make.top.equalTo(backView).offset(10)
+            make.left.equalTo(backView).offset(10)
             make.height.equalTo(40)
         }
         
@@ -229,17 +229,25 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             xAxis.append(habits[x].date)
         }
         
-        //FIMXE: also fix later
-//        let last = entries.last
+        //Displaying Current SuccessRate, Most Frequent %, Number of 100% reached
+        print(entries)
+        guard let currentRate = entries.last else {return}
         
-//        //Updating last rate as % in currentSuccessRate
-//        if last == nil {
-//            currentSuccessRate.text = "0.0%"
+        
+        if currentRate == nil {
+            currentSuccessRate.text = "0.0%"
+        } else {
+            currentSuccessRate.text = "\(String(currentRate.y))%"
+        }
+        
+        //Most Frequent
+//        let countHundred = [entries].filter { $0 == 100.0 }.count
+//        if countHundred == 1 {
+//            numberOfHundred.text = "\(String(countHundred)) Time"
 //        } else {
-//            let lastRate = habitRates[dayDifference].rate
-//            currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
+//            numberOfHundred.text = "\(String(countHundred)) Times"
 //        }
-//
+
         //Formatting xAxis from Numb to String
         totalLineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values: xAxis)
         
@@ -259,7 +267,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         // 4. Assign it to the chart’s data
         totalLineChart.data = data
         
-        if xAxis.count <= 10 {
+        if xAxis.count < 10 {
             totalLineChart.xAxis.axisMaximum = 10
             totalLineChart.xAxis.axisMinimum = 0
         } else {
