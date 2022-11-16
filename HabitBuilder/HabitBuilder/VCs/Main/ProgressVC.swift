@@ -173,14 +173,16 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         // todayPiChart grid
         totalLineChart.snp.makeConstraints{ (make) in
             make.top.equalTo(currentSuccessRateLabel.snp.bottom).offset(20)
-            make.left.right.bottom.equalTo(backView)
+            make.left.equalTo(backView).offset(10)
+            make.right.equalTo(backView).offset(-15)
+            make.bottom.equalTo(backView).offset(-20)
 
         }
         totalLineChart.center = backView.center
         totalLineChart.isUserInteractionEnabled = false
         totalLineChart.xAxis.labelPosition = .bottom
         totalLineChart.xAxis.labelFont = .boldSystemFont(ofSize: 12)
-        totalLineChart.xAxis.setLabelCount(5, force: false)
+        totalLineChart.xAxis.setLabelCount(4, force: false)
         totalLineChart.rightAxis.enabled = false
         totalLineChart.leftAxis.labelFont = .boldSystemFont(ofSize: 12)
         totalLineChart.leftAxis.setLabelCount(6, force: false)

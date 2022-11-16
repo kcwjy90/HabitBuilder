@@ -244,8 +244,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         habitLineChart.snp.makeConstraints{ (make) in
             make.top.equalTo(habitDateTime.snp.bottom)
-            make.left.equalTo(scrollContentView).offset(10)
-            make.right.equalTo(scrollContentView).offset(-10)
+            make.left.equalTo(scrollContentView).offset(15)
+            make.right.equalTo(scrollContentView).offset(-15)
             make.height.equalTo(220)
         }
         habitLineChart.center = view.center
@@ -676,7 +676,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             let updatedTotal = taskToUpdate.total - 1
             var updatedSuccess: Int
             
-            //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다. 
+            //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
             switch habitToUpdate.todaysResult {
             case 1 :
                 updatedSuccess = taskToUpdate.success - 1
