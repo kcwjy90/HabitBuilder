@@ -97,7 +97,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         v.textColor = .black
         return v
     }()
- 
+    
     // successButton 생성
     lazy var successButton: UIButton = {
         let v = UIButton()
@@ -134,7 +134,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     //==GRAPH RELATED===
     var habitLineChart = LineChartView()
     //==GRAPH RELATED===
-
+    
     
     lazy var scrollView: UIScrollView = {
         let v = UIScrollView()
@@ -224,7 +224,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitDesc.addPadding()
         habitDesc.layer.borderWidth = 1.5
         habitDesc.layer.borderColor = UIColor.pastGray.cgColor
-
+        
         
         // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
@@ -252,7 +252,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitLineChart.backgroundColor = .white
         habitLineChart.delegate = self
         habitLineChart.isUserInteractionEnabled = false
-//        habitLineChart.xAxis.granularity = 1
+        //        habitLineChart.xAxis.granularity = 1
         habitLineChart.xAxis.labelPosition = .bottom
         habitLineChart.xAxis.labelFont = .boldSystemFont(ofSize: 12)
         habitLineChart.xAxis.setLabelCount(5, force: false)
@@ -264,7 +264,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         habitLineChart.leftAxis.axisLineColor = .black
         habitLineChart.leftAxis.axisMinimum = 0
         habitLineChart.leftAxis.axisMaximum = 100
-//        habitLineChart.leftAxis.granularity = 1
+        //        habitLineChart.leftAxis.granularity = 1
         
         
         // currentSuccessRateBackView size grid
@@ -317,7 +317,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.centerX.equalTo(successButton)
         }
         
-   
+        
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         
         habitTitle.text = habit.title
@@ -327,7 +327,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         dateFormatter.dateFormat = "h:mm a"
         let habitTime = dateFormatter.string(from: habit.date)
         
-
+        
         guard let repeatType = habit.repeatType else { return }
         switch repeatType {
         case .none:
@@ -344,20 +344,20 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         case .monthly:
             dateFormatter.dateFormat = "d";
             let habitDay = dateFormatter.string(from: habit.date);
-                
+            
             var day = ""
+            
+            switch habitDay {
+            case "1": day = "\(habitDay)st"
+            case "2": day = "\(habitDay)nd"
+            case "3": day = "\(habitDay)rd"
+            case "21": day = "\(habitDay)st"
+            case "22": day = "\(habitDay)nd"
+            case "23": day = "\(habitDay)rd"
+            case "31": day = "\(habitDay)st"
+            default: day = "\(habitDay)th"
                 
-                switch habitDay {
-                case "1": day = "\(habitDay)st"
-                case "2": day = "\(habitDay)nd"
-                case "3": day = "\(habitDay)rd"
-                case "21": day = "\(habitDay)st"
-                case "22": day = "\(habitDay)nd"
-                case "23": day = "\(habitDay)rd"
-                case "31": day = "\(habitDay)st"
-                default: day = "\(habitDay)th"
-
-                }
+            }
             habitDateTime.text = "Every \(day) of the Month at \(habitTime)"
             
         case .yearly:
@@ -365,10 +365,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             let habitDay = dateFormatter.string(from: habit.date);
             habitDateTime.text = "Every \(habitDay) at \(habitTime)"
         }
-            
         
-        //MARK: If Habit already completed or Habit in the FUTURE, hide Success/Fail buttons
-        if habit.onGoing == false || habit.date > Date() {
+        
+        //MARK: If Habit already completed, hide Success/Fail buttons
+        if habit.onGoing == false {
+            //            || habit.date > Date() {
             successButton.isHidden = true
             failButton.isHidden = true
         } else {
@@ -392,10 +393,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-   
+        
         let startHabitDate = habit.startDate
         let currentHabitDate = habit.date
-
+        
         
         //MARK: Calculating the Date difference. converting seconds to date.
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
@@ -416,11 +417,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
         habits = self.localRealm.objects(RMO_Rate.self).filter("habitID == %@", habit.id)
-                    
+        
         print("habitdetailvc line 379---------habits--------------------------")
         print(habits)
-       
- 
+        
+        
         if habits!.count == 0 {
             print("0")
         } else {
@@ -430,7 +431,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             var xAxis: [String] = []
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM/dd/YY"
-
+            
             
             //MARK: changing dayDifference depending on what type of repeat type habit is
             guard let habitRates = habits else {return}
@@ -442,7 +443,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             case .daily:
                 print("daily")
             case .weekly:
-                dayDifference = dayDifference/7
+                dayDifference = Int(floor(Double(dayDifference/7)))
             case .monthly:
                 //FIXME: monthly fix needed
                 dayDifference = months
@@ -452,6 +453,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             
             
             switch habit.onGoing {
+                
+                //오늘의 하빗을 컴플리트 했으니(onGoing == false) 오늘 날짜의 rate이 뜬다.
             case false :
                 for x in 0...dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
@@ -467,14 +470,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                     let lastRate = habitRates[dayDifference].rate
                     currentSuccessRate.text = "\(String(format: "%.1f", Double(lastRate)))%"
                 }
-            
+                
+                //아직 오늘의 하빗을 컴플리트 하지 않았으니 (onGoing == true) 오늘 날짜의 rate은 뜨지 않는다.
             default :
                 for x in 0..<dayDifference{
                     entries.append(ChartDataEntry(x: Double(x), y: habitRates[x].rate))
                     xAxis.append(dateFormatter.string(from: habitRates[x].createdDate))
                 }
                 let last = entries.last
-
+                
                 //Updating last rate as % in currentSuccessRate.
                 if last == nil {
                     currentSuccessRate.text = "0.0%"
@@ -511,12 +515,12 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 habitLineChart.xAxis.axisMaximum = Double(xAxis.count + 1)
                 habitLineChart.xAxis.axisMinimum = 0
             }
-          
+            
         }
         
         
     }
-
+    
     
     
     override func viewDidAppear(_ animated: Bool) {
@@ -565,9 +569,10 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return}
         let updateHabit = realm[indexNumb]
         
-            try! self.localRealm.write {
-                updateHabit.onGoing = false
-            }
+        try! self.localRealm.write {
+            updateHabit.onGoing = false
+            updateHabit.todaysResult = 2
+        }
         
         
         print(self.localRealm.objects(RMO_Habit.self))
@@ -588,7 +593,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
-
+        
         
         
         //MARK: Success함에 따라 오늘 success한 count를 count_realm에 +. TodayProgressBar에 적용.
@@ -599,18 +604,18 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         print("TASK TO UPDATE +==========================\(taskToUpdate)")
         try! self.localRealm.write {
             taskToUpdate.success += 1
-    
+            
         }
- 
-      
-  
+        
+        
+        
         // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
         
         print("updateHabit +==========================\(updateHabit)")
-
+        
         guard let indexNumb = rateRealm.firstIndex(where: { $0.habitID == self.habit.id && $0.createdDate == self.habit.date}) else
         {return}
         let updateRate = rateRealm[indexNumb]
@@ -618,21 +623,22 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         print("updateRate ===========================================\(updateRate)")
         
         
-            let success = Double(updateHabit.success) + Double(1)
-            let total = Double(updateHabit.total)
-            let successRate = Double(success/total)*100
-           
-            
-            
-            try! self.localRealm.write {
-                updateHabit.onGoing = false
-                updateHabit.success += 1
-                updateRate.rate = successRate
-            }
+        let success = Double(updateHabit.success) + Double(1)
+        let total = Double(updateHabit.total)
+        let successRate = Double(success/total)*100
+        
+        
+        
+        try! self.localRealm.write {
+            updateHabit.onGoing = false
+            updateHabit.success += 1
+            updateHabit.todaysResult = 1
+            updateRate.rate = successRate
+        }
         
         print(self.localRealm.objects(RMO_Habit.self))
         print(self.localRealm.objects(RMO_Rate.self))
-            
+        
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
     }
@@ -652,6 +658,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             
             
             let countRealm = self.localRealm.objects(RMO_Count.self)
+            let habitRealm = self.localRealm.objects(RMO_Habit.self)
+            
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy/MM/dd"
             let today = Date()
@@ -660,13 +668,28 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             {return} //
             let taskToUpdate = countRealm[indexNumb]
             
+            guard let habitIndex = habitRealm.firstIndex(where: { $0.id == self.habit.id}) else
+            {return} //
+            let habitToUpdate = habitRealm[habitIndex]
+            
             //updating Final Total and Final Percent recorded in the habit about to be deleted
             let updatedTotal = taskToUpdate.total - 1
-            let updatedFinalPercent = Float(taskToUpdate.success)/Float(updatedTotal)
+            var updatedSuccess: Int
+            
+            //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다. 
+            switch habitToUpdate.todaysResult {
+            case 1 :
+                updatedSuccess = taskToUpdate.success - 1
+            default:
+                updatedSuccess = taskToUpdate.success
+            }
+            
+            let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
             
             //Removing total from CountRealm
             try! self.localRealm.write {
                 taskToUpdate.total = updatedTotal
+                taskToUpdate.success = updatedSuccess
                 taskToUpdate.finalPercent = updatedFinalPercent
             }
             
@@ -677,7 +700,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
                 
                 //MARK: to remove notification when habit is deleted.
                 NotificationManger.SI.removeNoti(id: thisId)
-
+                
                 try! self.localRealm.write {
                     let deleteHabit = realm.where {
                         $0.id == thisId
@@ -709,7 +732,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let taskToUpdate = realm[indexNumb]
-            
+        
         
         //MARK: updating Habit
         try! self.localRealm.write {
@@ -724,7 +747,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             taskToUpdate.desc = descText
         }
         
-
+        
         // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
         NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
         delegate?.editComp()

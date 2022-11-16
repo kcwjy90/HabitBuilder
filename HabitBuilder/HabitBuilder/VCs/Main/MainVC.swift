@@ -218,6 +218,7 @@ class MainVC: UIViewController {
             
             try! self.localRealm.write {
                 realm.setValue(true, forKey: "onGoing")
+                realm.setValue(0, forKey: "todaysResult")
             }
             
             initHabits()
@@ -500,7 +501,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy/MM/dd"
                     let countDate = dateFormatter.string(from: omd)
-                
+                    
                     if !countRealm.contains(where: { $0.date == countDate} )
                     {
                         let habitCount = RMO_Count()
@@ -523,6 +524,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 counts += 1
+                print("여기서 카운트 하나 올랐음 \(counts)")
                 print(self.localRealm.objects(RMO_Habit.self))
                 print(self.localRealm.objects(RMO_Rate.self))
                 
@@ -548,88 +550,92 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let dayDifference = Int(round(secondDifference/(60*60*24)))
             print("WEEKLY today ==========================\(today)")
             print("WEEKLY current habitDay ==========================\(currentHabitDate)")
-            let multiplesOfSeven = dayDifference/7
             
-            //%7 즉 일주일 간격이면
-            if dayDifference%7 == 0 {
+            var multiplesOfSeven = Int(floor(Double((dayDifference + 7)/7)))
+            if (Int((dayDifference + 7)/7)) % 7 == 0 {
+                multiplesOfSeven -= 1
+                print("1주일 차이 - multiples 는 = \(multiplesOfSeven)")
+            } else {
+                print("multiples stay the same \(multiplesOfSeven)")
+            }
+            print(multiplesOfSeven)
+            
+            //dayDifference가 >0 일경우
+            if dayDifference > 0 {
                 
-                switch dayDifference {
-                case 0:
+                //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
+                for day in 1...multiplesOfSeven{
                     
-                    //오늘 처음 weekly habit이 시작 되거나 dayDifference가 0 인경우. 이렇게 해야 line 594의 for문에서 upperbound 문제를 해결할수 있다. RMO_Rate은 따로 필요없다. 왜냐하면 NewVC에서 만들어 질때 이미 만들어짐
-                    print("No need to do anything")
+                    print("WEEKLY - multiplesofSeven \(multiplesOfSeven)")
+                    let success = Double(weeklyHabit.success)
+                    let total = Double(weeklyHabit.total) + Double(day)
+                    let successRate = Double(success/total)*100
+                    print("WEEKLY - SuccessRate \(successRate)")
                     
-                default:
+                    let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
+                    guard let omw = oneMoreWeek else {return}
                     
-                    //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
-                    for day in 1...multiplesOfSeven{
-                        
-                        print("WEEKLY - multiplesofSeven \(multiplesOfSeven)")
-                        let success = Double(weeklyHabit.success)
-                        let total = Double(weeklyHabit.total) + Double(day)
-                        let successRate = Double(success/total)*100
-                        print("WEEKLY - SuccessRate \(successRate)")
-                        
-                        let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
-                        guard let omw = oneMoreWeek else {return}
-                        
-                        let habitRate = RMO_Rate()
-                        
-                        habitRate.habitID = weeklyHabit.id
-                        habitRate.createdDate = omw
-                        habitRate.rate = successRate
-                        
-                        try! self.localRealm.write {
-                            localRealm.add(habitRate)
-                        }
-                        
-                        print("WEEKLY MainVC ====================================================")
-                        print(self.localRealm.objects(RMO_Habit.self))
-                        print(self.localRealm.objects(RMO_Rate.self))
-                        print("WEEKLY MainVC ====================================================")
-                        
-                        //Adding FinalPercent (0%) for all the missing days if they don't already exist.
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy/MM/dd"
-                        let countDate = dateFormatter.string(from: omw)
+                    let habitRate = RMO_Rate()
                     
-                        if !countRealm.contains(where: { $0.date == countDate} )
-                        {
-                            let habitCount = RMO_Count()
-                            habitCount.date = countDate
-                            habitCount.finalPercent = Float(0)
-                            
-                            try! localRealm.write {
-                                localRealm.add(habitCount)
-                            }
-                        }
-                        
+                    habitRate.habitID = weeklyHabit.id
+                    habitRate.createdDate = omw
+                    habitRate.rate = successRate
+                    
+                    try! self.localRealm.write {
+                        localRealm.add(habitRate)
                     }
                     
-                    //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
-                    var dateComponent = DateComponents()
-                    dateComponent.day = dayDifference
+                    print("WEEKLY MainVC ====================================================")
+                    print(self.localRealm.objects(RMO_Habit.self))
+                    print(self.localRealm.objects(RMO_Rate.self))
+                    print("WEEKLY MainVC ====================================================")
                     
-                    if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
-                        try! self.localRealm.write {
-                            weeklyHabit.total += multiplesOfSeven
-                            weeklyHabit.date = newHabitDate
-                        }
-                        print("WEEKLY - newHabitDate ==========================\(newHabitDate)")
-                        print("WEEKLY - weeklyHabit.total ==========================\(weeklyHabit.total)")
+                    //Adding FinalPercent (0%) for all the missing days if they don't already exist.
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy/MM/dd"
+                    let countDate = dateFormatter.string(from: omw)
+                    
+                    if !countRealm.contains(where: { $0.date == countDate} )
+                    {
+                        let habitCount = RMO_Count()
+                        habitCount.date = countDate
+                        habitCount.finalPercent = Float(0)
                         
-                        //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
-                        counts += 1
-                        print("WEEKLY - counts ==========================\(counts)")
-                    } else {
-                        print("Weekly if let NewHabitDate은 fail한 경우")
+                        try! localRealm.write {
+                            localRealm.add(habitCount)
+                        }
                     }
                     
                 }
                 
+                //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
+                var dateComponent = DateComponents()
+                dateComponent.day = multiplesOfSeven*7
+                
+                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: weeklyHabit.date) {
+                    try! self.localRealm.write {
+                        weeklyHabit.total += multiplesOfSeven
+                        weeklyHabit.date = newHabitDate
+                    }
+                    print("WEEKLY - newHabitDate ==========================\(newHabitDate)")
+                    print("WEEKLY - weeklyHabit.total ==========================\(weeklyHabit.total)")
+                    
+                } else {
+                    print("Weekly if let NewHabitDate은 fail한 경우")
+                }
+                
+                //!=weeklyhabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문
+            } else if dayDifference%7 == 0 && weeklyHabit.startDate != weeklyHabit.date {
+                
+                //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
+                counts += 1
+                print("여기서 카운트 하나 올랐음 \(counts)")
+
+                
             } else {
-                print("WEEKLY not divisible by 7. False++++++++++++++++++++++++++++")
+                print("NO NEED TO TAKE ANY ACTION")
             }
+            
         }
         
         
@@ -684,7 +690,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy/MM/dd"
                     let countDate = dateFormatter.string(from: omm)
-                
+                    
                     if !countRealm.contains(where: { $0.date == countDate} )
                     {
                         let habitCount = RMO_Count()
@@ -715,9 +721,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     
                     //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도 없이 모든 habit은 0%
                     counts += 1
-                    print("ONLY 오늘거만 counts ==========================\(counts)")
+                    print("여기서 카운트 하나 올랐음 \(counts)")
                     print(monthlyHabit)
-
+                    
                 } else {
                     print("MONTHLY if let NewHabitDate은 fail한 경우")
                 }
@@ -757,7 +763,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 counts += 1
-                print("yearly repeat 484-----------------------------------------------------------")
+                print("여기서 카운트 하나 올랐음 \(counts)")
                 print(counts)
                 
             } else {
@@ -770,8 +776,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
         }
         
-        print("final counts-----------------------------------------------------------")
-        print(counts)
+        print("final counts line 778---------------------------------------------------------\(counts)")
         
         if !countRealm.contains(where: { $0.date == todayDate} )
         {
