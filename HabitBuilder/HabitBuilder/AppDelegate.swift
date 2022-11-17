@@ -13,6 +13,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
 
      var window: UIWindow?
 
+    // Declaring TabBar
+    let tabBarController = UITabBarController()
+    
      func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
          // Override point for customization after application launch.
          
@@ -20,8 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
                   
          self.window = UIWindow(frame: UIScreen.main.bounds)
 
-         // Declaring TabBar
-         let tabBarController = UITabBarController()
         
          tabBarController.tabBar.isTranslucent = false // both lines needed
          tabBarController.tabBar.backgroundColor = .white // to change tabbar color
@@ -76,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerDelegat
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         UIApplication.shared.applicationIconBadgeNumber = 0
+        tabBarController.selectedIndex = 0
     }
 
 
