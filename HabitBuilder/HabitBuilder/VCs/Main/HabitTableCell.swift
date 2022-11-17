@@ -154,6 +154,7 @@ class HabitTableCell: UITableViewCell {
         newHabitTitle.snp.makeConstraints{ (make) in
             make.top.equalTo(titleStackView).offset(8)
             make.left.equalTo(titleBackground.snp.right).offset(7)
+            make.right.equalTo(middleLine)
         }
         
         newHabitDesc.snp.makeConstraints{ (make) in

@@ -7,7 +7,7 @@ target 'HabitBuilder' do
 
   # Pods for HabitBuilder
    pod 'SnapKit', '~> 5.6.0'
-   pod 'RealmSwift', '~>10'
+   pod 'RealmSwift', '~> 10.32.3'
    pod 'Charts'
    
 end

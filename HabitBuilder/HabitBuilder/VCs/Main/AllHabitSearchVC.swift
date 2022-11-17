@@ -261,14 +261,14 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: 만약 habit날짜가 오늘일 경우
         if dayDifference == 0 {
             
-            //MARK: 오늘 habit은 Today란 파란문구가 뜬다. complete 했으면 Completed가 뜬다.
+            //MARK: 오늘 habit은 Today란 파란문구가 뜬다. complete 했으면 Complete가 뜬다.
             switch newHabit.onGoing {
             case true :
                 cell.newHabitDate.textColor = UIColor.todayBlue;
                 newHabitDate = "Today"
             default :
                 cell.newHabitDate.textColor = UIColor.compBlue;
-                newHabitDate = "Completed"
+                newHabitDate = "Complete"
             }
             
         } else {

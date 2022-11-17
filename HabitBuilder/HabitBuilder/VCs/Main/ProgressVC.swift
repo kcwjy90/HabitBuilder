@@ -76,8 +76,8 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     
     lazy var currentSuccessRate: UILabel = {
         let v = UILabel()
-        v.text = "50%"
-        v.font = UIFont.systemFont(ofSize: 40.0)
+        v.text = "No Data"
+        v.font = UIFont.systemFont(ofSize: 30.0)
         v.textColor = .black
         return v
     }()
@@ -199,8 +199,12 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
+        let dateDisplay = DateFormatter()
+        dateDisplay.dateFormat = "MMM d, yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
+        let todayDisplay = dateDisplay.string(from: today)
+
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
         //MARK: todayLineChart 에 들어가는 count들을 넣어주는 코드
@@ -218,30 +222,47 @@ class ProgressVC: UIViewController, ChartViewDelegate {
 
         print("progressVC line 101=========================================\(habits)")
  
-        let dayDifference = habits.count - 1
-        print(dayDifference)
+        //Make today the last day to show the graph
+        guard let indexNumb = habits.firstIndex(where: { $0.date == todayDate}) else
+        {return}
+
+        //Displaying Current SuccessRate, [Most Frequent %, Number of 100% reached] - will be added later
+        if habits[indexNumb].total == 0 {
+            currentSuccessRate.text = "No Data"
+        } else {
+            currentSuccessRate.text = "\(String(format: "%.1f", habits[indexNumb].finalPercent*100))%"
+        }
+  
+
+
         
         // 1. Set ChartDataEntry
         var entries = [ChartDataEntry]()
         var xAxis: [String] = []
-  
         
-        for x in 0...dayDifference{
-            entries.append(ChartDataEntry(x: Double(x), y: Double((habits[x].finalPercent)*100)))
-            xAxis.append(habits[x].date)
-        }
-        
-        //Displaying Current SuccessRate, Most Frequent %, Number of 100% reached
-        print(entries)
-        guard let currentRate = entries.last else {return}
-        
-        
-        if currentRate == nil {
-            currentSuccessRate.text = "0.0%"
+        if indexNumb == 0 {
+            entries.append(ChartDataEntry(x: Double(indexNumb), y: Double((habits[indexNumb].finalPercent)*100)))
+            xAxis.append(habits[indexNumb].date)
         } else {
-            currentSuccessRate.text = "\(String(currentRate.y))%"
+            for x in 0...indexNumb{
+                entries.append(ChartDataEntry(x: Double(x), y: Double((habits[x].finalPercent)*100)))
+                xAxis.append(habits[x].date)
+            }
         }
         
+        
+        
+        //How I used to calculate current Rate
+//        print(entries)
+//        guard let currentRate = entries.last else {return}
+//        
+//        
+//        if currentRate == nil {
+//            currentSuccessRate.text = "0.0%"
+//        } else {
+//            currentSuccessRate.text = "\(String(currentRate.y))%"
+//        }
+//        
         //Most Frequent
 //        let countHundred = [entries].filter { $0 == 100.0 }.count
 //        if countHundred == 1 {

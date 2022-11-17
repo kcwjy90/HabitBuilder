@@ -162,23 +162,23 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // newHabitDateTimeBackview size grid
         newHabitDateTimeBackview.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
+            make.left.equalTo(newHabitTitle)
+            make.right.equalTo(newHabitTitle)
             make.height.equalTo(60)
         }
         
         // newHabitDateTimeLabel size grid
         newHabitDateTimeLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(newHabitDesc.snp.bottom).offset(10)
-            make.left.equalTo(backView).offset(39)
-            make.height.equalTo(60)
+            make.top.equalTo(newHabitDateTimeBackview)
+            make.left.equalTo(newHabitDateTimeBackview).offset(5)
+            make.height.equalTo(newHabitDateTimeBackview)
         }
         
         // newHabitDateTime size grid
         newHabitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(newHabitDateTimeBackview)
-            make.right.equalTo(backView).offset(-30)
-            make.height.equalTo(60)
+            make.right.equalTo(newHabitDateTimeBackview).offset(-5)
+            make.height.equalTo(newHabitDateTimeBackview)
         }
         newHabitDateTime.tintColor = .compBlue
         
@@ -186,8 +186,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
             make.top.equalTo(newHabitDateTimeBackview.snp.bottom).offset(5)
-            make.left.equalTo(backView).offset(16)
-            make.right.equalTo(backView).offset(-16)
+            make.left.equalTo(newHabitTitle)
+            make.right.equalTo(newHabitTitle)
             make.height.equalTo(60)
         }
         
@@ -195,7 +195,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         // repeatLabel size grid
         repeatLabel.snp.makeConstraints { (make) in
             make.top.equalTo(repeatBackView)
-            make.left.equalTo(backView).offset(39)
+            make.left.equalTo(newHabitDateTimeLabel)
             make.height.equalTo(60)
         }
         

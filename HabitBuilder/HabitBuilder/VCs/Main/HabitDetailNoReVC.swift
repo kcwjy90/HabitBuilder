@@ -254,21 +254,21 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         // habitDateTimeLabel size grid
         habitDateTimeLabel.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView)
-            make.left.equalTo(scrollContentView).offset(39)
+            make.left.equalTo(habitDateTimeBackView).offset(5)
             make.height.equalTo(habitDateTimeBackView)
         }
         
         // habitDateTime size grid
         habitDateTime.snp.makeConstraints { (make) in
             make.centerY.equalTo(habitDateTimeBackView)
-            make.right.equalTo(scrollContentView).offset(-34)
+            make.right.equalTo(habitDateTimeBackView).offset(-5)
             make.height.equalTo(habitDateTimeBackView)
         }
         habitDateTime.tintColor = .compBlue
 
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
+            make.top.equalTo(habitDateTimeBackView.snp.bottom)
             make.left.equalTo(habitTitle)
             make.right.equalTo(habitTitle)
             make.height.equalTo(habitDateTimeBackView)
@@ -276,8 +276,8 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         
         // repeatLabel size grid
         repeatLabel.snp.makeConstraints { (make) in
-            make.top.equalTo(habitDateTimeBackView.snp.bottom).offset(10)
-            make.left.equalTo(scrollContentView).offset(39)
+            make.top.equalTo(repeatBackView)
+            make.left.equalTo(habitDateTimeLabel)
             make.height.equalTo(60)
         }
         
@@ -301,7 +301,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         
         // successButton size grid
         successButton.snp.makeConstraints { (make) in
-            make.top.equalTo(repeatTypeLabel.snp.bottom).offset(30)
+            make.top.equalTo(repeatTypeLabel.snp.bottom).offset(20)
             make.height.equalTo(50)
             make.left.equalTo(scrollContentView).offset(16)
             make.right.equalTo(scrollContentView).offset(-16)
