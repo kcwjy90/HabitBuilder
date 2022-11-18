@@ -560,6 +560,20 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             }
             print(multiplesOfSeven)
             
+            
+            //!=weeklyhabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문. 밑의 밑의 function에서 count를 올리지 않고 오직 dayDifference%7 == 0일 경우에만 올린다.
+            if dayDifference%7 == 0 && weeklyHabit.startDate != weeklyHabit.date {
+                
+                //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
+                counts += 1
+                print("여기서 카운트 하나 올랐음 \(counts)")
+                
+            } else {
+                
+                print("No need for count to go up")
+                
+            }
+            
             //dayDifference가 >0 일경우
             if dayDifference > 0 {
                 
@@ -605,7 +619,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                             localRealm.add(habitCount)
                         }
                     }
-                    
                 }
                 
                 //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
@@ -624,19 +637,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     print("Weekly if let NewHabitDate은 fail한 경우")
                 }
                 
-                //!=weeklyhabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문
-            } else if dayDifference%7 == 0 && weeklyHabit.startDate != weeklyHabit.date {
-                
-                //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
-                counts += 1
-                print("여기서 카운트 하나 올랐음 \(counts)")
-
-                
             } else {
+                
                 print("NO NEED TO TAKE ANY ACTION")
             }
             
         }
+        
+        
         
         
         //monthly repeat
@@ -645,6 +653,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             //MARK: thisDate(Habit.date으로 부터 몇 달이나 지났는지 calculate
             let currentHabitDate = monthlyHabit.date
+            
+            let secondDifference = time(current: today, habitDate: currentHabitDate)
+            let dayDifference = Int(round(secondDifference/(60*60*24)))
             
             //MARK: Cutting unnecessary "months" from string. then converting to Int
             let formatter = DateComponentsFormatter()
@@ -660,20 +671,32 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             print("MONTHLHY START- this is MONTHS not accessed=======================\(months)")
             
-            if months > 0 {
-                print("HERE")
-                //login하지 않았던 날짜 하나하나에 rate 0%처리
-                for day in 1...months{
+            //!=monthlyHabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문. 밑의 밑의 function에서 count를 올리지 않고 오직 dayDifference%7 == 0일 경우에만 올린다.
+            if dayDifference == 0 && monthlyHabit.startDate != monthlyHabit.date {
+                
+                //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
+                counts += 1
+                print("여기서 카운트 하나 올랐음 \(counts)")
+                
+            } else {
+                print("No need for count to go up")
+            }
+            
+            
+            
+            if dayDifference > 0 {
+                
+                switch months {
+                    
+                    //dayDifference는 1보다 크지만 아직 1month가 안되었을때
+                case 0 :
+                    //login하지 않았던 날짜 하나하나에 rate 0%처리
                     
                     let success = Double(monthlyHabit.success)
-                    let total = Double(monthlyHabit.total) + Double(day)
+                    let total = Double(monthlyHabit.total) + Double(1)
                     let successRate = Double(success/total)*100
                     
-                    print("MONTHLY - success\(success)")
-                    print("MONTHLY - total\(total)")
-                    print("MONTHLY - total\(successRate)")
-                    
-                    let oneMoreMonth = Calendar.current.date(byAdding: .month,  value: day, to: currentHabitDate)
+                    let oneMoreMonth = Calendar.current.date(byAdding: .month,  value: 1, to: currentHabitDate)
                     guard let omm = oneMoreMonth else {return}
                     
                     let habitRate = RMO_Rate()
@@ -706,35 +729,89 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     print(self.localRealm.objects(RMO_Habit.self))
                     print(self.localRealm.objects(RMO_Rate.self))
                     
-                }
-                
-                //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
-                var dateComponent = DateComponents()
-                dateComponent.month = months
-                if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: currentHabitDate) {
-                    try! self.localRealm.write {
-                        monthlyHabit.total += months
-                        monthlyHabit.date = newHabitDate
+                    
+                    
+                    //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
+                    var dateComponent = DateComponents()
+                    dateComponent.month = 1
+                    if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: currentHabitDate) {
+                        try! self.localRealm.write {
+                            monthlyHabit.total += 1
+                            monthlyHabit.date = newHabitDate
+                        }
+                        print("MONTHLY most uptodate date ==========================\(newHabitDate)")
+                        print("MONTHLY.total ==========================\(monthlyHabit.total)")
+                        print(monthlyHabit)
+                        
+                    } else {
+                        
+                        print("MONTHLY if let NewHabitDate은 fail한 경우")
                     }
-                    print("MONTHLY most uptodate date ==========================\(newHabitDate)")
-                    print("MONTHLY.total ==========================\(monthlyHabit.total)")
                     
-                    //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도 없이 모든 habit은 0%
-                    counts += 1
-                    print("여기서 카운트 하나 올랐음 \(counts)")
-                    print(monthlyHabit)
+                default :
                     
-                } else {
-                    print("MONTHLY if let NewHabitDate은 fail한 경우")
+                    //month가 1 이하일때. login하지 않았던 날짜 하나하나에 rate 0%처리
+                    for day in 1...months{
+                        
+                        let success = Double(monthlyHabit.success)
+                        let total = Double(monthlyHabit.total) + Double(day)
+                        let successRate = Double(success/total)*100
+                        
+                        let oneMoreMonth = Calendar.current.date(byAdding: .month,  value: day, to: currentHabitDate)
+                        guard let omm = oneMoreMonth else {return}
+                        
+                        let habitRate = RMO_Rate()
+                        
+                        habitRate.habitID = monthlyHabit.id
+                        habitRate.createdDate = omm
+                        habitRate.rate = successRate
+                        
+                        try! self.localRealm.write {
+                            localRealm.add(habitRate)
+                        }
+                        
+                        //Adding FinalPercent (0%) for all the missing days if they don't already exist.
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy/MM/dd"
+                        let countDate = dateFormatter.string(from: omm)
+                        
+                        if !countRealm.contains(where: { $0.date == countDate} )
+                        {
+                            let habitCount = RMO_Count()
+                            habitCount.date = countDate
+                            habitCount.finalPercent = Float(0)
+                            
+                            try! localRealm.write {
+                                localRealm.add(habitCount)
+                            }
+                        }
+                        
+                        print("MONTHLY HabitRate-----\(habitRate)")
+                        print(self.localRealm.objects(RMO_Habit.self))
+                        print(self.localRealm.objects(RMO_Rate.self))
+                        
+                        
+                    }
+                    
+                    //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
+                    var dateComponent = DateComponents()
+                    dateComponent.month = months
+                    if let newHabitDate = Calendar.current.date(byAdding: dateComponent, to: currentHabitDate) {
+                        try! self.localRealm.write {
+                            monthlyHabit.total += months
+                            monthlyHabit.date = newHabitDate
+                        }
+                        print("MONTHLY most uptodate date ==========================\(newHabitDate)")
+                        print("MONTHLY.total ==========================\(monthlyHabit.total)")
+                        print(monthlyHabit)
+                        
+                    } else {
+                        print("MONTHLY if let NewHabitDate은 fail한 경우")
+                    }
                 }
-                
-            } else {
-                //RMO_Rate은 따로 필요없다. 왜냐하면 NewVC에서 만들어 질때 이미 만들어짐
-                print("No need to do anything. Monthly habit will be printed if exists, otherwise nothing happens")
             }
+            
         }
-        
-        
         
         //yearly repeat
         let yearlyHabits = self.localRealm.objects(RMO_Habit.self).filter("privateRepeatType == 4")
