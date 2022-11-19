@@ -402,17 +402,41 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let secondDifference = time(current: currentHabitDate, start: startHabitDate)
         var dayDifference = Int(round(secondDifference/(60*60*24)))
         
-        //MARK: Cutting unnecessary "months" from string. then converting to Int
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .full
-        formatter.allowedUnits = [.year, .month]
-        formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
         
-        let monthDiff = formatter.string(from: startHabitDate, to: currentHabitDate)
-        guard let stringMD = monthDiff else { return }
-        let intMonthDiff = Int(stringMD.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
-        guard let months = intMonthDiff else {return}
+        //MARK: For calculating difference in month. StartDate과 CurrentHabit을 비교
+        let calendar = Calendar.current
+        // Replace the hour (time) of both dates with 00:00
+        let currentDate = calendar.startOfDay(for: currentHabitDate)
+        let startDate = calendar.startOfDay(for: startHabitDate)
+
+        let monthDiff = calendar.dateComponents([.month], from: startDate, to: currentDate)
+        guard let months = monthDiff.month else {return}
         print(months)
+        
+        
+        let todayDate = calendar.startOfDay(for: Date())
+        let dayDiff = calendar.dateComponents([.day], from: todayDate, to: currentDate)
+        guard let days = dayDiff.day else {return}
+        print(days)
+    
+        var numbMonths: Int
+
+        
+        if months == 0 {
+            //MARK: answer for Step1 = if StartHabitDate == currentHabitDate, then count is numbMonths = 0
+            numbMonths = 0
+
+        } else {
+            //MARK: answer for Step2 = if currentHabitDate > today, then calculate the diff btwn today and currentHabitDate
+            if 0 == 0 {
+   
+            } else {
+         
+            }
+            
+        }
+        
+        
         
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
@@ -806,7 +830,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     }
     
 }
-
 
 
 

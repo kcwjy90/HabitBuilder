@@ -657,16 +657,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let secondDifference = time(current: today, habitDate: currentHabitDate)
             let dayDifference = Int(round(secondDifference/(60*60*24)))
             
-            //MARK: Cutting unnecessary "months" from string. then converting to Int
-            let formatter = DateComponentsFormatter()
-            formatter.unitsStyle = .full
-            formatter.allowedUnits = [.year, .month]
-            formatter.maximumUnitCount = 1 // often, you don't care about seconds if the elapsed time is in months, so you'll set max unit to whatever is appropriate in your case
-            
-            let monthDiff = formatter.string(from: currentHabitDate, to: today)
-            guard let stringMD = monthDiff else { return }
-            let intMonthDiff = Int(stringMD.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
-            guard let months = intMonthDiff else {return}
+            //MARK: For calculating difference in month. StartDate과 CurrentHabit을 비교
+            let calendar = Calendar.current
+            // Replace the hour (time) of both dates with 00:00
+            let currentDate = calendar.startOfDay(for: currentHabitDate)
+            let startDate = calendar.startOfDay(for: today)
+
+            let monthDiff = calendar.dateComponents([.month], from: currentDate, to: startDate)
+            guard let months = monthDiff.month else {return}
             print(months)
             
             print("MONTHLHY START- this is MONTHS not accessed=======================\(months)")
