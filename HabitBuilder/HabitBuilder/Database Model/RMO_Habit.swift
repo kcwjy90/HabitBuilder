@@ -28,6 +28,8 @@ class RMO_Habit: Object {
     @Persisted var success: Int
     @Persisted var total: Int
     @Persisted var todaysResult: Int
+    @Persisted var repeatOn: Bool
+
 
 
     @Persisted var privateRepeatType: Int = 0

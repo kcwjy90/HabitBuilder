@@ -317,7 +317,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             make.centerX.equalTo(successButton)
         }
         
-        
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         
         habitTitle.text = habit.title

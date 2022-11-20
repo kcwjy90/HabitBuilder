@@ -48,7 +48,20 @@ class NotificationManger: NSObject {
         
         guard let repeatType = habit.repeatType else { return }
         
-        execTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
+        let today = Date()
+        let habitStartDate = habit.startDate
+        
+        let calendar = Calendar.current
+        // Replace the hour (time) of both dates with 00:00
+        let habitStartD = calendar.startOfDay(for: habitStartDate)
+        let todayDate = calendar.startOfDay(for: today)
+        
+        //After the initial unrepeated notification, all the repeated habits get new repeatd notification
+        if todayDate >= habitStartD {
+            repeatTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
+        } else {
+            execTrigger(repeatType: repeatType, habit: habit, nc: notificationContent)
+        }
 
     }
     
@@ -59,6 +72,70 @@ class NotificationManger: NSObject {
     
     
     func execTrigger(repeatType: RepeatType, habit: RMO_Habit, nc: UNMutableNotificationContent) {
+        
+        let cal = Calendar.current
+        
+        let calM = cal.component(.month, from: habit.date)
+        let calW = cal.component(.weekOfMonth, from: habit.date)
+        let calWd = cal.component(.weekday, from: habit.date)
+        let calD = cal.component(.day, from: habit.date)
+        let calH = cal.component(.hour, from: habit.date)
+        let calMi = cal.component(.minute, from: habit.date)
+        
+        var repeats: Bool = false
+        
+        let noRepeat = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: habit.date)
+        var yesRepeat = DateComponents()
+        
+        var dateComponent = DateComponents()
+        
+        switch repeatType {
+        case .none:
+            repeats = false
+            dateComponent = noRepeat
+        case .daily:
+            repeats = false
+            yesRepeat.month = calM
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat            
+        case .weekly:
+            repeats = false
+            yesRepeat.month = calM
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        case .monthly:
+            repeats = false
+            yesRepeat.month = calM
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        case .yearly:
+            repeats = false
+            yesRepeat.day = calD
+            yesRepeat.hour = calH
+            yesRepeat.minute = calMi
+            dateComponent = yesRepeat
+        }
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponent, repeats: repeats)
+        let request = UNNotificationRequest(identifier: habit.id, content: nc, trigger: trigger)
+        
+        UNUserNotificationCenter.current().delegate = self
+        self.userNotificationCenter.add(request) { (error) in
+            if (error != nil)
+            {
+                print("Error" + error.debugDescription)
+                return
+            }
+        }
+    }
+    
+    func repeatTrigger(repeatType: RepeatType, habit: RMO_Habit, nc: UNMutableNotificationContent) {
         
         let cal = Calendar.current
         
@@ -119,7 +196,6 @@ class NotificationManger: NSObject {
             }
         }
     }
-    
     
     // HabitBuilder 실행 중에도 notification 받을수 있게 하는 code
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

@@ -241,6 +241,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         habit.date = newHabitDateTime.date
         habit.startDate = newHabitDateTime.date
         habit.repeatType = self.repTyp
+        habit.repeatOn = false
         habit.total += 1
         
         let dateFormatter = DateFormatter()
