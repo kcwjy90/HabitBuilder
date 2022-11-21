@@ -227,8 +227,8 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         {return}
 
         //Displaying Current SuccessRate, [Most Frequent %, Number of 100% reached] - will be added later
-        if habits[indexNumb].total == 0 {
-            currentSuccessRate.text = "No Data"
+        if habits[indexNumb].finalPercent == -123 {
+            currentSuccessRate.text = "No Habit"
         } else {
             currentSuccessRate.text = "\(String(format: "%.1f", habits[indexNumb].finalPercent*100))%"
         }
@@ -277,7 +277,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         // 2. Set ChartDataSet
         let set = LineChartDataSet(entries: entries, label: "% Succeeded")
         // Makes the line smooth, changes radius of circle = 3 + line thickness = 2
-        set.mode = .cubicBezier
+//        set.mode = .cubicBezier
         set.circleRadius = 3
         set.lineWidth = 2
         //            set.drawCirclesEnabled = false //Removes points on the graph

@@ -245,16 +245,20 @@ class MainVC: UIViewController {
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
         let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-        //        counts[0] = todayCount.success
-        //        counts[1] = todayCount.fail
-        //        counts[2] = todayCount.total
-        //
-        //        finalPercent = Float(counts[0])/Float(counts[2])
-        
+               
+        finalPercent = Float(todayCount.success)/Float(todayCount.total)
+        print(finalPercent)
         guard let progress = finalPercent else {return}
         
         try! self.localRealm.write {
-            todayCount.finalPercent = progress
+            //MARK: Blank CountRealm object gets created when app is ran on a day when there's no habit. Therefore progress is nan. If total for countRealm object == 0 and 0/progress != 0 b/c it's nan, finalPercent is given value of -123, so in the ProgressVC, that gets translated as "No Habit"
+            if todayCount.total == 0 && 0/progress != 0 {
+                todayCount.finalPercent = -123
+                print(todayCount.finalPercent)
+            } else {
+                todayCount.finalPercent = progress
+
+            }
         }
         print("todaycount in 257===================\(todayCount)")
         print("Final Percent is==========================\(progress)")
@@ -599,7 +603,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
            //MARK: 미래에 있을 weeklyhabit의 date을 적용해야 하기 때문에 dayDifference에서 7을 더한 숫자에서 7을 나눈 숫자의 floor을 찾는다. 만약 dayDifference + 7 나누기 7에서 딱 떨어지면 -1 을 뺸다. 
             var multiplesOfSeven = Int(floor(Double((dayDifference + 7)/7)))
-            if (Int((dayDifference + 7)/7)) % 7 == 0 {
+            print(dayDifference)
+            print(Int(dayDifference + 7) % 7)
+            if (Int(dayDifference + 7) % 7) == 0 {
                 multiplesOfSeven -= 1
                 print("1주일 차이 - multiples 는 = \(multiplesOfSeven)")
             } else {
