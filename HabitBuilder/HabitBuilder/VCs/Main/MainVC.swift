@@ -218,8 +218,8 @@ class MainVC: UIViewController {
             let realm = self.localRealm.objects(RMO_Habit.self).filter("onGoing == False")
             
             try! self.localRealm.write {
-                realm.setValue(true, forKey: "onGoing")
                 realm.setValue(0, forKey: "todaysResult")
+                realm.setValue(true, forKey: "onGoing")
             }
             
             initHabits()
