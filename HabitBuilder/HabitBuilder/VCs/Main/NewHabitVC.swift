@@ -20,7 +20,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         v.backgroundColor = .white
         return v
     }()
-  
+    
     // newHabitTitle TextField 생성
     lazy var newHabitTitle: UITextField = {
         let v = UITextField()
@@ -142,7 +142,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         newHabitTitle.setRightPaddingPoints(10)
         newHabitTitle.layer.borderWidth = 1.5
         newHabitTitle.layer.borderColor = UIColor.pastGray.cgColor
-
+        
         
         // newHabitDesc UITextVIew size grid
         newHabitDesc.snp.makeConstraints { (make) in
@@ -207,7 +207,6 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             make.right.equalTo(newHabitDateTime)
         }
         repeatButton.layer.borderWidth = 1.5
-        //FIXME: needs to change gray color to match Date and TIme
         repeatButton.layer.borderColor = UIColor.dateGray.cgColor
         repeatButton.layer.backgroundColor = UIColor.dateGray.cgColor
         
@@ -261,8 +260,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             
             try! localRealm.write {
                 localRealm.add(newCount)
-//                print("생성")
-//                print(newCount)
+                //                print("생성")
+                //                print(newCount)
             }
         }
         
@@ -273,8 +272,8 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         try! localRealm.write {
             existCount.total += 1
-//            print("+1")
-//            print(existCount)
+            //            print("+1")
+            //            print(existCount)
         }
         
         
@@ -286,7 +285,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         
         //Creating default RMO_Rate with 0% completion, so if the user doesn't do anything for the first day, it automatically saves 0%
         let rate = RMO_Rate()
-
+        
         rate.createdDate = habit.date
         rate.habitID = habit.id
         rate.privateRepeatType = habit.privateRepeatType
@@ -294,7 +293,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         let success = Double(0)
         let total = Double(1)
         let successRate = Double(success/total)*100
-       
+        
         rate.rate = successRate
         
         
@@ -307,7 +306,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
         print(self.localRealm.objects(RMO_Habit.self))
         print(self.localRealm.objects(RMO_Rate.self))
         print("=========printing RMO_Habit in NewHabitVC line 271===============")
-
+        
         //MARK: adding notification to Scheduler
         NotificationManger.SI.addScheduleNoti(habit: habit)
         dismiss(animated: true, completion: nil)
@@ -355,14 +354,14 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             guard let repeatType = RepeatType(rawValue: 0) else { return }
             self.repTyp = repeatType
         }))
-
+        
         self.present(alert, animated: true)
         
         
-//        let v = RepeatVC()
-//            v.delegate = self
-//            v.modalPresentationStyle = .pageSheet
-//            present(v, animated:true)   // modal view 가능케 하는 코드
+        //        let v = RepeatVC()
+        //            v.delegate = self
+        //            v.modalPresentationStyle = .pageSheet
+        //            present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     
@@ -396,7 +395,7 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
             action: #selector(backButtonPressed)
         )
         self.navigationItem.leftBarButtonItem?.tintColor = .black
-
+        
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Save",

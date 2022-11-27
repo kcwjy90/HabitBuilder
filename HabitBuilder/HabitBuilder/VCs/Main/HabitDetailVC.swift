@@ -407,7 +407,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         // Replace the hour (time) of both dates with 00:00
         let currentDate = calendar.startOfDay(for: currentHabitDate)
         let startDate = calendar.startOfDay(for: startHabitDate)
-
+        
         let monthDiff = calendar.dateComponents([.month], from: startDate, to: currentDate)
         guard let months = monthDiff.month else {return}
         print(months)
@@ -417,20 +417,20 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         let dayDiff = calendar.dateComponents([.day], from: todayDate, to: currentDate)
         guard let days = dayDiff.day else {return}
         print(days)
-    
+        
         var numbMonths: Int
-
+        
         
         if months == 0 {
             //MARK: answer for Step1 = if StartHabitDate == currentHabitDate, then count is numbMonths = 0
             numbMonths = 0
-
+            
         } else {
             //MARK: answer for Step2 = if currentHabitDate > today, then calculate the diff btwn today and currentHabitDate
             if 0 == 0 {
-   
+                
             } else {
-         
+                
             }
             
         }
@@ -468,7 +468,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             case .weekly:
                 dayDifference = Int(floor(Double(dayDifference/7)))
             case .monthly:
-                //FIXME: monthly fix needed
                 dayDifference = months
             case .yearly:
                 print("yearly")

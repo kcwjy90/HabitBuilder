@@ -28,7 +28,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
     // RMO_Habit에서 온 data를 넣을 empty한 array들
     var habits: [RMO_Count] = []
     var rates: Results<RMO_Count>? = nil
-
+    
     var success: Float?
     
     // numberOfHundred 생성
@@ -39,7 +39,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         v.textColor = .black
         return v
     }()
-
+    
     lazy var numberOfHundred: UILabel = {
         let v = UILabel()
         v.text = "No Data"
@@ -56,7 +56,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         v.textColor = .black
         return v
     }()
-
+    
     lazy var mostFrequentPercent: UILabel = {
         let v = UILabel()
         v.text = "No Data"
@@ -109,7 +109,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         backView.addSubview(numberOfHundred)
         backView.addSubview(currentSuccessRateLabel)
         backView.addSubview(currentSuccessRate)
-
+        
         
         view.backgroundColor = .white
         
@@ -134,21 +134,21 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.left.equalTo(backView).offset(10)
             make.height.equalTo(40)
         }
-
+        
         // mostFrequentPercent size grid
         mostFrequentPercent.snp.makeConstraints { (make) in
             make.top.equalTo(mostFrequentPercentLabel)
             make.left.equalTo(mostFrequentPercentLabel.snp.right).offset(10)
             make.height.equalTo(40)
         }
-
+        
         // numberOfHundredLabel size grid
         numberOfHundredLabel.snp.makeConstraints { (make) in
             make.top.equalTo(mostFrequentPercentLabel.snp.bottom).offset(10)
             make.left.equalTo(mostFrequentPercentLabel)
             make.height.equalTo(40)
         }
-
+        
         // numberOfHundred size grid
         numberOfHundred.snp.makeConstraints { (make) in
             make.top.equalTo(numberOfHundredLabel)
@@ -176,7 +176,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             make.left.equalTo(backView).offset(10)
             make.right.equalTo(backView).offset(-15)
             make.bottom.equalTo(backView).offset(-20)
-
+            
         }
         totalLineChart.center = backView.center
         totalLineChart.isUserInteractionEnabled = false
@@ -204,7 +204,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
         let todayDisplay = dateDisplay.string(from: today)
-
+        
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
         //MARK: todayLineChart 에 들어가는 count들을 넣어주는 코드
@@ -212,27 +212,26 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         {return}
         let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count 의 successRate을 불러옴
         success = Float(todayCount.finalPercent)
-                
+        
         habits = localRealm.objects(RMO_Count.self).toArray() //updating habits []
-
-        //FIXME: somehoe do order by year. then date. so......flip the date and save it as reverse date so it's yy/mm/dd
+        
         habits = habits.sorted(by: {
             $0.date.compare($1.date) == .orderedAscending
         })
-
+        
         print("progressVC line 101=========================================\(habits)")
- 
+        
         //Make today the last day to show the graph
         guard let indexNumb = habits.firstIndex(where: { $0.date == todayDate}) else
         {return}
-
+        
         //Displaying Current SuccessRate, [Most Frequent %, Number of 100% reached] - will be added later
         if habits[indexNumb].finalPercent == -123 {
             currentSuccessRate.text = "No Habit"
         } else {
             currentSuccessRate.text = "\(String(format: "%.1f", habits[indexNumb].finalPercent*100))%"
         }
-  
+        
         //MARK: counting how many 100% there are
         let numbHundred = localRealm.objects(RMO_Count.self).filter("finalPercent == 1")
         
@@ -241,7 +240,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         } else {
             numberOfHundred.text = "\(numbHundred.count) times"
         }
-
+        
         
         //MARK: finding the most frequent %
         var finalArray: [Float] = []
@@ -249,7 +248,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         for final in 0...indexNumb{
             finalArray.append(habits[final].finalPercent)
         }
-
+        
         print(finalArray)
         
         let countedSet = NSCountedSet(array: finalArray)
@@ -258,7 +257,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         guard let mostFvalue = mostFrequent else {return}
         let value = mostFrequent as! Int * 100
         mostFrequentPercent.text = "\(String(value))%"
-
+        
         
         // 1. Set ChartDataEntry
         var entries = [ChartDataEntry]()
@@ -274,34 +273,13 @@ class ProgressVC: UIViewController, ChartViewDelegate {
             }
         }
         
-        
-        
-        //How I used to calculate current Rate
-//        print(entries)
-//        guard let currentRate = entries.last else {return}
-//        
-//        
-//        if currentRate == nil {
-//            currentSuccessRate.text = "0.0%"
-//        } else {
-//            currentSuccessRate.text = "\(String(currentRate.y))%"
-//        }
-//        
-        //Most Frequent
-//        let countHundred = [entries].filter { $0 == 100.0 }.count
-//        if countHundred == 1 {
-//            numberOfHundred.text = "\(String(countHundred)) Time"
-//        } else {
-//            numberOfHundred.text = "\(String(countHundred)) Times"
-//        }
-
         //Formatting xAxis from Numb to String
         totalLineChart.xAxis.valueFormatter = IndexAxisValueFormatter(values: xAxis)
         
         // 2. Set ChartDataSet
         let set = LineChartDataSet(entries: entries, label: "% Succeeded")
         // Makes the line smooth, changes radius of circle = 3 + line thickness = 2
-//        set.mode = .cubicBezier
+        //        set.mode = .cubicBezier
         set.circleRadius = 3
         set.lineWidth = 2
         //            set.drawCirclesEnabled = false //Removes points on the graph
@@ -323,7 +301,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         }
         
     }
- 
+    
     
     //Navi Bar 만드는 func.
     func setNaviBar() {
@@ -331,3 +309,23 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         navigationController?.navigationBar.backgroundColor = .white
     }
 }
+
+
+//How I used to calculate current Rate
+//        print(entries)
+//        guard let currentRate = entries.last else {return}
+//
+//
+//        if currentRate == nil {
+//            currentSuccessRate.text = "0.0%"
+//        } else {
+//            currentSuccessRate.text = "\(String(currentRate.y))%"
+//        }
+//
+//Most Frequent
+//        let countHundred = [entries].filter { $0 == 100.0 }.count
+//        if countHundred == 1 {
+//            numberOfHundred.text = "\(String(countHundred)) Time"
+//        } else {
+//            numberOfHundred.text = "\(String(countHundred)) Times"
+//        }

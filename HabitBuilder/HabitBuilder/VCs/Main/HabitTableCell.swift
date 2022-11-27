@@ -90,11 +90,11 @@ class HabitTableCell: UITableViewCell {
         return v
     }()
     
-   
     
-  
     
-  
+    
+    
+    
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier )
@@ -111,7 +111,7 @@ class HabitTableCell: UITableViewCell {
         cellStackView.addArrangedSubview(dateStackView)
         dateStackView.addSubview(newHabitDate)
         dateStackView.addSubview(newHabitTime)
-
+        
         
         
         backView.snp.makeConstraints{ (make) in
@@ -130,11 +130,11 @@ class HabitTableCell: UITableViewCell {
             make.right.equalTo(boxCell).offset(-10)
             make.left.equalTo(boxCell).offset(10)
         }
-//        cellStackView.layer.borderWidth = 3.0
-//        cellStackView.layer.shadowOpacity = 0.2
-//        cellStackView.layer.shadowRadius = 0.2
-//        cellStackView.layer.masksToBounds = false;
-//        cellStackView.layer.borderColor = UIColor.white.cgColor
+        //        cellStackView.layer.borderWidth = 3.0
+        //        cellStackView.layer.shadowOpacity = 0.2
+        //        cellStackView.layer.shadowRadius = 0.2
+        //        cellStackView.layer.masksToBounds = false;
+        //        cellStackView.layer.borderColor = UIColor.white.cgColor
         
         //StackView containing title and desc
         titleStackView.snp.makeConstraints{ (make) in
@@ -150,7 +150,7 @@ class HabitTableCell: UITableViewCell {
             make.width.equalTo(25)
             make.left.equalTo(titleStackView).offset(15)
         }
-
+        
         newHabitTitle.snp.makeConstraints{ (make) in
             make.top.equalTo(titleStackView).offset(8)
             make.left.equalTo(titleBackground.snp.right).offset(7)
@@ -189,7 +189,7 @@ class HabitTableCell: UITableViewCell {
             make.left.equalTo(dateStackView)
         }
         
-       
+        
     }
     
     required init?(coder: NSCoder) {

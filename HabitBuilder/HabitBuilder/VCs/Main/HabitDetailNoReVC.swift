@@ -77,8 +77,8 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         let v = UIDatePicker()
         v.datePickerMode = .dateAndTime
         //MARK: two lines of code that doesn't allow user to pick PAST date. but if this is activated, then the time changes automatically when the user opens up existing habit.
-//        let today = Date()
-//        v.minimumDate = today
+        //        let today = Date()
+        //        v.minimumDate = today
         v.layer.cornerRadius = 15
         return v
     }()
@@ -241,7 +241,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         habitDesc.addPadding()
         habitDesc.layer.borderWidth = 1.5
         habitDesc.layer.borderColor = UIColor.pastGray.cgColor
-
+        
         
         // habitDateTimeBackview size grid
         habitDateTimeBackView.snp.makeConstraints { (make) in
@@ -265,7 +265,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.height.equalTo(habitDateTimeBackView)
         }
         habitDateTime.tintColor = .compBlue
-
+        
         // repeatBackview size grid
         repeatBackView.snp.makeConstraints { (make) in
             make.top.equalTo(habitDateTimeBackView.snp.bottom)
@@ -291,7 +291,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         repeatButton.layer.borderWidth = 1.5
         repeatButton.layer.borderColor = UIColor.dateGray.cgColor
         repeatButton.layer.backgroundColor = UIColor.dateGray.cgColor
-                
+        
         // repeatTypeLabel size grid
         repeatTypeLabel.snp.makeConstraints { (make) in
             make.centerY.equalTo(repeatBackView)
@@ -326,7 +326,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             make.centerX.equalTo(successButton)
         }
         
-   
+        
         // Displaying Title, Desc, DateTime, and Repeat Type from selected Habit cell from MainVC/AllHabitsVC
         habitTitle.text = habit.title
         habitDesc.text = habit.desc
@@ -415,13 +415,13 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             guard let repeatType = RepeatType(rawValue: 0) else { return }
             self.repTyp = repeatType
         }))
-
+        
         self.present(alert, animated: true)
         
-//        let v = RepeatVC()
-//        v.delegate = self
-//        v.modalPresentationStyle = .pageSheet
-//        present(v, animated:true)   // modal view 가능케 하는 코드
+        //        let v = RepeatVC()
+        //        v.delegate = self
+        //        v.modalPresentationStyle = .pageSheet
+        //        present(v, animated:true)   // modal view 가능케 하는 코드
     }
     
     //MARK: Fail Button Pressed
@@ -441,22 +441,22 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         try! self.localRealm.write {
             taskToUpdate.fail += 1
         }
-    
+        
         
         // MARK: RMO_Habit을 지운다. Removes from both TodaysTableView + AllSearchTableView
         
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
-                    
-            let thisId = habit.id
-            try! self.localRealm.write {
-                
-                let deleteHabit = realm.where {
-                    $0.id == thisId
-                }
-                self.localRealm.delete(deleteHabit)
+        
+        let thisId = habit.id
+        try! self.localRealm.write {
+            
+            let deleteHabit = realm.where {
+                $0.id == thisId
             }
+            self.localRealm.delete(deleteHabit)
+        }
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
     }
@@ -481,26 +481,26 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         try! self.localRealm.write {
             taskToUpdate.success += 1
         }
- 
-  
+        
+        
         // MARK: RMO_Habit을 지운다. Removes from both TodaysTableView + AllSearchTableView
-
+        
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
         
         let thisId = habit.id
+        
+        try! self.localRealm.write {
             
-            try! self.localRealm.write {
-
-                updateHabit.success += 1
-
-                let deleteHabit = realm.where {
-                    $0.id == thisId
-                }
-                self.localRealm.delete(deleteHabit)
-
+            updateHabit.success += 1
+            
+            let deleteHabit = realm.where {
+                $0.id == thisId
             }
+            self.localRealm.delete(deleteHabit)
+            
+        }
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
         
@@ -566,7 +566,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         let countRealm = localRealm.objects(RMO_Count.self)
         let realm = localRealm.objects(RMO_Habit.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
-
+        
         
         //Filtering the habit where ID matches
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
@@ -613,7 +613,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
         
         guard let rateIndex = rateRealm.firstIndex(where: { $0.habitID == self.habit.id}) else {return}
         let rateToUpdate = rateRealm[rateIndex]
-
+        
         try! self.localRealm.write {
             
             if repTyp == nil {
@@ -634,7 +634,7 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
                 taskToUpdate.title = titleText
             }
             taskToUpdate.desc = descText
-
+            
             if repTyp == nil {
                 taskToUpdate.repeatType = prevRep
             } else {
@@ -644,20 +644,20 @@ class HabitDetailNoReVC: UIViewController, UISearchBarDelegate, UITextViewDelega
             //MARK: If Habit Date was updated
             if taskToUpdate.date != habitDateTime.date {
                 print("theyare different")
-
+                
                 taskToUpdate.date = habitDateTime.date
                 taskToUpdate.startDate = habitDateTime.date
                 taskToUpdate.total = 1
                 taskToUpdate.success = 0
-                                
+                
             } else {
                 print("no changes")
                 return
             }
-   
+            
         }
         
-
+        
         // MARK: Update된 Habit을 noti scheduler에. 자동적으로 이 전에 저장된건 지워짐.
         NotificationManger.SI.addScheduleNoti(habit: taskToUpdate)
         self.delegate?.editComp()

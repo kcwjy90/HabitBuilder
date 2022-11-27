@@ -1,10 +1,10 @@
 import UIKit
 
 class searchVC: UIViewController, UISearchBarDelegate {
-
+    
     
     let localRealm = DBManager.SI.realm!
-
+    
     // backView 생성
     lazy var backView: UIView = {
         let v = UIView()
@@ -40,7 +40,7 @@ class searchVC: UIViewController, UISearchBarDelegate {
     
     override func loadView() {
         super.loadView()
-
+        
         setNaviBar()
         
         searchBar.delegate = self
@@ -68,7 +68,7 @@ class searchVC: UIViewController, UISearchBarDelegate {
         }
         
         reloadData()
-
+        
         
     }
     
@@ -83,7 +83,7 @@ class searchVC: UIViewController, UISearchBarDelegate {
         title = "Search Habits"         // Nav Bar. 와우 간단하게 title 만 적어도 생기는구나..
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationController?.navigationBar.backgroundColor = .white
-    
+        
         overrideUserInterfaceStyle = .light //이게 없으면 앱 실행시키면 tableView가 까만색
         
         // Swipe to dismiss tableView
@@ -98,7 +98,7 @@ class searchVC: UIViewController, UISearchBarDelegate {
         searchedTableView.reloadData()
     }
     
-
+    
 }
 
 
@@ -138,11 +138,11 @@ extension searchVC: UITableViewDelegate, UITableViewDataSource {
         
         if habitSearched {
             print("search 됨 - searchedHabtits.count =  \(searchedHabits.count)")
-
-// 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
-
+            
+            // 결국 여기서 걸려서 에러가 나는데..문제가 filter된 row랑 지워야 되는 row가 아직도 안 맞는다는 건데...분명히 rr로 업데이트를 했으면 맞아야 하는거 아닌가...???
+            
             return searchedHabits.count //원래는 Habits였으나 searchedHabits []으로 바뀜
-
+            
         } else {
             print("search 안됨 - habits.count =  \(habits.count)")
             return habits.count

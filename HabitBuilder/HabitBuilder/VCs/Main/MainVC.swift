@@ -24,7 +24,7 @@ class MainVC: UIViewController {
     
     let localRealm = DBManager.SI.realm!
     
-    //MARK: ====realm Noti 에서 쓰는거===
+    //MARK: ====Needed for Realm Noti===
     deinit {
         print("deinit - NewHabitVC")
         notificationToken?.invalidate()
@@ -32,7 +32,7 @@ class MainVC: UIViewController {
     
     var status: NewHabitVCStatus = .initialize
     var notificationToken: NotificationToken? = nil
-    //===components needed for realm Noti===
+    //====== ====Needed for Realm Noti===
     
     
     // backView 생성
@@ -245,7 +245,7 @@ class MainVC: UIViewController {
         guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
         {return}
         let todayCount = countRealm[indexNumb] //todayCount = 오늘 날짜에 해당하는 RMO_Count obj
-               
+        
         finalPercent = Float(todayCount.success)/Float(todayCount.total)
         print(finalPercent)
         guard let progress = finalPercent else {return}
@@ -257,7 +257,7 @@ class MainVC: UIViewController {
                 print(todayCount.finalPercent)
             } else {
                 todayCount.finalPercent = progress
-
+                
             }
         }
         print("todaycount in 257===================\(todayCount)")
@@ -467,7 +467,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             } else {
                 print("repeatOn has been updated")
             }
-           
+            
         }
     }
     
@@ -485,11 +485,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
         //all counts of repeated habits that have dates changed to today will come here and be added to countrealm at the bottom
         var counts = 0
-        
-        
-        //TEST 용
-        //        let calendar = Calendar.current
-        //        let tmr = calendar.date(byAdding: .day, value: 1, to: Date())
         
         //FIXME: 여기서 privateRepeatType 말고 repeatType 을 쓰니 찾을수 없다고 나오는디...
         //daily repeat
@@ -516,7 +511,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             guard let startDays = startDiff.day else {return}
             let newTotal = startDays + 1
             print("dayDiff는 여기 : \(newTotal)")
-
+            
             
             //MARK: 접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 접속하지 않은 10/2 = 50%, 10/3 = 33%. 접속한 날짜인 10/4는 일단 무조건 fail 로 간주한다. 그래서 user가 rate을 하지 않거나 app을 열기만 하고 아무것도 하지 않은경우 자동적으로 fail이 됨 (25%). cell을 touch해서 success를 할 경우만 rate이 올라감.
             
@@ -601,7 +596,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             guard let dayDifference = dayDiff.day else {return}
             print("dayDiff는 여기 : \(dayDifference)")
             
-           //MARK: 미래에 있을 weeklyhabit의 date을 적용해야 하기 때문에 dayDifference에서 7을 더한 숫자에서 7을 나눈 숫자의 floor을 찾는다. 만약 dayDifference + 7 나누기 7에서 딱 떨어지면 -1 을 뺸다. 
+            //MARK: 미래에 있을 weeklyhabit의 date을 적용해야 하기 때문에 dayDifference에서 7을 더한 숫자에서 7을 나눈 숫자의 floor을 찾는다. 만약 dayDifference + 7 나누기 7에서 딱 떨어지면 -1 을 뺸다.
             var multiplesOfSeven = Int(floor(Double((dayDifference + 7)/7)))
             print(dayDifference)
             print(Int(dayDifference + 7) % 7)
@@ -711,7 +706,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             // Replace the hour (time) of both dates with 00:00
             let currentHDate = calendar.startOfDay(for: currentHabitDate)
             let todayDate = calendar.startOfDay(for: today)
-
+            
             let monthDiff = calendar.dateComponents([.month], from: currentHDate, to: todayDate)
             let dayDiff =  calendar.dateComponents([.day], from: currentHDate, to: todayDate)
             guard let months = monthDiff.month else {return}
@@ -719,7 +714,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             guard let days = dayDiff.day else { return }
             print("dayDiff는 여기 : \(days)")
-
+            
             print("MONTHLHY START- this is MONTHS not accessed=======================\(months)")
             
             //!=monthlyHabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문. 밑의 밑의 function에서 count를 올리지 않고 오직 dayDifference%7 == 0일 경우에만 올린다.
@@ -1004,7 +999,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             let today = Date()
             
-            //FIXME: Need to somehow compare the dates (only days), not strings
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy/MM/dd"
             let todayString = dateFormatter.string(from: today)
@@ -1073,138 +1067,137 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         
     }
     
-    
-//    //MARK: SWIPE action
-//    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-//
-//        //FIXME: 나중에 dateformatter 얘들 scope을 바꿔야지
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "yyyy/MM/dd"
-//        let today = Date()
-//        let todayDate = dateFormatter.string(from: today)
-//        let countRealm = self.localRealm.objects(RMO_Count.self)
-//        let realm = self.localRealm.objects(RMO_Habit.self)
-//
-//        //MARK: Habit을 Success 했으면..
-//        let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-//            print("Success")
-//
-//            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
-//            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-//            {return} //
-//            let taskToUpdate = countRealm[indexNumb]
-//
-//            try! self.localRealm.write {
-//                taskToUpdate.success += 1
-//            }
-//            print("Success 한 count - \(self.localRealm.objects(RMO_Count.self))")
-//
-//            var habit: RMO_Habit
-//
-//            guard let h = self.habits else {return}
-//            habit = h[indexPath.row]
-//
-//            let thisId = habit.id
-//
-//            try! self.localRealm.write {
-//
-//                let deleteHabit = realm.where {
-//                    $0.id == thisId
-//                }
-//                self.localRealm.delete(deleteHabit)
-//            }
-//
-//        }
-//        success.backgroundColor = .systemBlue
-//
-//        //MARK: Habit을 Remove 했으면
-//        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-//            print("Remove")
-//            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
-//
-//            let alert = UIAlertController(
-//                title: "Delete this Habit",
-//                message: "",
-//                preferredStyle: .alert)
-//
-//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
-//
-//                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-//                {return} //
-//                let taskToUpdate = countRealm[indexNumb]
-//
-//                try! self.localRealm.write {
-//                    taskToUpdate.remove += 1
-//                }
-//                print(self.localRealm.objects(RMO_Count.self))
-//
-//
-//                var habit: RMO_Habit
-//
-//                guard let h = self.habits else {return}
-//                habit = h[indexPath.row]
-//
-//
-//
-//                let thisId = habit.id
-//
-//                try! self.localRealm.write {
-//
-//                    let deleteHabit = realm.where {
-//                        $0.id == thisId
-//                    }
-//                    self.localRealm.delete(deleteHabit)
-//                }
-//
-//            }))
-//
-//            self.present(alert, animated: true, completion: nil)
-//
-//
-//
-//        }
-//        remove.backgroundColor = .systemOrange
-//
-//        //MARK: Habit을 Fail 했으면..
-//        let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-//            print("Fail")
-//
-//            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
-//            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-//            {return} //
-//            let taskToUpdate = countRealm[indexNumb]
-//
-//            try! self.localRealm.write {
-//                taskToUpdate.fail += 1
-//            }
-//            print(self.localRealm.objects(RMO_Count.self))
-//
-//
-//            var habit: RMO_Habit
-//
-//            guard let h = self.habits else {return}
-//            habit = h[indexPath.row]
-//
-//
-//
-//            let thisId = habit.id
-//
-//
-//            try! self.localRealm.write {
-//
-//                let deleteHabit = realm.where {
-//                    $0.id == thisId
-//                }
-//                self.localRealm.delete(deleteHabit)
-//            }
-//
-//        }
-//        fail.backgroundColor = .systemRed
-//
-//        return UISwipeActionsConfiguration(actions: [remove, fail, success])
-//
-//    }
+    //FIXME: SWIPE action bring back?
+    //    //MARK: SWIPE action
+    //    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    //
+    //        let dateFormatter = DateFormatter()
+    //        dateFormatter.dateFormat = "yyyy/MM/dd"
+    //        let today = Date()
+    //        let todayDate = dateFormatter.string(from: today)
+    //        let countRealm = self.localRealm.objects(RMO_Count.self)
+    //        let realm = self.localRealm.objects(RMO_Habit.self)
+    //
+    //        //MARK: Habit을 Success 했으면..
+    //        let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+    //            print("Success")
+    //
+    //            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
+    //            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+    //            {return} //
+    //            let taskToUpdate = countRealm[indexNumb]
+    //
+    //            try! self.localRealm.write {
+    //                taskToUpdate.success += 1
+    //            }
+    //            print("Success 한 count - \(self.localRealm.objects(RMO_Count.self))")
+    //
+    //            var habit: RMO_Habit
+    //
+    //            guard let h = self.habits else {return}
+    //            habit = h[indexPath.row]
+    //
+    //            let thisId = habit.id
+    //
+    //            try! self.localRealm.write {
+    //
+    //                let deleteHabit = realm.where {
+    //                    $0.id == thisId
+    //                }
+    //                self.localRealm.delete(deleteHabit)
+    //            }
+    //
+    //        }
+    //        success.backgroundColor = .systemBlue
+    //
+    //        //MARK: Habit을 Remove 했으면
+    //        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+    //            print("Remove")
+    //            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 remove를 +1 한다
+    //
+    //            let alert = UIAlertController(
+    //                title: "Delete this Habit",
+    //                message: "",
+    //                preferredStyle: .alert)
+    //
+    //            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    //            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+    //
+    //                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+    //                {return} //
+    //                let taskToUpdate = countRealm[indexNumb]
+    //
+    //                try! self.localRealm.write {
+    //                    taskToUpdate.remove += 1
+    //                }
+    //                print(self.localRealm.objects(RMO_Count.self))
+    //
+    //
+    //                var habit: RMO_Habit
+    //
+    //                guard let h = self.habits else {return}
+    //                habit = h[indexPath.row]
+    //
+    //
+    //
+    //                let thisId = habit.id
+    //
+    //                try! self.localRealm.write {
+    //
+    //                    let deleteHabit = realm.where {
+    //                        $0.id == thisId
+    //                    }
+    //                    self.localRealm.delete(deleteHabit)
+    //                }
+    //
+    //            }))
+    //
+    //            self.present(alert, animated: true, completion: nil)
+    //
+    //
+    //
+    //        }
+    //        remove.backgroundColor = .systemOrange
+    //
+    //        //MARK: Habit을 Fail 했으면..
+    //        let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+    //            print("Fail")
+    //
+    //            //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
+    //            guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+    //            {return} //
+    //            let taskToUpdate = countRealm[indexNumb]
+    //
+    //            try! self.localRealm.write {
+    //                taskToUpdate.fail += 1
+    //            }
+    //            print(self.localRealm.objects(RMO_Count.self))
+    //
+    //
+    //            var habit: RMO_Habit
+    //
+    //            guard let h = self.habits else {return}
+    //            habit = h[indexPath.row]
+    //
+    //
+    //
+    //            let thisId = habit.id
+    //
+    //
+    //            try! self.localRealm.write {
+    //
+    //                let deleteHabit = realm.where {
+    //                    $0.id == thisId
+    //                }
+    //                self.localRealm.delete(deleteHabit)
+    //            }
+    //
+    //        }
+    //        fail.backgroundColor = .systemRed
+    //
+    //        return UISwipeActionsConfiguration(actions: [remove, fail, success])
+    //
+    //    }
     
 }
 
