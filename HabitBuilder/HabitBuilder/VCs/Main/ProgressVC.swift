@@ -254,9 +254,18 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         let countedSet = NSCountedSet(array: finalArray)
         let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
         
-        guard let mostFvalue = mostFrequent else {return}
-        let value = mostFrequent as! Int * 100
-        mostFrequentPercent.text = "\(String(value))%"
+        print(mostFrequent)
+        
+        //MARK: Changing mostFrequent number which is NSNumber to "string" in decimal -> converting back to Float to *100 -> back to String
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        let freqValString = formatter.string(from: mostFrequent as! NSNumber) ?? ""
+        let freqValFloat = Float(freqValString)
+
+        guard let freqValPercent = freqValFloat else {return}
+        let freqValFinal = String(freqValPercent*100)
+
+        mostFrequentPercent.text = "\(freqValFinal)%"
         
         
         // 1. Set ChartDataEntry
