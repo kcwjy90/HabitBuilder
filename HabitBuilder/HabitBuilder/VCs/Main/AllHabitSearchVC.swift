@@ -333,149 +333,167 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
                 print("Success")
     
-                //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
-                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-                {return} //
-                let taskToUpdate = countRealm[indexNumb]
-    
-                try! self.localRealm.write {
-                    taskToUpdate.success += 1
-                }
-                print("after success - \(self.localRealm.objects(RMO_Count.self))")
-    
                 let habit = self.searchedHabits[indexPath.row]
                 let thisId = habit.id
-    
-                // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
-                guard let indexNumb = realm.firstIndex(where: { $0.id == thisId}) else
-                {return}
-                let updateHabit = realm[indexNumb]
                 
-                print("updateHabit +==========================\(updateHabit)")
-                
-                guard let indNumb = rateRealm.firstIndex(where: { $0.habitID == thisId && $0.createdDate == habit.date}) else
-                {return}
-                let updateRate = rateRealm[indNumb]
-                
-                print("updateRate ===========================================\(updateRate)")
-                
-                
-                let success = Double(updateHabit.success) + Double(1)
-                let total = Double(updateHabit.total)
-                let successRate = Double(success/total)*100
-                
-                if habit.repeatType != RepeatType.none {
+                if habit.onGoing == false {
                     
-                    try! self.localRealm.write {
-                        updateHabit.onGoing = false
-                        updateHabit.success += 1
-                        updateHabit.todaysResult = 1
-                        updateRate.rate = successRate
-                    }
+                    
+                    //If habit has been rated already, it gives alert
+                    let alert = UIAlertController(
+                        title: "Habit Already Rated",
+                        message: "",
+                        preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "Confirm", style: .cancel , handler: {_ in
+            
+                        self.allHabitsTableView.reloadData()
+                    }))
+                    self.present(alert, animated: true, completion: nil)
+            
                     
                 } else {
                     
+                    //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
+                    guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+                    {return} //
+                    let taskToUpdate = countRealm[indexNumb]
+        
                     try! self.localRealm.write {
-                        
-                        let deleteHabit = realm.where {
-                            $0.id == thisId
-                        }
-                        self.localRealm.delete(deleteHabit)
+                        taskToUpdate.success += 1
                     }
+                    print("after success - \(self.localRealm.objects(RMO_Count.self))")
+        
+                    // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
+                    guard let indexNumb = realm.firstIndex(where: { $0.id == thisId}) else
+                    {return}
+                    let updateHabit = realm[indexNumb]
                     
-                    //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-                    tableView.beginUpdates()
-                    self.searchedHabits.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .fade)
-                    tableView.endUpdates()
-                    actionPerformed(true)
+                    print("updateHabit +==========================\(updateHabit)")
                     
+                    guard let indNumb = rateRealm.firstIndex(where: { $0.habitID == thisId && $0.createdDate == habit.date}) else
+                    {return}
+                    let updateRate = rateRealm[indNumb]
+                    
+                    print("updateRate ===========================================\(updateRate)")
+                    
+                    
+                    let success = Double(updateHabit.success) + Double(1)
+                    let total = Double(updateHabit.total)
+                    let successRate = Double(success/total)*100
+                    
+                    if habit.repeatType != RepeatType.none {
+                        
+                            try! self.localRealm.write {
+                                updateHabit.onGoing = false
+                                updateHabit.success += 1
+                                updateHabit.todaysResult = 1
+                                updateRate.rate = successRate
+                            }
+                            self.allHabitsTableView.reloadData()
+                            
+                    } else {
+                        
+                        try! self.localRealm.write {
+                            
+                            let deleteHabit = realm.where {
+                                $0.id == thisId
+                            }
+                            self.localRealm.delete(deleteHabit)
+                        }
+                        
+                        //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                        tableView.beginUpdates()
+                        self.searchedHabits.remove(at: indexPath.row)
+                        tableView.deleteRows(at: [indexPath], with: .fade)
+                        tableView.endUpdates()
+                        actionPerformed(true)
+                        
+                    }
                 }
-                
-               
             }
             success.backgroundColor = .systemBlue
     
             
             
-            //MARK: Habit을 Remove 했으면
-            let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-                print("Remove")
-                
-                
-                
-                let alert = UIAlertController(
-                    title: "Delete this Habit",
-                    message: "",
-                    preferredStyle: .alert)
-                
-                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
-                    
-                    //Deleting RMO_Count object.
-                    guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-                    {return} //
-                    let taskToUpdate = countRealm[indexNumb]
-                    
-                
-                    //Deleting RMO_Habit object.
-                    let habit = self.searchedHabits[indexPath.row]
-                    let thisId = habit.id
-                    
-                    guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
-                    {return} //
-                    let habitToUpdate = realm[habitIndex]
-                    
-                    
-                    //updating Final Total and Final Percent recorded in the habit about to be deleted
-                    let updatedTotal = taskToUpdate.total - 1
-                    var updatedSuccess: Int
-                    
-                    //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
-                    switch habitToUpdate.todaysResult {
-                    case 1 :
-                        updatedSuccess = taskToUpdate.success - 1
-                    default:
-                        updatedSuccess = taskToUpdate.success
-                    }
-                    
-                    let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
-
-                    
-                    //Removing total from CountRealm
-                    try! self.localRealm.write {
-                        taskToUpdate.total = updatedTotal
-                        taskToUpdate.success = updatedSuccess
-                        taskToUpdate.finalPercent = updatedFinalPercent
-                    }
-                    
-                    print(self.localRealm.objects(RMO_Count.self))
-                    
-                    //MARK: to remove notification when habit is deleted.
-                    NotificationManger.SI.removeNoti(id: thisId)
-                    
-                    try! self.localRealm.write {
-                        
-                        let deleteHabit = realm.where {
-                            $0.id == thisId
-                        }
-                        self.localRealm.delete(deleteHabit)
-                    }
-                    
-                    
-                }))
-                
-                self.present(alert, animated: true, completion: nil)
-            
+//            //MARK: Habit을 Remove 했으면
+//            let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+//                print("Remove")
+//
+//
+//
+//                let alert = UIAlertController(
+//                    title: "Delete this Habit",
+//                    message: "",
+//                    preferredStyle: .alert)
+//
+//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//                alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+//
+//                    //Deleting RMO_Count object.
+//                    guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+//                    {return} //
+//                    let taskToUpdate = countRealm[indexNumb]
+//
+//
+//                    //Deleting RMO_Habit object.
+//                    let habit = self.searchedHabits[indexPath.row]
+//                    let thisId = habit.id
+//
+//                    guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
+//                    {return} //
+//                    let habitToUpdate = realm[habitIndex]
+//
+//
+//                    //updating Final Total and Final Percent recorded in the habit about to be deleted
+//                    let updatedTotal = taskToUpdate.total - 1
+//                    var updatedSuccess: Int
+//
+//                    //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
+//                    switch habitToUpdate.todaysResult {
+//                    case 1 :
+//                        updatedSuccess = taskToUpdate.success - 1
+//                    default:
+//                        updatedSuccess = taskToUpdate.success
+//                    }
+//
+//                    let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
+//
+//
+//                    //Removing total from CountRealm
+//                    try! self.localRealm.write {
+//                        taskToUpdate.total = updatedTotal
+//                        taskToUpdate.success = updatedSuccess
+//                        taskToUpdate.finalPercent = updatedFinalPercent
+//                    }
+//
+//                    print(self.localRealm.objects(RMO_Count.self))
+//
+//                    //MARK: to remove notification when habit is deleted.
+//                    NotificationManger.SI.removeNoti(id: thisId)
+//
+//                    try! self.localRealm.write {
+//
+//                        let deleteHabit = realm.where {
+//                            $0.id == thisId
+//                        }
+//                        self.localRealm.delete(deleteHabit)
+//                    }
+//
+//
+//                }))
+//
+//                self.present(alert, animated: true, completion: nil)
+//
 //                //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
 //                tableView.beginUpdates()
 //                self.searchedHabits.remove(at: indexPath.row)
 //                tableView.deleteRows(at: [indexPath], with: .fade)
 //                tableView.endUpdates()
 //                actionPerformed(true)
-               
-            }
-            remove.backgroundColor = .systemOrange
+//
+//            }
+//            remove.backgroundColor = .systemOrange
     
             
             
@@ -483,59 +501,78 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             //MARK: Habit을 Fail 했으면..
             let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
                 print("Fail")
-    
-                //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
-                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-                {return} //
-                let taskToUpdate = countRealm[indexNumb]
-    
-                try! self.localRealm.write {
-                    taskToUpdate.fail += 1
-                }
-                print(self.localRealm.objects(RMO_Count.self))
-    
+                
                 let habit = self.searchedHabits[indexPath.row]
                 let thisId = habit.id
     
-                //If RepeatType is NOT none, just turn onGoing to false, todayResult = 2. Otherwise just delete the habit
-                
-                if habit.repeatType != RepeatType.none {
-                    // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
-                    guard let indexNumb = realm.firstIndex(where: { $0.id == thisId}) else
-                    {return}
-                    let updateHabit = realm[indexNumb]
+                if habit.onGoing == false {
                     
-                    try! self.localRealm.write {
-                        updateHabit.onGoing = false
-                        updateHabit.todaysResult = 2
-                    }
+                    //MARK: If habit has been rated already, it just gives alert
+                    let alert = UIAlertController(
+                        title: "Habit Already Rated",
+                        message: "",
+                        preferredStyle: .alert)
+                    
+                    alert.addAction(UIAlertAction(title: "Confirm", style: .cancel , handler: {_ in
+            
+                        self.allHabitsTableView.reloadData()
+                    }))
+                    self.present(alert, animated: true, completion: nil)
                     
                 } else {
                     
+                    //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
+                    guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+                    {return} //
+                    let taskToUpdate = countRealm[indexNumb]
+        
                     try! self.localRealm.write {
-                        
-                        let deleteHabit = realm.where {
-                            $0.id == thisId
-                        }
-                        self.localRealm.delete(deleteHabit)
+                        taskToUpdate.fail += 1
                     }
-                    //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
-                    tableView.beginUpdates()
-                    self.searchedHabits.remove(at: indexPath.row)
-                    tableView.deleteRows(at: [indexPath], with: .fade)
-                    tableView.endUpdates()
-                    actionPerformed(true)
+                    print(self.localRealm.objects(RMO_Count.self))
+        
+                    //If RepeatType is NOT none, just turn onGoing to false, todayResult = 2. Otherwise just delete the habit
+                    
+                    if habit.repeatType != RepeatType.none {
+                        // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
+                            
+                        guard let indexNumb = realm.firstIndex(where: { $0.id == thisId}) else
+                        {return}
+                        let updateHabit = realm[indexNumb]
+                        
+                        try! self.localRealm.write {
+                            updateHabit.onGoing = false
+                            updateHabit.todaysResult = 2
+                        }
+                        self.allHabitsTableView.reloadData()
+                                                    
+                    } else {
+                        
+                        try! self.localRealm.write {
+                            
+                            let deleteHabit = realm.where {
+                                $0.id == thisId
+                            }
+                            self.localRealm.delete(deleteHabit)
+                        }
+                        //위에는 RMO_Habit에서 지워주는 코드. 밑에는 tableView자체에서 지워지는 코드
+                        tableView.beginUpdates()
+                        self.searchedHabits.remove(at: indexPath.row)
+                        tableView.deleteRows(at: [indexPath], with: .fade)
+                        tableView.endUpdates()
+                        actionPerformed(true)
+                        
+                    }
                     
                 }
-    
-                
+               
             }
             fail.backgroundColor = .systemRed
     
             //        let configuration = UISwipeActionsConfiguration(actions: [remove, fail, success])
             //        configuration.performsFirstActionWithFullSwipe = false
     
-            return UISwipeActionsConfiguration(actions: [remove, fail, success])
+            return UISwipeActionsConfiguration(actions: [ fail, success])
     
         }
     

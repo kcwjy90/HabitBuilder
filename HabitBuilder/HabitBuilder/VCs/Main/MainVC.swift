@@ -1139,79 +1139,79 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         success.backgroundColor = .systemBlue
         
         
-        //MARK: Habit을 Remove 했으면
-        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("Remove")
-            
-            let alert = UIAlertController(
-                title: "Delete this Habit",
-                message: "",
-                preferredStyle: .alert)
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
-                
-                //Deleting RMO_Count object.
-                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-                {return} //
-                let taskToUpdate = countRealm[indexNumb]
-                
-            
-                //Deleting RMO_Habit object.
-            
-                var habit: RMO_Habit
-                guard let h = self.habits else {return}
-                habit = h[indexPath.row]
-                let thisId = habit.id
-                
-                guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
-                {return} //
-                let habitToUpdate = realm[habitIndex]
-                
-                
-                //updating Final Total and Final Percent recorded in the habit about to be deleted
-                let updatedTotal = taskToUpdate.total - 1
-                var updatedSuccess: Int
-                
-                //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
-                switch habitToUpdate.todaysResult {
-                case 1 :
-                    updatedSuccess = taskToUpdate.success - 1
-                default:
-                    updatedSuccess = taskToUpdate.success
-                }
-                
-                let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
-
-                
-                //Removing total from CountRealm
-                try! self.localRealm.write {
-                    taskToUpdate.total = updatedTotal
-                    taskToUpdate.success = updatedSuccess
-                    taskToUpdate.finalPercent = updatedFinalPercent
-                }
-                
-                print(self.localRealm.objects(RMO_Count.self))
-                
-                //MARK: to remove notification when habit is deleted.
-                NotificationManger.SI.removeNoti(id: thisId)
-                
-                try! self.localRealm.write {
-                    
-                    let deleteHabit = realm.where {
-                        $0.id == thisId
-                    }
-                    self.localRealm.delete(deleteHabit)
-                }
-                
-            }))
-            
-            self.present(alert, animated: true, completion: nil)
-            
-            
-            
-        }
-        remove.backgroundColor = .systemOrange
+//        //MARK: Habit을 Remove 했으면
+//        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+//            print("Remove")
+//            
+//            let alert = UIAlertController(
+//                title: "Delete this Habit",
+//                message: "",
+//                preferredStyle: .alert)
+//            
+//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+//                
+//                //Deleting RMO_Count object.
+//                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+//                {return} //
+//                let taskToUpdate = countRealm[indexNumb]
+//                
+//            
+//                //Deleting RMO_Habit object.
+//            
+//                var habit: RMO_Habit
+//                guard let h = self.habits else {return}
+//                habit = h[indexPath.row]
+//                let thisId = habit.id
+//                
+//                guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
+//                {return} //
+//                let habitToUpdate = realm[habitIndex]
+//                
+//                
+//                //updating Final Total and Final Percent recorded in the habit about to be deleted
+//                let updatedTotal = taskToUpdate.total - 1
+//                var updatedSuccess: Int
+//                
+//                //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
+//                switch habitToUpdate.todaysResult {
+//                case 1 :
+//                    updatedSuccess = taskToUpdate.success - 1
+//                default:
+//                    updatedSuccess = taskToUpdate.success
+//                }
+//                
+//                let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
+//
+//                
+//                //Removing total from CountRealm
+//                try! self.localRealm.write {
+//                    taskToUpdate.total = updatedTotal
+//                    taskToUpdate.success = updatedSuccess
+//                    taskToUpdate.finalPercent = updatedFinalPercent
+//                }
+//                
+//                print(self.localRealm.objects(RMO_Count.self))
+//                
+//                //MARK: to remove notification when habit is deleted.
+//                NotificationManger.SI.removeNoti(id: thisId)
+//                
+//                try! self.localRealm.write {
+//                    
+//                    let deleteHabit = realm.where {
+//                        $0.id == thisId
+//                    }
+//                    self.localRealm.delete(deleteHabit)
+//                }
+//                
+//            }))
+//            
+//            self.present(alert, animated: true, completion: nil)
+//            
+//            
+//            
+//        }
+//        remove.backgroundColor = .systemOrange
         
         
         
@@ -1276,7 +1276,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         fail.backgroundColor = .systemRed
         
-        return UISwipeActionsConfiguration(actions: [remove, fail, success])
+        return UISwipeActionsConfiguration(actions: [fail, success])
         
     }
     

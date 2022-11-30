@@ -263,7 +263,8 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         let freqValFloat = Float(freqValString)
 
         guard let freqValPercent = freqValFloat else {return}
-        let freqValFinal = String(freqValPercent*100)
+        let freqRound = freqValPercent*10/10.0 //round up to 10th decimal
+        let freqValFinal = String((freqRound)*100)
 
         mostFrequentPercent.text = "\(freqValFinal)%"
         
