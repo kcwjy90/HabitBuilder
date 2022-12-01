@@ -61,13 +61,6 @@ class MainVC: UIViewController {
         return v
     }()
     
-    // progressLabel 생성
-    lazy var progressLabel: UILabel = {
-        let v = UILabel()
-        v.textAlignment = .left
-        return v
-    }()
-    
     // perecentLabel 생성
     lazy var percentLabel: UILabel = {
         let v = UILabel()
@@ -78,6 +71,14 @@ class MainVC: UIViewController {
     // progressImage 생성
     lazy var progressImage: UIImageView = {
         let v = UIImageView()
+        return v
+    }()
+    
+    // progressFraction 생성
+    lazy var progressFraction: UILabel = {
+        let v = UILabel()
+        v.textAlignment = .center
+        v.text = "0 / 0"
         return v
     }()
     
@@ -126,9 +127,9 @@ class MainVC: UIViewController {
         dateLabelBackView.addSubview(dateLabel)
         backView.addSubview(todaysHabitTableView)
         backView.addSubview(progressImage)
-        backView.addSubview(progressLabel)
         backView.addSubview(percentLabel)
         backView.addSubview(todayProgressBar)
+        todayProgressBar.addSubview(progressFraction)
         
         
         // BackView grid
@@ -165,6 +166,7 @@ class MainVC: UIViewController {
         }
         progressImage.image = UIImage(named: "PF")
         
+    
         percentLabel.snp.makeConstraints{ (make) in
             make.top.equalTo(todaysHabitTableView.snp.bottom)
             make.height.equalTo(20)
@@ -173,20 +175,18 @@ class MainVC: UIViewController {
             make.bottom.equalTo(todayProgressBar.snp.top)
         }
         
-        //        progressLabel.snp.makeConstraints{ (make) in
-        //            make.top.equalTo(todayProgressBar)
-        //            make.height.equalTo(20)
-        //            make.left.equalTo(todayProgressBar).offset(5)
-        //            make.right.equalTo(todayProgressBar)
-        //            make.bottom.equalTo(todayProgressBar)
-        //        }
-        
         todayProgressBar.snp.makeConstraints{ (make) in
             make.height.equalTo(30)
             make.left.equalTo(progressImage.snp.right).offset(10)
             make.right.equalTo(backView).offset(-10)
             make.bottom.equalTo(backView)
         }
+        
+        progressFraction.snp.makeConstraints{ (make) in
+            make.centerY.equalTo(todayProgressBar)
+            make.right.equalTo(todayProgressBar).offset(-5)
+        }
+
         
         
         
@@ -1055,9 +1055,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         // "The Realm is already in a write transaction" 에러가 뜸.
         // 내 생각에 이 이유는 line 708이 setRealmNoti 안에 있기 때문. 하지만 얘를 } 밖으로 보내버리면 새로운 하빗이 추가 되었을때 progressBar가 업데이트 되지 않음.
         guard let progress = finalPercent else {return}
-        
-        //        progressLabel.text = "\(String(counts[0])) / \(String(counts[2]))"
-        
+                
         if counts[2] == 0 {
             percentLabel.text = "Please Add Your Habits"
         } else {
@@ -1065,6 +1063,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         }
         todayProgressBar.progress = progress
         
+        progressFraction.text = "\(Int(counts[0])) / \(Int(counts[2]))"
+        
+        
+        if Int(progress) == Int(1) {
+            progressFraction.textColor = .white
+        } else {
+            progressFraction.textColor = .compBlue
+        }
     }
     
     //MARK: SWIPE action
