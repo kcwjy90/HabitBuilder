@@ -156,7 +156,6 @@ class MainVC: UIViewController {
             make.bottom.equalTo(progressImage.snp.top)
         }
         
-        
         progressImage.snp.makeConstraints{ (make) in
             make.top.equalTo(todaysHabitTableView.snp.bottom)
             make.height.equalTo(50)
@@ -166,7 +165,6 @@ class MainVC: UIViewController {
         }
         progressImage.image = UIImage(named: "PF")
         
-    
         percentLabel.snp.makeConstraints{ (make) in
             make.top.equalTo(todaysHabitTableView.snp.bottom)
             make.height.equalTo(20)
@@ -186,10 +184,6 @@ class MainVC: UIViewController {
             make.centerY.equalTo(todayProgressBar)
             make.right.equalTo(todayProgressBar).offset(-5)
         }
-
-        
-        
-        
         
         updateOngoing()
         updateRepeaton()
@@ -260,8 +254,6 @@ class MainVC: UIViewController {
                 
             }
         }
-        print("todaycount in 257===================\(todayCount)")
-        print("Final Percent is==========================\(progress)")
         
     }
     //MARK: when app enters foreground, refreshes today's date
@@ -352,8 +344,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
         }
         
-        
-        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
@@ -367,7 +357,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         else {
             return UITableViewCell()
         }
-        
         
         let newHabit = theHabits[indexPath.row]
         let title = newHabit.title
@@ -420,15 +409,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             initHabits()
             
-            print("===========================true=============")
-            print(self.localRealm.objects(RMO_Habit.self))
-            
-            
         } else {
             //아직 다음날이 아니라서 아무것도 안함
             print("===========================false=============")
-            print(self.localRealm.objects(RMO_Habit.self))
-            print(self.localRealm.objects(RMO_Count.self))
             return
         }
         
@@ -504,13 +487,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
             let dayDiff =  calendar.dateComponents([.day], from: currentHDate, to: todayDate)
             guard let dayDifference = dayDiff.day else {return}
-            print("dayDiff는 여기 : \(dayDifference)")
             
             //MARK: Calculating Total number of days of Habit being live. today - startdate + 1
             let startDiff =  calendar.dateComponents([.day], from: habitSDate, to: todayDate)
             guard let startDays = startDiff.day else {return}
             let newTotal = startDays + 1
-            print("dayDiff는 여기 : \(newTotal)")
             
             
             //MARK: 접속하지 않았던 비어있던 날짜에 rate 집어넣어 주기 (예> 10/1 마지막 접속 sucess (100%).그 다음 접속은 10/4. 그러면 접속하지 않은 10/2 = 50%, 10/3 = 33%. 접속한 날짜인 10/4는 일단 무조건 fail 로 간주한다. 그래서 user가 rate을 하지 않거나 app을 열기만 하고 아무것도 하지 않은경우 자동적으로 fail이 됨 (25%). cell을 touch해서 success를 할 경우만 rate이 올라감.
@@ -565,14 +546,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 counts += 1
-                print("여기서 카운트 하나 올랐음 \(counts)")
-                print(self.localRealm.objects(RMO_Habit.self))
-                print(self.localRealm.objects(RMO_Rate.self))
                 
             } else {
                 print("Daily - daydifference = 0 ")
-                print(self.localRealm.objects(RMO_Habit.self))
-                print(self.localRealm.objects(RMO_Rate.self))
             }
         }
         
@@ -594,7 +570,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             //MARK: Calculating the Date difference between today's date & habit.date so we can add that many days to exisitng habit.date
             let dayDiff =  calendar.dateComponents([.day], from: currentHDate, to: todayDate)
             guard let dayDifference = dayDiff.day else {return}
-            print("dayDiff는 여기 : \(dayDifference)")
             
             //MARK: 미래에 있을 weeklyhabit의 date을 적용해야 하기 때문에 dayDifference에서 7을 더한 숫자에서 7을 나눈 숫자의 floor을 찾는다. 만약 dayDifference + 7 나누기 7에서 딱 떨어지면 -1 을 뺸다.
             var multiplesOfSeven = Int(floor(Double((dayDifference + 7)/7)))
@@ -602,7 +577,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             print(Int(dayDifference + 7) % 7)
             if (Int(dayDifference + 7) % 7) == 0 {
                 multiplesOfSeven -= 1
-                print("1주일 차이 - multiples 는 = \(multiplesOfSeven)")
             } else {
                 print("multiples stay the same \(multiplesOfSeven)")
             }
@@ -614,12 +588,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 
                 //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
                 counts += 1
-                print("여기서 카운트 하나 올랐음 \(counts)")
                 
             } else {
-                
                 print("No need for count to go up")
-                
             }
             
             //dayDifference가 >0 일경우
@@ -628,11 +599,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 //접속하지 않았던 주는 모두 fail로 간주. 오늘도 fail로 간주. 만약 success할경우 오늘의 percent가 올라감
                 for day in 1...multiplesOfSeven{
                     
-                    print("WEEKLY - multiplesofSeven \(multiplesOfSeven)")
                     let success = Double(weeklyHabit.success)
                     let total = Double(weeklyHabit.total) + Double(day)
                     let successRate = Double(success/total)*100
-                    print("WEEKLY - SuccessRate \(successRate)")
                     
                     let oneMoreWeek = Calendar.current.date(byAdding: .weekOfMonth,  value: day, to: currentHabitDate)
                     guard let omw = oneMoreWeek else {return}
@@ -646,11 +615,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     try! self.localRealm.write {
                         localRealm.add(habitRate)
                     }
-                    
-                    print("WEEKLY MainVC ====================================================")
-                    print(self.localRealm.objects(RMO_Habit.self))
-                    print(self.localRealm.objects(RMO_Rate.self))
-                    print("WEEKLY MainVC ====================================================")
                     
                     //Adding FinalPercent (0%) for all the missing days if they don't already exist.
                     let dateFormatter = DateFormatter()
@@ -678,15 +642,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         weeklyHabit.total += multiplesOfSeven
                         weeklyHabit.date = newHabitDate
                     }
-                    print("WEEKLY - newHabitDate ==========================\(newHabitDate)")
-                    print("WEEKLY - weeklyHabit.total ==========================\(weeklyHabit.total)")
                     
                 } else {
                     print("Weekly if let NewHabitDate은 fail한 경우")
                 }
-                
             } else {
-                
                 print("NO NEED TO TAKE ANY ACTION")
             }
             
@@ -710,19 +670,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             let monthDiff = calendar.dateComponents([.month], from: currentHDate, to: todayDate)
             let dayDiff =  calendar.dateComponents([.day], from: currentHDate, to: todayDate)
             guard let months = monthDiff.month else {return}
-            print("monthDiff는 여기 : \(months)")
             
             guard let days = dayDiff.day else { return }
-            print("dayDiff는 여기 : \(days)")
-            
-            print("MONTHLHY START- this is MONTHS not accessed=======================\(months)")
             
             //!=monthlyHabit.date하는 이유는 이미 habit이 만들어 질때 count+1 되었다. 그렇기 때문에 만약 startdate (만들어진 날짜) == habit.date이 동일하면 또 count를 올릴필요가 없기 때문. 밑의 밑의 function에서 count를 올리지 않고 오직 dayDifference%7 == 0일 경우에만 올린다.
             if days == 0 && monthlyHabit.startDate != monthlyHabit.date {
                 
                 //접속하지 않은 날짜는 count를 샐필요가 없음. count하는 이유가 %를 구하기 위해서기 때문. 만약 그날 접속을 안했다면 count할 필요도없이 모든 habit은 0%
                 counts += 1
-                print("여기서 카운트 하나 올랐음 \(counts)")
                 
             } else {
                 print("No need for count to go up")
@@ -771,12 +726,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         }
                     }
                     
-                    print("MONTHLY HabitRate-----\(habitRate)")
-                    print(self.localRealm.objects(RMO_Habit.self))
-                    print(self.localRealm.objects(RMO_Rate.self))
-                    
-                    
-                    
                     //0%처리 끝나고 "오늘" 날짜에 해당하는 날짜를 existing habit.date에 넣어준다.
                     var dateComponent = DateComponents()
                     dateComponent.month = 1
@@ -785,9 +734,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                             monthlyHabit.total += 1
                             monthlyHabit.date = newHabitDate
                         }
-                        print("MONTHLY most uptodate date ==========================\(newHabitDate)")
-                        print("MONTHLY.total ==========================\(monthlyHabit.total)")
-                        print(monthlyHabit)
                         
                     } else {
                         
@@ -832,10 +778,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                             }
                         }
                         
-                        print("MONTHLY HabitRate-----\(habitRate)")
-                        print(self.localRealm.objects(RMO_Habit.self))
-                        print(self.localRealm.objects(RMO_Rate.self))
-                        
                         
                     }
                     
@@ -847,9 +789,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                             monthlyHabit.total += months
                             monthlyHabit.date = newHabitDate
                         }
-                        print("MONTHLY most uptodate date ==========================\(newHabitDate)")
-                        print("MONTHLY.total ==========================\(monthlyHabit.total)")
-                        print(monthlyHabit)
+                        
                         
                     } else {
                         print("MONTHLY if let NewHabitDate은 fail한 경우")
@@ -886,20 +826,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                 }
                 
                 counts += 1
-                print("여기서 카운트 하나 올랐음 \(counts)")
-                print(counts)
+                
                 
             } else {
                 print("FAlse")
-                print(todayString)
-                print(habitYearAwayString)
-                print(yearlyHabit.date)
-                print("++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
             }
         }
         
-        print("final counts line 778---------------------------------------------------------\(counts)")
         
         if !countRealm.contains(where: { $0.date == todayDate} )
         {
@@ -1055,7 +989,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         // "The Realm is already in a write transaction" 에러가 뜸.
         // 내 생각에 이 이유는 line 708이 setRealmNoti 안에 있기 때문. 하지만 얘를 } 밖으로 보내버리면 새로운 하빗이 추가 되었을때 progressBar가 업데이트 되지 않음.
         guard let progress = finalPercent else {return}
-                
+        
         if counts[2] == 0 {
             percentLabel.text = "Please Add Your Habits"
         } else {
@@ -1083,12 +1017,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
-
+        
         
         
         //MARK: Habit을 Success 했으면..
         let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("Success")
             
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 success를 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
@@ -1098,7 +1031,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             try! self.localRealm.write {
                 taskToUpdate.success += 1
             }
-            print("Success 한 count - \(self.localRealm.objects(RMO_Count.self))")
             
             var habit: RMO_Habit
             guard let h = self.habits else {return}
@@ -1110,13 +1042,11 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             {return}
             let updateHabit = realm[indexNumb]
             
-            print("updateHabit +==========================\(updateHabit)")
             
             guard let indNumb = rateRealm.firstIndex(where: { $0.habitID == thisId && $0.createdDate == habit.date}) else
             {return}
             let updateRate = rateRealm[indNumb]
             
-            print("updateRate ===========================================\(updateRate)")
             
             let success = Double(updateHabit.success) + Double(1)
             let total = Double(updateHabit.total)
@@ -1145,86 +1075,85 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         success.backgroundColor = .systemBlue
         
         
-//        //MARK: Habit을 Remove 했으면
-//        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-//            print("Remove")
-//            
-//            let alert = UIAlertController(
-//                title: "Delete this Habit",
-//                message: "",
-//                preferredStyle: .alert)
-//            
-//            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
-//                
-//                //Deleting RMO_Count object.
-//                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
-//                {return} //
-//                let taskToUpdate = countRealm[indexNumb]
-//                
-//            
-//                //Deleting RMO_Habit object.
-//            
-//                var habit: RMO_Habit
-//                guard let h = self.habits else {return}
-//                habit = h[indexPath.row]
-//                let thisId = habit.id
-//                
-//                guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
-//                {return} //
-//                let habitToUpdate = realm[habitIndex]
-//                
-//                
-//                //updating Final Total and Final Percent recorded in the habit about to be deleted
-//                let updatedTotal = taskToUpdate.total - 1
-//                var updatedSuccess: Int
-//                
-//                //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
-//                switch habitToUpdate.todaysResult {
-//                case 1 :
-//                    updatedSuccess = taskToUpdate.success - 1
-//                default:
-//                    updatedSuccess = taskToUpdate.success
-//                }
-//                
-//                let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
-//
-//                
-//                //Removing total from CountRealm
-//                try! self.localRealm.write {
-//                    taskToUpdate.total = updatedTotal
-//                    taskToUpdate.success = updatedSuccess
-//                    taskToUpdate.finalPercent = updatedFinalPercent
-//                }
-//                
-//                print(self.localRealm.objects(RMO_Count.self))
-//                
-//                //MARK: to remove notification when habit is deleted.
-//                NotificationManger.SI.removeNoti(id: thisId)
-//                
-//                try! self.localRealm.write {
-//                    
-//                    let deleteHabit = realm.where {
-//                        $0.id == thisId
-//                    }
-//                    self.localRealm.delete(deleteHabit)
-//                }
-//                
-//            }))
-//            
-//            self.present(alert, animated: true, completion: nil)
-//            
-//            
-//            
-//        }
-//        remove.backgroundColor = .systemOrange
+        //        //MARK: Habit을 Remove 했으면
+        //        let remove = UIContextualAction(style: .normal, title: "Remove") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
+        //            print("Remove")
+        //
+        //            let alert = UIAlertController(
+        //                title: "Delete this Habit",
+        //                message: "",
+        //                preferredStyle: .alert)
+        //
+        //            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        //            alert.addAction(UIAlertAction(title: "Confirm", style: .destructive, handler: {_ in
+        //
+        //                //Deleting RMO_Count object.
+        //                guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
+        //                {return} //
+        //                let taskToUpdate = countRealm[indexNumb]
+        //
+        //
+        //                //Deleting RMO_Habit object.
+        //
+        //                var habit: RMO_Habit
+        //                guard let h = self.habits else {return}
+        //                habit = h[indexPath.row]
+        //                let thisId = habit.id
+        //
+        //                guard let habitIndex = realm.firstIndex(where: { $0.id == thisId}) else
+        //                {return} //
+        //                let habitToUpdate = realm[habitIndex]
+        //
+        //
+        //                //updating Final Total and Final Percent recorded in the habit about to be deleted
+        //                let updatedTotal = taskToUpdate.total - 1
+        //                var updatedSuccess: Int
+        //
+        //                //remove 할때 만약에 success 된 habit일 경우 지우면 success도 지워진다.
+        //                switch habitToUpdate.todaysResult {
+        //                case 1 :
+        //                    updatedSuccess = taskToUpdate.success - 1
+        //                default:
+        //                    updatedSuccess = taskToUpdate.success
+        //                }
+        //
+        //                let updatedFinalPercent = Float(updatedSuccess)/Float(updatedTotal)
+        //
+        //
+        //                //Removing total from CountRealm
+        //                try! self.localRealm.write {
+        //                    taskToUpdate.total = updatedTotal
+        //                    taskToUpdate.success = updatedSuccess
+        //                    taskToUpdate.finalPercent = updatedFinalPercent
+        //                }
+        //
+        //                print(self.localRealm.objects(RMO_Count.self))
+        //
+        //                //MARK: to remove notification when habit is deleted.
+        //                NotificationManger.SI.removeNoti(id: thisId)
+        //
+        //                try! self.localRealm.write {
+        //
+        //                    let deleteHabit = realm.where {
+        //                        $0.id == thisId
+        //                    }
+        //                    self.localRealm.delete(deleteHabit)
+        //                }
+        //
+        //            }))
+        //
+        //            self.present(alert, animated: true, completion: nil)
+        //
+        //
+        //
+        //        }
+        //        remove.backgroundColor = .systemOrange
         
         
         
         
         //MARK: Habit을 Fail 했으면..
         let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-            print("Fail")
             
             //오늘 날짜를 가진 object를 찾아서 delete 될때마다 fail을 +1 한다
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
@@ -1242,7 +1171,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             guard let h = self.habits else {return}
             habit = h[indexPath.row]
-        
+            
             let thisId = habit.id
             
             //If RepeatType is NOT none, just turn onGoing to false, todayResult = 2. Otherwise just delete the habit
@@ -1268,17 +1197,6 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     self.localRealm.delete(deleteHabit)
                 }
             }
-
-            
-            
-            
-            
-            
-            
-            
-            
-           
-            
         }
         fail.backgroundColor = .systemRed
         
