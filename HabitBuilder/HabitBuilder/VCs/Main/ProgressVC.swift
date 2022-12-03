@@ -203,7 +203,6 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         dateDisplay.dateFormat = "MMM d, yyyy"
         let today = Date()
         let todayDate = dateFormatter.string(from: today)
-        let todayDisplay = dateDisplay.string(from: today)
         
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
@@ -253,9 +252,7 @@ class ProgressVC: UIViewController, ChartViewDelegate {
         
         let countedSet = NSCountedSet(array: finalArray)
         let mostFrequent = countedSet.max { countedSet.count(for: $0) < countedSet.count(for: $1) }
-        
-        print(mostFrequent)
-        
+                
         //MARK: Changing mostFrequent number which is NSNumber to "string" in decimal -> converting back to Float to *100 -> back to String
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal

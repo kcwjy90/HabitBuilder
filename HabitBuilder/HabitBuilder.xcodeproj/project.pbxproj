@@ -7,21 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480567FC280E6E050066FF9A /* AllHabitsVC.swift */; };
-		480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480568022817A5DA0066FF9A /* NotiTestVC.swift */; };
-		4839B57028924E1B0073F6E1 /* searchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4839B56F28924E1B0073F6E1 /* searchVC.swift */; };
 		4839B574289CF39E0073F6E1 /* AllHabitSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */; };
 		485EA4C72834C99500C38387 /* ProgressVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485EA4C62834C99400C38387 /* ProgressVC.swift */; };
 		488CA39F2834D653002F1E6B /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 488CA39E2834D653002F1E6B /* SwiftUICharts */; };
 		488CA3A12836048F002F1E6B /* RMO_Count.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488CA3A02836048F002F1E6B /* RMO_Count.swift */; };
-		488CA3A328409D0C002F1E6B /* RepeatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488CA3A228409D0B002F1E6B /* RepeatVC.swift */; };
-		488CA3A528409DB4002F1E6B /* RepeatTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488CA3A428409DB4002F1E6B /* RepeatTableCell.swift */; };
 		48990397281BBBC3009ED152 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990396281BBBC3009ED152 /* NotificationManager.swift */; };
 		48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48990398281DB99E009ED152 /* HabitDetailVC.swift */; };
 		48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CE927F6706A00967056 /* RMO_Habit.swift */; };
-		48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B22CEC27F7153B00967056 /* MainVCnotusing.swift */; };
 		48BCF66128ED55590007D433 /* RMO_Rate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BCF66028ED55590007D433 /* RMO_Rate.swift */; };
-		48BD66F9281A644300F239A6 /* NotiTest2VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BD66F8281A644300F239A6 /* NotiTest2VC.swift */; };
 		48CC438D28F3F94600A4AAF3 /* HabitDetailNoReVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CC438C28F3F94600A4AAF3 /* HabitDetailNoReVC.swift */; };
 		C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */; };
 		C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */; };
@@ -38,20 +31,13 @@
 
 /* Begin PBXFileReference section */
 		389F6030B377C8AD6055D89E /* Pods_HabitBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HabitBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		480567FC280E6E050066FF9A /* AllHabitsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllHabitsVC.swift; sourceTree = "<group>"; };
-		480568022817A5DA0066FF9A /* NotiTestVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTestVC.swift; sourceTree = "<group>"; };
-		4839B56F28924E1B0073F6E1 /* searchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchVC.swift; sourceTree = "<group>"; };
 		4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllHabitSearchVC.swift; sourceTree = "<group>"; };
 		485EA4C62834C99400C38387 /* ProgressVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressVC.swift; sourceTree = "<group>"; };
 		488CA3A02836048F002F1E6B /* RMO_Count.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Count.swift; sourceTree = "<group>"; };
-		488CA3A228409D0B002F1E6B /* RepeatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatVC.swift; sourceTree = "<group>"; };
-		488CA3A428409DB4002F1E6B /* RepeatTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatTableCell.swift; sourceTree = "<group>"; };
 		48990396281BBBC3009ED152 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		48990398281DB99E009ED152 /* HabitDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitDetailVC.swift; sourceTree = "<group>"; };
 		48B22CE927F6706A00967056 /* RMO_Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Habit.swift; sourceTree = "<group>"; };
-		48B22CEC27F7153B00967056 /* MainVCnotusing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCnotusing.swift; sourceTree = "<group>"; };
 		48BCF66028ED55590007D433 /* RMO_Rate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMO_Rate.swift; sourceTree = "<group>"; };
-		48BD66F8281A644300F239A6 /* NotiTest2VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotiTest2VC.swift; sourceTree = "<group>"; };
 		48CC438C28F3F94600A4AAF3 /* HabitDetailNoReVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitDetailNoReVC.swift; sourceTree = "<group>"; };
 		4D74EE2AC5A365C3D37B7746 /* Pods-HabitBuilder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.release.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.release.xcconfig"; sourceTree = "<group>"; };
 		680D9F63CFD8EBC82EE79390 /* Pods-HabitBuilder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HabitBuilder.debug.xcconfig"; path = "Target Support Files/Pods-HabitBuilder/Pods-HabitBuilder.debug.xcconfig"; sourceTree = "<group>"; };
@@ -92,17 +78,6 @@
 			path = "Database Model";
 			sourceTree = "<group>";
 		};
-		48B22CEB27F7151C00967056 /* NotInUseMain */ = {
-			isa = PBXGroup;
-			children = (
-				48B22CEC27F7153B00967056 /* MainVCnotusing.swift */,
-				480568022817A5DA0066FF9A /* NotiTestVC.swift */,
-				48BD66F8281A644300F239A6 /* NotiTest2VC.swift */,
-			);
-			name = NotInUseMain;
-			path = "안쓰는Main";
-			sourceTree = "<group>";
-		};
 		82C23625D13EA4BCC056A5B6 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -137,7 +112,6 @@
 				C0B2E8D627A11B4E00BC03EB /* Managers */,
 				C0B2E8D427A11B4100BC03EB /* Common */,
 				C0B2E8D727A11BB500BC03EB /* Extensions */,
-				C0B2E8D327A11B2C00BC03EB /* Libs */,
 				480567F527FBD4390066FF9A /* Database Model */,
 				C0B2E8D527A11B4B00BC03EB /* VCs */,
 				C0B2E8C827A119DB00BC03EB /* Assets.xcassets */,
@@ -145,13 +119,6 @@
 				C0B2E8CD27A119DB00BC03EB /* Info.plist */,
 			);
 			path = HabitBuilder;
-			sourceTree = "<group>";
-		};
-		C0B2E8D327A11B2C00BC03EB /* Libs */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Libs;
 			sourceTree = "<group>";
 		};
 		C0B2E8D427A11B4100BC03EB /* Common */ = {
@@ -165,7 +132,6 @@
 		C0B2E8D527A11B4B00BC03EB /* VCs */ = {
 			isa = PBXGroup;
 			children = (
-				48B22CEB27F7151C00967056 /* NotInUseMain */,
 				C0B2E8D827A11BF600BC03EB /* Main */,
 			);
 			path = VCs;
@@ -194,15 +160,11 @@
 			children = (
 				C0B2E8E527A11DC500BC03EB /* MainVC.swift */,
 				4839B573289CF39D0073F6E1 /* AllHabitSearchVC.swift */,
-				480567FC280E6E050066FF9A /* AllHabitsVC.swift */,
 				485EA4C62834C99400C38387 /* ProgressVC.swift */,
 				C01CC1FD27A3C96A00698E03 /* NewHabitVC.swift */,
 				48990398281DB99E009ED152 /* HabitDetailVC.swift */,
 				48CC438C28F3F94600A4AAF3 /* HabitDetailNoReVC.swift */,
 				C01CC1FF27A3D34600698E03 /* HabitTableCell.swift */,
-				488CA3A228409D0B002F1E6B /* RepeatVC.swift */,
-				488CA3A428409DB4002F1E6B /* RepeatTableCell.swift */,
-				4839B56F28924E1B0073F6E1 /* searchVC.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -335,28 +297,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				488CA3A528409DB4002F1E6B /* RepeatTableCell.swift in Sources */,
-				48B22CED27F7153B00967056 /* MainVCnotusing.swift in Sources */,
 				48990399281DB99E009ED152 /* HabitDetailVC.swift in Sources */,
 				C0B2E8DE27A11C8200BC03EB /* DBManager.swift in Sources */,
 				C0B2E8E627A11DC500BC03EB /* MainVC.swift in Sources */,
 				C0B2E8E227A11D1C00BC03EB /* ServiceKey.swift in Sources */,
 				485EA4C72834C99500C38387 /* ProgressVC.swift in Sources */,
 				C0B2E8C027A119D900BC03EB /* AppDelegate.swift in Sources */,
-				480568032817A5DA0066FF9A /* NotiTestVC.swift in Sources */,
 				C0B2E8E027A11C9A00BC03EB /* PrefsManager.swift in Sources */,
-				488CA3A328409D0C002F1E6B /* RepeatVC.swift in Sources */,
 				488CA3A12836048F002F1E6B /* RMO_Count.swift in Sources */,
 				C01CC1FE27A3C96A00698E03 /* NewHabitVC.swift in Sources */,
-				4839B57028924E1B0073F6E1 /* searchVC.swift in Sources */,
 				4839B574289CF39E0073F6E1 /* AllHabitSearchVC.swift in Sources */,
-				48BD66F9281A644300F239A6 /* NotiTest2VC.swift in Sources */,
 				48BCF66128ED55590007D433 /* RMO_Rate.swift in Sources */,
 				C0B2E8E427A11DA600BC03EB /* ColorExtension.swift in Sources */,
 				48B22CEA27F6706A00967056 /* RMO_Habit.swift in Sources */,
 				48990397281BBBC3009ED152 /* NotificationManager.swift in Sources */,
 				48CC438D28F3F94600A4AAF3 /* HabitDetailNoReVC.swift in Sources */,
-				480567FD280E6E050066FF9A /* AllHabitsVC.swift in Sources */,
 				C01CC20027A3D34600698E03 /* HabitTableCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -497,7 +452,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = JDSC8J9R2Y;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JDSC8J9R2Y;
 				INFOPLIST_FILE = HabitBuilder/Info.plist;
@@ -507,7 +462,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chikim.habitbuilder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = dev_habitbuilder;
@@ -526,7 +481,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = JDSC8J9R2Y;
 				INFOPLIST_FILE = HabitBuilder/Info.plist;
@@ -536,7 +491,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chikim.habitbuilder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -1000,7 +1000,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         progressFraction.text = "\(Int(counts[0])) / \(Int(counts[2]))"
         
         
-        if Int(progress) == Int(1) {
+        if Float(progress) == Float(1) {
             progressFraction.textColor = .white
         } else {
             progressFraction.textColor = .compBlue

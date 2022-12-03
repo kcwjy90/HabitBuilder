@@ -407,15 +407,15 @@ class NewHabitVC: UIViewController, UISearchBarDelegate, UITextViewDelegate {
     }
 }
 
-
-//MARK: Receiving updated repeatType from ReapetVC
-extension NewHabitVC: RepeatVCDelegate {
-    func didChangeRepeatType(repeatType: RepeatType) {
-        repTyp = repeatType
-        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
-        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
-    }
-}
+//
+////MARK: Receiving updated repeatType from ReapetVC
+//extension NewHabitVC: RepeatVCDelegate {
+//    func didChangeRepeatType(repeatType: RepeatType) {
+//        repTyp = repeatType
+//        let repeatTypeString = String(describing: repeatType) //string으로 바꿔줌. repeatType이 원래 있는 type이 아니라서 그냥 String(repeatType) 하면 안되고 "describing:" 을 넣어줘야함
+//        repeatTypeLabel.text = repeatTypeString.capitalized + " >"
+//    }
+//}
 
 
 //MARK: Adding padding to UITextField
