@@ -410,13 +410,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         
         let monthDiff = calendar.dateComponents([.month], from: startDate, to: currentDate)
         guard let months = monthDiff.month else {return}
-        print(months)
         
         
         let todayDate = calendar.startOfDay(for: Date())
         let dayDiff = calendar.dateComponents([.day], from: todayDate, to: currentDate)
         guard let days = dayDiff.day else {return}
-        print(days)
         
         var numbMonths: Int
         
@@ -440,10 +438,7 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         //일단 여기서 스톱
         //역시나 test용. 나중에 y axis에 갈것. success/fail 중 눌러지는것에 반응
         habits = self.localRealm.objects(RMO_Rate.self).filter("habitID == %@", habit.id)
-        
-        print("habitdetailvc line 379---------habits--------------------------")
-        print(habits)
-        
+                
         
         if habits!.count == 0 {
             print("0")
@@ -525,7 +520,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             // 3. Set ChartData
             let data = LineChartData(dataSet: set)
             data.setDrawValues(false) //Removes label
-            print(xAxis)
             
             // 4. Assign it to the chart’s data
             habitLineChart.data = data
@@ -597,10 +591,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         }
         
         
-        print(self.localRealm.objects(RMO_Habit.self))
-        print(self.localRealm.objects(RMO_Rate.self))
-        
-        
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)
     }
@@ -623,7 +613,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         {return} //
         let taskToUpdate = countRealm[indexNumb]
         
-        print("TASK TO UPDATE +==========================\(taskToUpdate)")
         try! self.localRealm.write {
             taskToUpdate.success += 1
             
@@ -635,15 +624,11 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         guard let indexNumb = realm.firstIndex(where: { $0.id == self.habit.id}) else
         {return}
         let updateHabit = realm[indexNumb]
-        
-        print("updateHabit +==========================\(updateHabit)")
-        
+                
         guard let indexNumb = rateRealm.firstIndex(where: { $0.habitID == self.habit.id && $0.createdDate == self.habit.date}) else
         {return}
         let updateRate = rateRealm[indexNumb]
-        
-        print("updateRate ===========================================\(updateRate)")
-        
+                
         
         let success = Double(updateHabit.success) + Double(1)
         let total = Double(updateHabit.total)
@@ -658,8 +643,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             updateRate.rate = successRate
         }
         
-        print(self.localRealm.objects(RMO_Habit.self))
-        print(self.localRealm.objects(RMO_Rate.self))
         
         delegate?.editComp()
         self.dismiss(animated: true, completion: nil)

@@ -85,9 +85,7 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         
         
         reloadData()
-        
-        print("after app runs - after reloaddata()\(habits)")
-        
+                
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -116,7 +114,6 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
     func reloadData() {
         // MARK: Get all habits with onGoing = true in the realm. Doesn't have to be ONGOING
         habits = localRealm.objects(RMO_Habit.self).toArray() //updating habits []
-        print("reloaddata-\(habits)")
         //
         habits = habits.sorted(by: {
             $0.date.compare($1.date) == .orderedAscending
@@ -331,7 +328,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
     
             //MARK: Habit을 Success 했으면..
             let success = UIContextualAction(style: .normal, title: "Success") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-                print("Success")
     
                 let habit = self.searchedHabits[indexPath.row]
                 let thisId = habit.id
@@ -362,21 +358,17 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
                     try! self.localRealm.write {
                         taskToUpdate.success += 1
                     }
-                    print("after success - \(self.localRealm.objects(RMO_Count.self))")
         
                     // MARK: RepeatType isn't 0, therefore, won't  be deleted from the AllHabitSearchView.
                     guard let indexNumb = realm.firstIndex(where: { $0.id == thisId}) else
                     {return}
                     let updateHabit = realm[indexNumb]
                     
-                    print("updateHabit +==========================\(updateHabit)")
                     
                     guard let indNumb = rateRealm.firstIndex(where: { $0.habitID == thisId && $0.createdDate == habit.date}) else
                     {return}
                     let updateRate = rateRealm[indNumb]
-                    
-                    print("updateRate ===========================================\(updateRate)")
-                    
+                                        
                     
                     let success = Double(updateHabit.success) + Double(1)
                     let total = Double(updateHabit.total)
@@ -500,7 +492,6 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
             
             //MARK: Habit을 Fail 했으면..
             let fail = UIContextualAction(style: .destructive, title: "Fail") { (contextualAction, view, actionPerformed: (Bool) -> ()) in
-                print("Fail")
                 
                 let habit = self.searchedHabits[indexPath.row]
                 let thisId = habit.id
@@ -529,8 +520,7 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
                     try! self.localRealm.write {
                         taskToUpdate.fail += 1
                     }
-                    print(self.localRealm.objects(RMO_Count.self))
-        
+
                     //If RepeatType is NOT none, just turn onGoing to false, todayResult = 2. Otherwise just delete the habit
                     
                     if habit.repeatType != RepeatType.none {
