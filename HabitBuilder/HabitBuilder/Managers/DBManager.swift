@@ -18,7 +18,7 @@ class DBManager: NSObject {
     }
     
     func initialize() {
-        let realmConfig = Realm.Configuration(schemaVersion: 28,
+        let realmConfig = Realm.Configuration(schemaVersion: 30,
             migrationBlock: { (migration, oldSchemaVersion) in
                 switch oldSchemaVersion {
                 case 0 :

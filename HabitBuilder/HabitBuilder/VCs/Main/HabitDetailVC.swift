@@ -390,6 +390,15 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
         return current.timeIntervalSinceReferenceDate - start.timeIntervalSinceReferenceDate
     }
     
+    func dateString(a: Date) -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        
+        return dateFormatter.string(from: a)
+        
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -564,10 +573,9 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     //MARK: fail button pressed
     @objc func failButtonPressed(sender: UIButton){
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
+    
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         
@@ -598,10 +606,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     
     @objc func successButtonPressed(sender: UIButton){
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
@@ -665,10 +671,8 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
             let countRealm = self.localRealm.objects(RMO_Count.self)
             let habitRealm = self.localRealm.objects(RMO_Habit.self)
             
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy/MM/dd"
             let today = Date()
-            let todayDate = dateFormatter.string(from: today)
+            let todayDate = self.dateString(a: today)
             guard let indexNumb = countRealm.firstIndex(where: { $0.date == todayDate}) else
             {return} //
             let taskToUpdate = countRealm[indexNumb]
@@ -728,8 +732,6 @@ class HabitDetailVC: UIViewController, UISearchBarDelegate, UITextViewDelegate, 
     //MARK: Making changes to the existing habit
     @objc func saveButtonPressed() {
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let countRealm = localRealm.objects(RMO_Count.self)
         let realm = localRealm.objects(RMO_Habit.self)
         

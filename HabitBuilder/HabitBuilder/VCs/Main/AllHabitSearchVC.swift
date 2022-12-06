@@ -106,6 +106,15 @@ class AllHabitSearchVC: UIViewController, UISearchBarDelegate {
         allHabitsTableView.keyboardDismissMode = UIScrollView.KeyboardDismissMode.interactive
     }
     
+    func dateString(a: Date) -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        
+        return dateFormatter.string(from: a)
+        
+    }
+    
     //MARK: time function that returns timeInterval
     func time(current: Date, habitDate: Date) -> TimeInterval {
         return current.timeIntervalSinceReferenceDate - habitDate.timeIntervalSinceReferenceDate
@@ -317,10 +326,8 @@ extension AllHabitSearchVC: UITableViewDelegate, UITableViewDataSource {
         //MARK: SWIPE action
         func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
     
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy/MM/dd"
             let today = Date()
-            let todayDate = dateFormatter.string(from: today)
+            let todayDate = dateString(a: today)
             let countRealm = self.localRealm.objects(RMO_Count.self)
             let realm = self.localRealm.objects(RMO_Habit.self)
             let rateRealm = self.localRealm.objects(RMO_Rate.self)

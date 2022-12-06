@@ -229,10 +229,8 @@ class MainVC: UIViewController {
     
     func updateFinalPercent() {
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
         //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
@@ -458,10 +456,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     func initHabits() {
         
         //To add today's habit's count
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
         
@@ -520,9 +516,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     }
                     
                     //Adding FinalPercent (0%) for all the missing days if they don't already exist.
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy/MM/dd"
-                    let countDate = dateFormatter.string(from: omd)
+                    let countDate = dateString(a: omd)
                     
                     if !countRealm.contains(where: { $0.date == countDate} )
                     {
@@ -617,9 +611,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     }
                     
                     //Adding FinalPercent (0%) for all the missing days if they don't already exist.
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy/MM/dd"
-                    let countDate = dateFormatter.string(from: omw)
+                    let countDate = dateString(a: omw)
                     
                     if !countRealm.contains(where: { $0.date == countDate} )
                     {
@@ -711,9 +703,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                     }
                     
                     //Adding FinalPercent (0%) for all the missing days if they don't already exist.
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy/MM/dd"
-                    let countDate = dateFormatter.string(from: omm)
+                    let countDate = dateString(a: omm)
                     
                     if !countRealm.contains(where: { $0.date == countDate} )
                     {
@@ -763,9 +753,7 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
                         }
                         
                         //Adding FinalPercent (0%) for all the missing days if they don't already exist.
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy/MM/dd"
-                        let countDate = dateFormatter.string(from: omm)
+                        let countDate = dateString(a: omm)
                         
                         if !countRealm.contains(where: { $0.date == countDate} )
                         {
@@ -805,15 +793,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
             
             
             //If current Habit + 1 week == today's date...
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy/MM/dd"
             var dateComponent = DateComponents()
             dateComponent.year = 1
             let futureYear = Calendar.current.date(byAdding: dateComponent, to: yearlyHabit.date)
             
             guard let yearlyDate = futureYear else { return }
-            let habitYearAwayString = dateFormatter.string(from: yearlyDate)
-            let todayString = dateFormatter.string(from: Date())
+
+            let habitYearAwayString = dateString(a: yearlyDate)
+            let todayString = dateString(a: Date())
             
             
             //Then execute
@@ -858,6 +845,14 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     
+    func dateString(a: Date) -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        
+        return dateFormatter.string(from: a)
+        
+    }
     
     
     //MARK: setting Realm Notification function
@@ -932,11 +927,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
         if let exeToday: Date = executedToday as? Date {
             
             let today = Date()
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy/MM/dd"
-            let todayString = dateFormatter.string(from: today)
-            let exeString = dateFormatter.string(from: exeToday)
+         
+            let todayString = dateString(a: today)
+            let exeString = dateString(a: exeToday)
             
             if todayString != exeString {
                 //          if today > exeToday {
@@ -969,11 +962,9 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     
     func updateProgressBar() {
         
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
+        
         let countRealm = self.localRealm.objects(RMO_Count.self)
         
         //MARK: today's piechart에 들어가는 count들을 넣어주는 코드
@@ -1010,10 +1001,8 @@ extension MainVC: UITableViewDelegate, UITableViewDataSource {
     //MARK: SWIPE action
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/MM/dd"
         let today = Date()
-        let todayDate = dateFormatter.string(from: today)
+        let todayDate = dateString(a: today)
         let countRealm = self.localRealm.objects(RMO_Count.self)
         let realm = self.localRealm.objects(RMO_Habit.self)
         let rateRealm = self.localRealm.objects(RMO_Rate.self)
