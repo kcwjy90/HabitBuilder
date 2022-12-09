@@ -18,9 +18,7 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 ### Who can use HabitBuilder?
 ###### HabitBuilder is for _Everyone_
 + :man: Dad 
-<br>
 + :woman: Mom
-<br>
 + :older_man: Grandparent
 <br>
 + :girl: Daughter
