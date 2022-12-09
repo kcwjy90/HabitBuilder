@@ -1,5 +1,7 @@
-
+<p align="center">
 <a href="https://itunes.apple.com/app/githawk-for-github/id1252320249"><img src="HabitBuilder/HabitBuilder/Assets.xcassets/HB Logo.imageset/thumbnail_제목_없는_아트워크 (1).png" /></a>
+</p>
+
 # HabiltBuilder 
 
 ## _Build better Habits and Improve your Life_
