@@ -17,11 +17,10 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 
 |         | Features  |
 ----------|-----------------
-:zero: | _Inbox Zero_ your notifications
-:pencil: | Comment even faster than on GitHub desktop
-:thumbsup: | The only app with emoji reactions!
-:zap: | Native markdown rendering
-:octocat: | 100% free and open source
+:pencil: | Give your Habit _Title and Description_ 
+:alarm_clock: | Designate _Time and Frequency_
+:thumbsup: | Mark your _Success Rate_  
+:chart_with_upwards_trend: | Monitor your _Progress_ and build better Habit
 
 ### Who can use HabitBuilder?
 ###### HabitBuilder is for _Everyone_
