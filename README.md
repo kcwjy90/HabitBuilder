@@ -6,6 +6,7 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 
 ## Provided Features
 <br>
+
 |         | Features  |
 ----------|-----------------
 :pencil: | Give your Habit _Title and Description_ 
