@@ -1,5 +1,6 @@
 
 # HabiltBuilder 
+<a href="https://itunes.apple.com/app/githawk-for-github/id1252320249"><img src="HabitBuilder/HabitBuilder/Assets.xcassets/HB Logo.imageset/thumbnail_제목_없는_아트워크 (1)@2x.png" /></a>
 
 ## _Build better Habits and Improve your Life_
 :calendar: HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits :white_check_mark:
