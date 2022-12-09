@@ -5,7 +5,8 @@
 
 ## _Build better Habits and Improve your Life_
 <img src="HabitBuilder/HabitBuilder/Assets.xcassets/AppIcon.appiconset/20.png" /></a>
-HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits :white_check_mark:
+HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits 
+<img src="HabitBuilder/HabitBuilder/Assets.xcassets/AppIcon.appiconset/20.png" /></a>
 <br>
 <br>
 
@@ -15,7 +16,7 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 ----------|-----------------
 :pencil: | Give your Habit _Title and Description_ 
 :alarm_clock: | Designate _Time and Frequency_
-:thumbsup: | Mark your _Success Rate_  
+:white_check_mark: | Mark your _Success Rate_  
 :chart_with_upwards_trend: | Monitor your _Progress_ and build better Habit
 
 <br>
