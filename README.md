@@ -17,11 +17,11 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 
 ### Who can use HabitBuilder?
 ###### HabitBuilder is for _Everyone_
-+:man: Dad
-+:woman: Mom
-+:older_man: Grandparent
-+:girl: Daughter
-+:smile_cat: Even your cat!
++ :man: Dad
++ :woman: Mom
++ :older_man: Grandparent
++ :girl: Daughter
++ :smile_cat: Even your cat!
 
 <br>
 <h3 align="center">••• Contact •••</h3>
