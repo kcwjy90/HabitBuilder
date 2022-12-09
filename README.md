@@ -5,7 +5,7 @@
 
 ## _Build better Habits and Improve your Life_
 <img src="HabitBuilder/HabitBuilder/Assets.xcassets/AppIcon.appiconset/20.png" /></a>
-HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits 
+HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better Habits 
 <img src="HabitBuilder/HabitBuilder/Assets.xcassets/AppIcon.appiconset/20.png" /></a>
 <br>
 <br>
