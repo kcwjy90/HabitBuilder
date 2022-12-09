@@ -7,8 +7,8 @@
 HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits 
 <br>
 
-### Provided Features
-###### What can you _do_ with HabitBuilder?
+## Provided Features
+#### What can you _do_ with HabitBuilder?
 <br>
 
 |         | Features  |
@@ -18,8 +18,8 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 :thumbsup: | Mark your _Success Rate_  
 :chart_with_upwards_trend: | Monitor your _Progress_ and build better Habit
 
-### Who can use HabitBuilder?
-###### HabitBuilder is for _Everyone_
+## Who can use HabitBuilder?
+#### HabitBuilder is for _Everyone_
 <br>
 
 + :man: Dad 
