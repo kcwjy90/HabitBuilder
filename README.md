@@ -1,5 +1,7 @@
 
-# HabiltBuilder ### _Build better Habits and Improve your Life_
+# HabiltBuilder 
+
+## _Build better Habits and Improve your Life_
 HabitBuilder is a user-friendly mobile to-to app that tracks your progress to help you build better habits 
 <br>
 <br>
@@ -23,8 +25,6 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 + :older_man: Grandparent
 + :girl: Daughter
 + :smile_cat: Even your cat!
-
-<br>
 
 <h3 align="center">••• Contact •••</h3>
 <p align="center">
