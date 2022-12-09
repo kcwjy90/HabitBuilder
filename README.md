@@ -14,6 +14,7 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 :thumbsup: | Mark your _Success Rate_  
 :chart_with_upwards_trend: | Monitor your _Progress_ and build better Habit
 
+<br>
 
 ## HabitBuilder is for _Everyone_
 <br>
