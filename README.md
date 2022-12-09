@@ -19,7 +19,7 @@ HabitBuilder is a user-friendly mobile to-to app that tracks your progress to he
 <br>
 
 ## HabitBuilder is for _Everyone_
-<br>
+
 + :man: Dad 
 + :woman: Mom
 + :older_man: Grandparent
